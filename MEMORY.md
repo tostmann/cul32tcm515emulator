@@ -36,7 +36,7 @@ Die **Hardware-Schwäche (falsches 433-MHz-Matching-Netzwerk) ist als definitive
 9.  **Task Management (Final)**: Stack des USB-Empfangstasks auf **8192 Bytes** erhöht.
 10. **Test-Schnittstellen (Final, Software-in-the-Loop)**:
     *   **Loopback-Modus**: Aktivierbar via `COMMON_COMMAND` (Opcode `0x7E`). Sendet TX-Pakete direkt an den Host zurück. **VALIDIERT**.
-    *   **Puls-Injektion**: Schnittstelle via `COMMON_COMMAND` (Opcode `0x7F`), um virtuelle RMT-Pulse in den Decoder einzuspeisen. **IMPLEMENTIERT & VERIFIZIERT** (Mechanismus funktioniert, Decoder-Logik noch fehlerhaft).
+    *   **Puls-Injektion**: Schnittstelle via `COMMON_COMMAND` (Opcode `0x7F`), um virtuelle RMT-Pulse in den Decoder einzuspeisen. **IMPLEMENTIERT & MECHANISMUS VERIFIZIERT** (Decoder-Logik noch fehlerhaft).
 
 ### Abgeschlossene Aufgaben (Development Log)
 *   **DONE**: **GitHub-Repository erstellt und konfiguriert**: Projekt auf GitHub (`cul32tcm515emulator`) initialisiert, inkl. projektspezifischem Deploy-Key, `README.md` und `.gitignore`.
