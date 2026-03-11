@@ -112,6 +112,10 @@ static void handle_complete_telegram(const uint8_t *data, uint16_t length) {
                     dev.rlc = rlc_rx;
                     enocean_nvs_save_device(&dev);
                     
+                    // Diag: send cleartext byte
+                    uint8_t diag[2] = { 0xCC, payload[0] };
+                    esp3_send_packet(0x35, diag, 2, NULL, 0);
+
                     uint8_t *dec_data = malloc(length);
                     if (dec_data) {
                         memcpy(dec_data, data, length);
