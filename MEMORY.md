@@ -6,16 +6,16 @@ Entwicklung einer Firmware für den ESP32-C6, die ein EnOcean TCM515 (ESP3-Proto
 ### Aktueller Stand
 Die Kernfunktionalität ist vollständig implementiert und getestet. Die Firmware kann ESP3-Pakete (Typ 1, RADIO_ERP1) über die native USB-Schnittstelle empfangen, eine "Listen-Before-Talk"-Prüfung durchführen, das EnOcean-Telegramm als 3 Sub-Telegramme über den CC1101 aussenden und eingehende Host-Telegramme mit einer ESP3-Erfolgsmeldung (Typ 2, RET_OK) quittieren.
 
-Der Empfang von EnOcean-Telegrammen ist ebenfalls implementiert und setzt auf eine robuste Software-Dekodierung, um Jitter-anfällige Sensoren (z.B. PTM-Schalter) zuverlässig zu empfangen.
+Der Empfang von EnOcean-Telegrammen ist ebenfalls implementiert und setzt auf eine robuste Software-Dekodierung, um Jitter-anfällige Sensoren (z.B. PTM-Schalter) zuverlässig zu empfangen. Eingehende EnOcean-Telegramme werden korrekt dekodiert und als ESP3-Pakete an den Host gesendet.
 
-Ein Python-Testskript hat die Sende-Funktionalität erfolgreich validiert.
+Ein Python-Testskript hat die Sende- und Empfangs-Funktionalität erfolgreich validiert.
 
 ### Architektur-Entscheidungen
 
 1.  **Framework**: ESP-IDF mit PlatformIO für robustes Build-Management und Komponenten-Handling.
 2.  **Kommunikations-Schnittstelle**: Der native USB-JTAG-Controller des ESP32-C6 wird für den ESP3-Datenstrom verwendet. System-Logs werden zur Laufzeit auf diesem Port deaktiviert, um einen sauberen Binär-Datenstrom zu gewährleisten.
 3.  **Protokoll-Handling**: Eine dedizierte State-Machine (`esp3_proto.c`) parst den eingehenden ESP3-Stream byte-weise. Dies ist speichereffizient und fehlertolerant.
-4.  **Radio Abstraction**: Eine Hardware Abstraction Layer (`radio_hal.c`) kapselt die gesamte SPI-Kommunikation und Konfiguration des CC1101.
+4.  **Radio Abstraction**: Eine Hardware Abstraction Layer (`radio_hal.c`) kapselt die gesamte SPI-Kommunikation und Konfiguration des CC1101 sowie die RMT-basierte Empfangslogik.
 5.  **Sendestrategie (Implementiert)**:
     *   **Modus**: CC1101 im FIFO-Paketmodus mit Hardware-Manchester-Codierung.
     *   **Listen-Before-Talk (LBT)**: Vor dem Senden wird der RSSI-Wert des CC1101 ausgelesen, um Kollisionen zu vermeiden.
@@ -40,4 +40,5 @@ Ein Python-Testskript hat die Sende-Funktionalität erfolgreich validiert.
 *   **DONE**: RMT-Receiver zur Erfassung des demodulierten Signals implementiert.
 *   **DONE**: Carrier-Sense-Logik (GDO2) zur CPU-Entlastung des RMT-Tasks implementiert.
 *   **DONE**: Jitter-toleranten Manchester-Software-Decoder ("Half-Bit-Extractor") implementiert.
+*   **DONE**: Anwendungslogik zur Weiterleitung empfangener EnOcean-Pakete an den Host über das ESP3-Protokoll implementiert.
 *   **DONE**: Kompilierte Binärdateien (`factory.bin`) und ein `manifest.json` für die Veröffentlichung bereitgestellt.
