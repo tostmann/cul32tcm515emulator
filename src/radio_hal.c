@@ -10,9 +10,11 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
+#include "esp_heap_caps.h"
 
 static const char *TAG = "RADIO_HAL";
 static spi_device_handle_t spi_handle;
+static SemaphoreHandle_t spi_mutex = NULL;
 SemaphoreHandle_t rf_rx_semaphore = NULL;
 volatile bool is_transmitting = false;
 

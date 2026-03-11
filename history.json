@@ -419,5 +419,189 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "$HOME/.platformio/penv/bin/pio run -t upload --upload-port /dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:90:B0-if00"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n\n... [OUTPUT TRUNCATED. Total size: 7381 bytes. Showing last 1500 bytes. Full output saved in 'last_execution.log'. Use 'grep' or 'read_file last_execution.log' to analyze!]\nWrote 3072 bytes (103 compressed) at 0x00008000 in 0.0 seconds (904.6 kbit/s).\nHash of data verified.\nCompressed 171888 bytes to 91581...\n\nWriting at 0x00010000 [\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]   0.0% 0/91581 bytes... \n\nWriting at 0x00019a38 [\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  17.9% 16384/91581 bytes... \n\nWriting at 0x00020e96 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  35.8% 32768/91581 bytes... \n\nWriting at 0x00027966 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  53.7% 49152/91581 bytes... \n\nWriting at 0x0002e219 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  71.6% 65536/91581 bytes... \n\nWriting at 0x000354fc [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591]  89.5% 81920/91581 bytes... \n\nWriting at 0x00039f70 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588] 100.0% 91581/91581 bytes... \nWrote 171888 bytes (91581 compressed) at 0x00010000 in 1.0 seconds (1393.3 kbit/s).\nHash of data verified.\n\nHard resetting via RTS pin...\n========================= [SUCCESS] Took 19.85 seconds =========================\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "python3 diff_test_enocean.py > test_results_3.log 2>&1 & sleep 15; kill $!"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 1\nOutput:\n/bin/sh: 1: kill: No such process\n\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "cat test_results_3.log"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n\n... [OUTPUT TRUNCATED. Total size: 21466 bytes. Showing last 6000 bytes. Full output saved in 'last_execution.log'. Use 'grep' or 'read_file last_execution.log' to analyze!]\n[EMULATOR] Received: 4553502d524f4d3a657370333263362d32303232303931390d0a4275696c643a53657020313920323032320d0a7273743a307863202853575f435055292c626f6f743a3078316320285350495f464153545f464c4153485f424f4f54290d0a53617665642050433a307834303031393735610d0a53504957503a307865650d0a6d6f64653a44494f2c20636c6f636b206469763a320d0a6c6f61643a307834303837353733302c6c656e3a30783562300d0a6c6f61643a307834303836623931302c6c656e3a30786261380d0a6c6f61643a307834303836653631302c6c656e3a3078323735340d0a656e74727920307834303836623931300d0a\n[EMULATOR] Received: 4553502d524f4d3a657370333263362d32303232303931390d0a4275696c643a53657020313920323032320d0a7273743a307863202853575f435055292c626f6f743a3078316320285350495f464153545f464c4153485f424f4f54290d0a53617665642050433a307834303031393735610d0a53504957503a307865650d0a6d6f64653a44494f2c20636c6f636b206469763a320d0a6c6f61643a307834303837353733302c6c656e3a30783562300d0a6c6f61643a307834303836623931302c6c656e3a30786261380d0a6c6f61643a307834303836653631302c6c656e3a3078323735340d0a656e74727920307834303836623931300d0a\n[EMULATOR] Received: 4553502d524f4d3a657370333263362d32303232303931390d0a4275696c643a53657020313920323032320d0a7273743a307863202853575f435055292c626f6f743a3078316320285350495f464153545f464c4153485f424f4f54290d0a53617665642050433a307834303031393735610d0a53504957503a307865650d0a6d6f64653a44494f2c20636c6f636b206469763a320d0a6c6f61643a307834303837353733302c6c656e3a30783562300d0a6c6f61643a307834303836623931302c6c656e3a30786261380d0a6c6f61643a307834303836653631302c6c656e3a3078323735340d0a656e74727920307834303836623931300d0a\n[EMULATOR] Received: 4553502d524f4d3a657370333263362d32303232303931390d0a4275696c643a53657020313920323032320d0a7273743a307863202853575f435055292c626f6f743a3078316320285350495f464153545f464c4153485f424f4f54290d0a53617665642050433a307834303031393735610d0a53504957503a307865650d0a6d6f64653a44494f2c20636c6f636b206469763a320d0a6c6f61643a307834303837353733302c6c656e3a30783562300d0a6c6f61643a307834303836623931302c6c656e3a30786261380d0a6c6f61643a307834303836653631302c6c656e3a3078323735340d0a656e74727920307834303836623931300d0a\n[EMULATOR] Received: 4553502d524f4d3a657370333263362d32303232303931390d0a4275696c643a53657020313920323032320d0a7273743a307863202853575f435055292c626f6f743a3078316320285350495f464153545f464c4153485f424f4f54290d0a53617665642050433a307834303031393735610d0a53504957503a307865650d0a6d6f64653a44494f2c20636c6f636b206469763a320d0a6c6f61643a307834303837353733302c6c656e3a30783562300d0a6c6f61643a307834303836623931302c6c656e3a30786261380d0a6c6f61643a307834303836653631302c6c656e3a3078323735340d0a\n[EMULATOR] Received: 656e74727920307834303836623931300d0a\n[EMULATOR] Received: 4553502d524f4d3a657370333263362d32303232303931390d0a4275696c643a53657020313920323032320d0a7273743a307863202853575f435055292c626f6f743a3078316320285350495f464153545f464c4153485f424f4f54290d0a53617665642050433a307834303031393735610d0a53504957503a307865650d0a6d6f64653a44494f2c20636c6f636b206469763a320d0a6c6f61643a307834303837353733302c6c656e3a30783562300d0a6c6f61643a307834303836623931302c6c656e3a30786261380d0a6c6f61643a307834303836653631302c6c656e3a3078323735340d0a656e74727920307834303836623931300d0a\n[EMULATOR] Received: 4553502d524f4d3a657370333263362d32303232303931390d0a4275696c643a53657020313920323032320d0a7273743a307863202853575f435055292c626f6f743a3078316320285350495f464153545f464c4153485f424f4f54290d0a53617665642050433a307834303031393735610d0a53504957503a307865650d0a6d6f64653a44494f2c20636c6f636b206469763a320d0a6c6f61643a307834303837353733302c6c656e3a30783562300d0a6c6f61643a307834303836623931302c6c656e3a30786261380d0a6c6f61643a307834303836653631302c6c656e3a3078323735340d0a656e74727920307834303836623931300d0a\n[EMULATOR] Received: 4553502d524f4d3a657370333263362d32303232303931390d0a4275696c643a53657020313920323032320d0a7273743a307863202853575f435055292c626f6f743a3078316320285350495f464153545f464c4153485f424f4f54290d0a53617665642050433a307834303031393735610d0a53504957503a307865650d0a6d6f64653a44494f2c20636c6f636b206469763a320d0a6c6f61643a307834303837353733302c6c656e3a30783562300d0a6c6f61643a307834303836623931302c6c656e3a30786261380d0a6c6f61643a307834303836653631302c6c656e3a3078323735340d0a656e74727920307834303836623931300d0a\n[EMULATOR] Received: 4553502d524f4d3a657370333263362d32303232303931390d0a4275696c643a53657020313920323032320d0a7273743a307863202853575f435055292c626f6f743a3078316320285350495f464153545f464c4153485f424f4f54290d0a53617665642050433a307834303031393735610d0a53504957503a307865650d0a6d6f64653a44494f2c20636c6f636b206469763a320d0a6c6f61643a307834303837353733302c6c656e3a30783562300d0a6c6f61643a307834303836623931302c6c656e3a30786261380d0a6c6f61643a307834303836653631302c6c656e3a3078323735340d0a656e74727920307834303836623931300d0a\n[EMULATOR] Received: 4553502d524f4d3a657370333263362d32303232303931390d0a\n[EMULATOR] Received: 4275696c643a53657020313920323032320d0a7273743a307863202853575f435055292c626f6f743a3078316320285350495f464153545f464c4153485f424f4f54290d0a53617665642050433a307834303031393735610d0a53504957503a307865650d0a6d6f64653a44494f2c20636c6f636b206469763a320d0a6c6f61643a307834303837353733302c6c656e3a30783562300d0a6c6f61643a307834303836623931302c6c656e3a30786261380d0a6c6f61643a307834303836653631302c6c656e3a3078323735340d0a656e74727920307834303836623931300d0a\n[EMULATOR] Received: 4553502d524f4d3a657370333263362d32303232303931390d0a4275696c643a53657020313920323032320d0a7273743a307863202853575f435055292c626f6f743a3078316320285350495f464153545f464c4153485f424f4f54290d0a53617665642050433a307834303031393735610d0a53504957503a307865650d0a6d6f64653a44494f2c20636c6f636b206469763a320d0a6c6f61643a307834303837353733302c6c656e3a30783562300d0a6c6f61643a307834303836623931302c6c656e3a30786261380d0a6c6f61643a307834303836653631302c6c656e3a3078323735340d0a656e74727920307834303836623931300d0a\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "read_file",
+          "args": {
+            "path": "sdkconfig.defaults"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "read_file",
+          "response": {
+            "result": "CONFIG_ESP_CONSOLE_NONE=y\nCONFIG_ESP_CONSOLE_SECONDARY_NONE=y\nCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=n\nCONFIG_ESP_CONSOLE_UART_DEFAULT=n\nCONFIG_ESP_CONSOLE_UART=n\nCONFIG_BOOTLOADER_LOG_LEVEL_NONE=y\nCONFIG_LOG_DEFAULT_LEVEL_NONE=y\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "read_file",
+          "args": {
+            "path": "src/radio_hal.c"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "read_file",
+          "response": {
+            "result": "#include \"radio_hal.h\"\n#include \"cc1101_regs.h\"\n#include \"esp3_proto.h\"\n#include \"driver/spi_master.h\"\n#include \"driver/gpio.h\"\n#include \"driver/rmt_rx.h\"\n#include \"esp_log.h\"\n#include \"esp_random.h\"\n#include \"esp_rom_sys.h\"\n#include \"freertos/FreeRTOS.h\"\n#include \"freertos/task.h\"\n#include \"freertos/semphr.h\"\n\nstatic const char *TAG = \"RADIO_HAL\";\nstatic spi_device_handle_t spi_handle;\nSemaphoreHandle_t rf_rx_semaphore = NULL;\nvolatile bool is_transmitting = false;\n\n// RMT Configuration\n#define RMT_RESOLUTION_HZ   1000000 // 1 MHz -> 1 \u00b5s\n#define MAX_RMT_SYMBOLS     1024\n#define THRESHOLD_SHORT_MIN 3   // 3.0 \u00b5s\n#define THRESHOLD_SHORT_MAX 5   // 5.0 \u00b5s\n#define THRESHOLD_LONG_MIN  6   // 6.0 \u00b5s\n#define THRESHOLD_LONG_MAX  10  // 10.0 \u00b5s\n\nstatic rmt_channel_handle_t rx_channel = NULL;\nstatic TaskHandle_t rf_task_handle = NULL;\nstatic SemaphoreHandle_t rmt_done_sem = NULL;\nstatic rmt_symbol_word_t *rmt_rx_buffer = NULL;\nstatic SemaphoreHandle_t carrier_sense_sem = NULL;\n\n// ISR / Callbacks\nstatic bool IRAM_ATTR rmt_rx_done_callback(rmt_channel_handle_t channel, const rmt_rx_done_event_data_t *edata, void *user_ctx) {\n    BaseType_t high_task_wakeup = pdFALSE;\n    xSemaphoreGiveFromISR(rmt_done_sem, &high_task_wakeup);\n    return high_task_wakeup == pdTRUE;\n}\n\nstatic void IRAM_ATTR gdo2_cs_isr_handler(void* arg) {\n    BaseType_t high_task_wakeup = pdFALSE;\n    xSemaphoreGiveFromISR(carrier_sense_sem, &high_task_wakeup);\n    if (high_task_wakeup) portYIELD_FROM_ISR();\n}\n\n// SPI Implementation\nstatic void spi_init(void) {\n    spi_bus_config_t buscfg = {\n        .miso_io_num = PIN_MISO,\n        .mosi_io_num = PIN_MOSI,\n        .sclk_io_num = PIN_SCK,\n        .quadwp_io_num = -1,\n        .quadhd_io_num = -1,\n        .max_transfer_sz = 64\n    };\n    spi_device_interface_config_t devcfg = {\n        .clock_speed_hz = 5000000,\n        .mode = 0,\n        .spics_io_num = PIN_SS,\n        .queue_size = 3,\n        .flags = 0\n    };\n    ESP_ERROR_CHECK(spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_DISABLED));\n    ESP_ERROR_CHECK(spi_bus_add_device(SPI2_HOST, &devcfg, &spi_handle));\n}\n\nvoid cc1101_strobe(uint8_t cmd) {\n    spi_transaction_t t = { .length = 8, .tx_data = {cmd}, .flags = SPI_TRANS_USE_TXDATA };\n    spi_device_polling_transmit(spi_handle, &t);\n}\n\nvoid cc1101_write_reg(uint8_t addr, uint8_t value) {\n    uint8_t tx_data[2] = { addr, value };\n    spi_transaction_t t = { .length = 16, .tx_buffer = tx_data };\n    spi_device_polling_transmit(spi_handle, &t);\n}\n\nuint8_t cc1101_read_reg(uint8_t addr) {\n    uint8_t tx_data[2] = { (uint8_t)(addr | 0x80), 0x00 };\n    uint8_t rx_data[2] = { 0 };\n    spi_transaction_t t = { .length = 16, .tx_buffer = tx_data, .rx_buffer = rx_data };\n    spi_device_polling_transmit(spi_handle, &t);\n    return rx_data[1];\n}\n\nuint8_t cc1101_read_status(uint8_t addr) {\n    uint8_t tx_data[2] = { (uint8_t)(addr | 0xC0), 0x00 };\n    uint8_t rx_data[2] = { 0 };\n    spi_transaction_t t = { .length = 16, .tx_buffer = tx_data, .rx_buffer = rx_data };\n    spi_device_polling_transmit(spi_handle, &t);\n    return rx_data[1];\n}\n\nvoid cc1101_write_burst(uint8_t addr, const uint8_t *data, uint8_t len) {\n    uint8_t header = addr | 0x40;\n    spi_transaction_t t = { .length = 8, .tx_data = {header}, .flags = SPI_TRANS_USE_TXDATA };\n    spi_device_polling_transmit(spi_handle, &t);\n    spi_transaction_t t_data = { .length = len * 8, .tx_buffer = data };\n    spi_device_polling_transmit(spi_handle, &t_data);\n}\n\nvoid cc1101_read_burst(uint8_t addr, uint8_t *data, uint8_t len) {\n    uint8_t header = addr | 0xC0;\n    spi_transaction_t t = { .length = 8, .tx_data = {header}, .flags = SPI_TRANS_USE_TXDATA };\n    spi_device_polling_transmit(spi_handle, &t);\n    spi_transaction_t t_data = { .length = len * 8, .rx_buffer = data };\n    spi_device_polling_transmit(spi_handle, &t_data);\n}\n\n// Manchester Decoding\nstatic void rmt_to_manchester_decode(const rmt_symbol_word_t *symbols, size_t num_symbols) {\n    static uint8_t half_bits[MAX_RMT_SYMBOLS * 2];\n    int hb_count = 0;\n\n    for (size_t i = 0; i < num_symbols; i++) {\n        int durations[2] = {symbols[i].duration0, symbols[i].duration1};\n        int levels[2]    = {symbols[i].level0, symbols[i].level1};\n        for (int p = 0; p < 2; p++) {\n            int d = durations[p];\n            int l = levels[p];\n            if (d == 0) continue;\n            if (d < 2) continue; // Noise filter at 1MHz\n            \n            int n = (d + 2) / 4; // 4us = 4 ticks at 1MHz\n            if (n > 4) n = 4;\n            for (int k = 0; k < n && hb_count < (MAX_RMT_SYMBOLS * 2); k++) {\n                half_bits[hb_count++] = l;\n            }\n        }\n    }\n    if (hb_count < 32) return;\n\n    uint8_t payload[64];\n    int payload_len = 0;\n    bool synced = false;\n    uint8_t current_byte = 0;\n    int bit_count = 0;\n\n    int sync_idx = -1;\n    uint32_t pattern = 0;\n    for (int i = 0; i < hb_count; i++) {\n        pattern = (pattern << 1) | half_bits[i];\n        if ((pattern & 0xFFFF) == 0xCCF3) { \n            sync_idx = i + 1;\n            synced = true;\n            break;\n        }\n    }\n\n    if (synced && sync_idx != -1) {\n        for (int i = sync_idx; i < hb_count - 1; i += 2) {\n            uint8_t hb1 = half_bits[i];\n            uint8_t hb2 = half_bits[i+1];\n            int decoded_bit = -1;\n            if (hb1 == 1 && hb2 == 0) decoded_bit = 1;\n            else if (hb1 == 0 && hb2 == 1) decoded_bit = 0;\n            else { i--; continue; } \n            \n            current_byte = (current_byte << 1) | decoded_bit;\n            bit_count++;\n            if (bit_count == 8) {\n                if (payload_len < sizeof(payload)) payload[payload_len++] = current_byte;\n                bit_count = 0;\n            }\n        }\n    }\n    if (synced && payload_len > 0) {\n        uint8_t opt_data[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x40, 0x00 };\n        esp3_send_packet(ESP3_TYPE_RADIO_ERP1, payload, payload_len, opt_data, 7);\n    }\n}\n\nstatic void rf_rx_task_impl(void *pvParameters) {\n    rmt_receive_config_t rec_config = {\n        .signal_range_min_ns = 1000,\n        .signal_range_max_ns = 40000,\n    };\n    while (1) {\n        if (xSemaphoreTake(carrier_sense_sem, portMAX_DELAY) == pdTRUE) {\n            rmt_enable(rx_channel);\n            rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS, &rec_config);\n            \n            if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(30)) == pdTRUE) {\n                size_t rx_symbols_count = 0;\n                for(int i=0; i<MAX_RMT_SYMBOLS; i++) {\n                    if(rmt_rx_buffer[i].duration0 == 0) break;\n                    rx_symbols_count++;\n                }\n                if (rx_symbols_count > 10) {\n                    rmt_to_manchester_decode(rmt_rx_buffer, rx_symbols_count);\n                }\n            }\n            rmt_disable(rx_channel);\n            // Wait for carrier to clear or timeout\n            int wait_tout = 50;\n            while (gpio_get_level(PIN_GDO2) == 1 && wait_tout > 0) {\n                vTaskDelay(pdMS_TO_TICKS(1));\n                wait_tout--;\n            }\n            vTaskDelay(pdMS_TO_TICKS(2));\n            xSemaphoreTake(carrier_sense_sem, 0); // Clear any pending interrupt\n        }\n    }\n}\n\nvoid radio_rmt_rx_init(void) {\n    rmt_done_sem = xSemaphoreCreateBinary();\n    carrier_sense_sem = xSemaphoreCreateBinary();\n    \n    rmt_rx_buffer = (rmt_symbol_word_t *)heap_caps_calloc(\n        MAX_RMT_SYMBOLS, \n        sizeof(rmt_symbol_word_t), \n        MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL\n    );\n\n    rmt_rx_channel_config_t rx_chan_config = {\n        .clk_src = RMT_CLK_SRC_DEFAULT,\n        .resolution_hz = RMT_RESOLUTION_HZ,\n        .mem_block_symbols = 48, \n        .gpio_num = PIN_GDO0,\n        .flags.invert_in = false,\n        .flags.with_dma = true\n    };\n    ESP_ERROR_CHECK(rmt_new_rx_channel(&rx_chan_config, &rx_channel));\n    rmt_rx_event_callbacks_t cbs = { .on_recv_done = rmt_rx_done_callback };\n    ESP_ERROR_CHECK(rmt_rx_register_event_callbacks(rx_channel, &cbs, NULL));\n    \n    xTaskCreate(rf_rx_task_impl, \"rf_rx_task\", 4096, NULL, 5, &rf_task_handle);\n    \n    gpio_config_t io_conf = {\n        .pin_bit_mask = (1ULL << PIN_GDO2),\n        .mode = GPIO_MODE_INPUT,\n        .pull_up_en = 0,\n        .pull_down_en = 1,\n        .intr_type = GPIO_INTR_POSEDGE\n    };\n    gpio_config(&io_conf);\n    gpio_isr_handler_add(PIN_GDO2, gdo2_cs_isr_handler, NULL);\n}\n\nvoid radio_hal_init(void) {\n    spi_init();\n    gpio_config_t io_led = { .pin_bit_mask = (1ULL << PIN_LED), .mode = GPIO_MODE_OUTPUT, .pull_up_en = 1 };\n    gpio_config(&io_led);\n    gpio_set_level(PIN_LED, 1);\n    \n    cc1101_strobe(CC1101_SRES);\n    vTaskDelay(pdMS_TO_TICKS(10));\n    for (int i = 0; i < sizeof(erp1_config)/sizeof(cc1101_cfg_t); i++) {\n        cc1101_write_reg(erp1_config[i].addr, erp1_config[i].val);\n    }\n    cc1101_write_burst(0x3E, patable_ook, 2);\n    \n    gpio_install_isr_service(0);\n    radio_rmt_rx_init();\n    \n    cc1101_strobe(CC1101_SRX);\n    ESP_LOGI(TAG, \"CC1101 Initialized in Async RX Mode with RMT\");\n}\n\nstatic bool check_lbt(void) {\n    uint8_t rssi_raw = cc1101_read_status(0x34);\n    if (rssi_raw >= 75) return false;\n    return true;\n}\n\nstatic const uint8_t manchester_lut[16] = {\n    0x55, 0x56, 0x59, 0x5A, 0x65, 0x66, 0x69, 0x6A,\n    0x95, 0x96, 0x99, 0x9A, 0xA5, 0xA6, 0xA9, 0xAA\n};\n\nvoid radio_transmit(const uint8_t *data, uint8_t len) {\n    if (len > 31) return; \n    uint8_t encoded_len = len * 2;\n    uint8_t encoded_data[64];\n\n    for (uint8_t i = 0; i < len; i++) {\n        encoded_data[i * 2]     = manchester_lut[data[i] >> 4];\n        encoded_data[i * 2 + 1] = manchester_lut[data[i] & 0x0F];\n    }\n\n    is_transmitting = true;\n    gpio_intr_disable(PIN_GDO2);\n    \n    cc1101_strobe(CC1101_SIDLE);\n    \n    // Set Baudrate to 250kbps for raw chip transmission (since 125kbps Manchester = 250kbps chips)\n    cc1101_write_reg(0x10, 0x2D); // MDMCFG4: 250kbps\n    cc1101_write_reg(0x11, 0x3B); // MDMCFG3\n    \n    cc1101_write_reg(0x08, 0x00);        // PKTCTRL0: Fixed Packet Length\n    cc1101_write_reg(0x06, encoded_len); // PKTLEN\n    cc1101_write_reg(0x13, 0x22);        // MDMCFG1: 4 bytes preamble\n    cc1101_write_reg(0x04, 0xAA);        // SYNC1\n    cc1101_write_reg(0x05, 0xAD);        // SYNC0\n    cc1101_write_reg(0x12, 0x32);        // MDMCFG2: ASK/OOK, No HW Manchester, 16/16 sync\n    \n    for(int i = 0; i < 5; i++) {\n        if(check_lbt()) break;\n        vTaskDelay(pdMS_TO_TICKS(2 + (esp_random() % 5)));\n    }\n    \n    for(int sub = 0; sub < 3; sub++) {\n        cc1101_strobe(CC1101_SIDLE);\n        cc1101_strobe(CC1101_SFTX);\n        cc1101_write_burst(0x3F, encoded_data, encoded_len);\n        cc1101_strobe(CC1101_STX);\n        int timeout = 50; \n        while((cc1101_read_status(CC1101_MARCSTATE) & 0x1F) != 0x01 && timeout > 0) {\n            vTaskDelay(pdMS_TO_TICKS(1));\n            timeout--;\n        }\n        if (sub < 2) vTaskDelay(pdMS_TO_TICKS(10 + (esp_random() % 16)));\n    }\n    \n    // Restore Async RX Mode (125kbps filters)\n    cc1101_write_reg(0x10, 0x4C); // Optimized MDMCFG4 for RX\n    cc1101_write_reg(0x11, 0x3B); // Optimized MDMCFG3 for RX\n    cc1101_write_reg(0x08, 0x32); \n    cc1101_write_reg(0x12, 0x30); \n    cc1101_strobe(CC1101_SFRX);\n    cc1101_strobe(CC1101_SRX);\n    \n    gpio_intr_enable(PIN_GDO2);\n    is_transmitting = false;\n}\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "read_file",
+          "args": {
+            "path": "src/esp3_proto.c"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "read_file",
+          "response": {
+            "result": "#include \"esp3_proto.h\"\n#include \"radio_hal.h\"\n#include \"driver/usb_serial_jtag.h\"\n#include <stdlib.h>\n#include <string.h>\n\ntypedef enum {\n    STATE_SYNC, STATE_HEADER, STATE_CRC8H, STATE_DATA, STATE_CRC8D\n} esp3_state_t;\n\nstatic esp3_state_t rx_state = STATE_SYNC;\nstatic uint8_t header_buf[4];\nstatic uint8_t header_idx = 0;\nstatic uint8_t *payload_buf = NULL;\nstatic uint16_t payload_idx = 0;\nstatic esp3_packet_t current_packet;\n\n// EnOcean CRC8\nstatic uint8_t crc8_table[256];\nstatic bool crc8_table_init = false;\n\nstatic void init_crc8_table(void) {\n    for (int i = 0; i < 256; i++) {\n        uint8_t crc = i;\n        for (int j = 0; j < 8; j++) {\n            if (crc & 0x80) crc = (crc << 1) ^ 0x07;\n            else crc <<= 1;\n        }\n        crc8_table[i] = crc;\n    }\n    crc8_table_init = true;\n}\n\nstatic uint8_t calc_buffer_crc(const uint8_t *buf, uint16_t len) {\n    if (!crc8_table_init) init_crc8_table();\n    uint8_t crc = 0;\n    for (uint16_t i = 0; i < len; i++) {\n        crc = crc8_table[crc ^ buf[i]];\n    }\n    return crc;\n}\n\nvoid esp3_init(void) {\n    rx_state = STATE_SYNC;\n    if (!crc8_table_init) init_crc8_table();\n}\n\nvoid esp3_send_packet(uint8_t type, const uint8_t *data, uint16_t data_len, const uint8_t *opt, uint8_t opt_len) {\n    uint8_t header[4] = { (uint8_t)(data_len >> 8), (uint8_t)(data_len & 0xFF), opt_len, type };\n    uint8_t crc8h = calc_buffer_crc(header, 4);\n    \n    uint8_t crc8d = 0;\n    if (data_len > 0 || opt_len > 0) {\n        // Calculate CRC8 over data then opt_data\n        if (data_len > 0) {\n             for(int i=0; i<data_len; i++) crc8d = crc8_table[crc8d ^ data[i]];\n        }\n        if (opt_len > 0) {\n             for(int i=0; i<opt_len; i++) crc8d = crc8_table[crc8d ^ opt[i]];\n        }\n    }\n\n    uint8_t sync = ESP3_SYNC_BYTE;\n    usb_serial_jtag_write_bytes(&sync, 1, portMAX_DELAY);\n    usb_serial_jtag_write_bytes(header, 4, portMAX_DELAY);\n    usb_serial_jtag_write_bytes(&crc8h, 1, portMAX_DELAY);\n    if (data_len > 0) usb_serial_jtag_write_bytes(data, data_len, portMAX_DELAY);\n    if (opt_len > 0) usb_serial_jtag_write_bytes(opt, opt_len, portMAX_DELAY);\n    usb_serial_jtag_write_bytes(&crc8d, 1, portMAX_DELAY);\n}\n\nvoid esp3_send_response(uint8_t ret_code) {\n    esp3_send_packet(ESP3_TYPE_RESPONSE, &ret_code, 1, NULL, 0);\n}\n\nvoid esp3_process_byte(uint8_t byte) {\n    switch (rx_state) {\n        case STATE_SYNC:\n            if (byte == ESP3_SYNC_BYTE) {\n                header_idx = 0;\n                rx_state = STATE_HEADER;\n            }\n            break;\n        case STATE_HEADER:\n            header_buf[header_idx++] = byte;\n            if (header_idx == 4) rx_state = STATE_CRC8H;\n            break;\n        case STATE_CRC8H:\n            if (byte == calc_buffer_crc(header_buf, 4)) {\n                current_packet.data_len = (header_buf[0] << 8) | header_buf[1];\n                current_packet.opt_len = header_buf[2];\n                current_packet.packet_type = header_buf[3];\n                uint16_t total_len = current_packet.data_len + current_packet.opt_len;\n                if (total_len > 0) {\n                    payload_buf = malloc(total_len);\n                    if (!payload_buf) { rx_state = STATE_SYNC; return; }\n                    payload_idx = 0;\n                    rx_state = STATE_DATA;\n                } else {\n                    rx_state = STATE_CRC8D;\n                }\n            } else {\n                rx_state = STATE_SYNC;\n            }\n            break;\n        case STATE_DATA:\n            payload_buf[payload_idx++] = byte;\n            if (payload_idx == (current_packet.data_len + current_packet.opt_len)) {\n                rx_state = STATE_CRC8D;\n            }\n            break;\n        case STATE_CRC8D:\n            {\n                uint16_t total_len = current_packet.data_len + current_packet.opt_len;\n                uint8_t expected_crc = calc_buffer_crc(payload_buf, total_len);\n                if (byte == expected_crc) {\n                    current_packet.data = payload_buf;\n                    current_packet.opt_data = payload_buf + current_packet.data_len;\n                    if (current_packet.packet_type == ESP3_TYPE_RADIO_ERP1) {\n                        radio_transmit(current_packet.data, current_packet.data_len);\n                        esp3_send_response(RET_OK);\n                    }\n                }\n            }\n            if (payload_buf) free(payload_buf);\n            payload_buf = NULL;\n            rx_state = STATE_SYNC;\n            break;\n    }\n}\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "#include \"freertos/task.h\"\n#include \"freertos/semphr.h\"\n#include \"esp_heap_caps.h\"\n\nstatic const char *TAG = \"RADIO_HAL\";\nstatic spi_device_handle_t spi_handle;\nstatic SemaphoreHandle_t spi_mutex = NULL;\nSemaphoreHandle_t rf_rx_semaphore = NULL;\nvolatile bool is_transmitting = false;",
+            "path": "src/radio_hal.c",
+            "original_text": "#include \"freertos/task.h\"\n#include \"freertos/semphr.h\"\n\nstatic const char *TAG = \"RADIO_HAL\";\nstatic spi_device_handle_t spi_handle;\nSemaphoreHandle_t rf_rx_semaphore = NULL;\nvolatile bool is_transmitting = false;"
+          }
+        }
+      }
+    ]
   }
 ]
