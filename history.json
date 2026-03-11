@@ -1708,5 +1708,33 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "static void rmt_to_manchester_decode(const rmt_symbol_word_t *symbols, size_t num_symbols) {\n    uint32_t sync_reg = 0;\n    bool in_frame = false;\n    uint8_t payload[64]; int payload_len = 0;\n    uint8_t cur_byte = 0; int bit_cnt = 0;\n    int chip_pair = 0; uint8_t chip1 = 0;\n\n    // DEBUG: Send pulse count to host\n    uint8_t debug_count = (uint8_t)num_symbols;\n    esp3_send_packet(0x33, &debug_count, 1, NULL, 0);\n\n    for (size_t i = 0; i < num_symbols; i++) {",
+            "path": "src/radio_hal.c",
+            "original_text": "static void rmt_to_manchester_decode(const rmt_symbol_word_t *symbols, size_t num_symbols) {\n    uint32_t sync_reg = 0;\n    bool in_frame = false;\n    uint8_t payload[64]; int payload_len = 0;\n    uint8_t cur_byte = 0; int bit_cnt = 0;\n    int chip_pair = 0; uint8_t chip1 = 0;\n\n    // DEBUG: Send first 8 levels to host\n    uint8_t debug_buf[8];\n    for(int i=0; i<8 && i<num_symbols; i++) debug_buf[i] = symbols[i].level0;\n    esp3_send_packet(0x33, debug_buf, 8, NULL, 0);\n\n    for (size_t i = 0; i < num_symbols; i++) {"
+          }
+        }
+      }
+    ]
   }
 ]

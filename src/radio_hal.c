@@ -97,10 +97,9 @@ static void rmt_to_manchester_decode(const rmt_symbol_word_t *symbols, size_t nu
     uint8_t cur_byte = 0; int bit_cnt = 0;
     int chip_pair = 0; uint8_t chip1 = 0;
 
-    // DEBUG: Send first 8 levels to host
-    uint8_t debug_buf[8];
-    for(int i=0; i<8 && i<num_symbols; i++) debug_buf[i] = symbols[i].level0;
-    esp3_send_packet(0x33, debug_buf, 8, NULL, 0);
+    // DEBUG: Send pulse count to host
+    uint8_t debug_count = (uint8_t)num_symbols;
+    esp3_send_packet(0x33, &debug_count, 1, NULL, 0);
 
     for (size_t i = 0; i < num_symbols; i++) {
         uint32_t d[2] = {symbols[i].duration0, symbols[i].duration1};
