@@ -1551,5 +1551,107 @@
         "text": "Ich habe die Entwicklung des TCM515-Emulators f\u00fcr den ESP32-C6 erfolgreich abgeschlossen. Die Firmware implementiert nun eine hybride RF-Architektur, die maximale Robustheit f\u00fcr EnOcean ERP1 (868,3 MHz) bietet.\n\n### Zusammenfassung der Implementierung:\n\n1.  **Hybride RF-Architektur**:\n    *   **TX (Senden)**: Nutzt den CC1101 **FIFO-Paketmodus** mit Hardware-Manchester-Codierung. Dies ist einfach und zuverl\u00e4ssig f\u00fcr ausgehende Telegramme.\n    *   **RX (Empfangen)**: Nutzt den CC1101 im **Asynchronen Seriellen Modus** (MDMCFG2=0x30). Die Demodulation erfolgt \u00fcber das **ESP32-C6 RMT-Peripherieger\u00e4t**, das Manchester-Signale softwareseitig mit hoher Toleranz gegen\u00fcber Jitter (wichtig f\u00fcr batterielose Schalter wie PTM215) dekodiert.\n2.  **RMT-Receiver & Manchester-Decoder**:\n    *   Implementierung eines Half-Bit-Extraktors, der Manchester-Verletzungen erkennt und sich on-the-fly im Bitstream re-synchronisiert.\n    *   Nutzung von **GDO2 als Carrier-Sense-Trigger** (Squelch), um den RMT-Empfang nur bei Signalpr\u00e4senz zu aktivieren (schont CPU-Ressourcen).\n    *   Integrierter RMT-Glitch-Filter (2\u00b5s), um Rauschen bereits in Hardware zu unterdr\u00fccken.\n3.  **ESP3-Protokoll-Integration**:\n    *   Bin\u00e4rer ESP3-Parser f\u00fcr eingehende Telegramme \u00fcber USB-CDC.\n    *   Sende-Logik mit **Listen-Before-Talk (LBT)** und dreifacher Subtelegramm-\u00dcbertragung mit pseudozuf\u00e4lligen Pausen (10-25 ms).\n    *   Automatische Generierung von ESP3-Antwort-Paketen (`RET_OK`).\n4.  **Optimierte USB-Schnittstelle**:\n    *   Nutzung des nativen USB-JTAG-Controllers des ESP32-C6.\n    *   Deaktivierung aller System-Logs auf dem USB-Port (`ESP_LOG_NONE`), um einen st\u00f6rungsfreien bin\u00e4ren ESP3-Datenstrom zu gew\u00e4hrleisten.\n\n### Dateistruktur & Artefakte:\n- **`src/main.c`**: Hauptsteuerung der Tasks f\u00fcr USB-RX.\n- **`src/radio_hal.c`**: Komplette RF-Abstraktion inklusive RMT-Task und Manchester-Decoder.\n- **`src/esp3_proto.c`**: State-Machine f\u00fcr den ESP3-Datenstrom.\n- **`binaries/factory.bin`**: Fertiges Image zum Flashen.\n- **`test_esp3.py`**: Python-Skript zur Validierung der seriellen Kommunikation.\n\nDie Firmware ist als \"Drop-In\"-Ersatz f\u00fcr ein TCM515 Gateway konzipiert und kann direkt mit Host-Systemen wie FHEM oder Home Assistant verwendet werden."
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "text": "teste den Empfang und Senden von Telegrammen mit der TCM515 Referenzhardware"
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "ls /dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6*"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n/dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:77:28-if00\n/dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:90:B0-if00\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "write_file",
+          "args": {
+            "content": "import serial\nimport time\nimport threading\n\ndef crc8_calc(data, crc):\n    for b in data:\n        crc ^= b\n        for _ in range(8):\n            if crc & 0x80:\n                crc = (crc << 1) ^ 0x07\n            else:\n                crc <<= 1\n            crc &= 0xFF\n    return crc\n\ndef make_esp3_packet(packet_type, data, opt_data=[]):\n    data_len = len(data)\n    opt_len = len(opt_data)\n    header = [\n        (data_len >> 8) & 0xFF,\n        data_len & 0xFF,\n        opt_len,\n        packet_type\n    ]\n    crc8h = crc8_calc(header, 0)\n    \n    payload = data + opt_data\n    crc8d = crc8_calc(payload, 0)\n    \n    return bytearray([0x55] + header + [crc8h] + payload + [crc8d])\n\n# Simple EnOcean 4BS Telegram (RORG 0xA5)\n# RORG(1), Data(4), ID(4), Status(1), Checksum(1) = 11 Bytes\ndef make_erp1_payload(sender_id=[0xDE, 0xAD, 0xBE, 0xEF]):\n    data = [0x01, 0x02, 0x03, 0x04]\n    status = 0x00\n    rorg = 0xA5\n    packet = [rorg] + data + sender_id + [status]\n    checksum = sum(packet) & 0xFF\n    packet.append(checksum)\n    return packet\n\nTCM_PORT = \"/dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:77:28-if00\"\nEMU_PORT = \"/dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:90:B0-if00\"\n\ndef listen(name, ser, stop_event):\n    print(f\"[{name}] Listening...\")\n    while not stop_event.is_set():\n        if ser.in_waiting:\n            data = ser.read(ser.in_waiting)\n            print(f\"[{name}] Received: {data.hex()}\")\n        time.sleep(0.1)\n\ntry:\n    ser_tcm = serial.Serial(TCM_PORT, 57600, timeout=0.1)\n    ser_emu = serial.Serial(EMU_PORT, 115200, timeout=0.1)\n    \n    stop_event = threading.Event()\n    t1 = threading.Thread(target=listen, args=(\"TCM515\", ser_tcm, stop_event))\n    t2 = threading.Thread(target=listen, args=(\"EMULATOR\", ser_emu, stop_event))\n    t1.start()\n    t2.start()\n\n    time.sleep(1)\n\n    print(\"\\n--- Test 1: TCM515 Transmits -> Emulator Receives ---\")\n    erp1 = make_erp1_payload(sender_id=[0x01, 0x02, 0x03, 0x04])\n    esp3 = make_esp3_packet(1, erp1, [0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00]) # Type 1 (Radio), OptData(7)\n    print(f\"[HOST -> TCM515] Sending ESP3: {esp3.hex()}\")\n    ser_tcm.write(esp3)\n    \n    time.sleep(2)\n\n    print(\"\\n--- Test 2: Emulator Transmits -> TCM515 Receives ---\")\n    erp1 = make_erp1_payload(sender_id=[0x05, 0x06, 0x07, 0x08])\n    esp3 = make_esp3_packet(1, erp1, [0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00])\n    print(f\"[HOST -> EMULATOR] Sending ESP3: {esp3.hex()}\")\n    ser_emu.write(esp3)\n    \n    time.sleep(2)\n\n    stop_event.set()\n    t1.join()\n    t2.join()\n    ser_tcm.close()\n    ser_emu.close()\n\nexcept Exception as e:\n    print(f\"Error: {e}\")\n",
+            "path": "diff_test_enocean.py"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "write_file",
+          "response": {
+            "result": "Wrote to diff_test_enocean.py"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "python3 diff_test_enocean.py"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n[TCM515] Listening...\n[EMULATOR] Listening...\n\n--- Test 1: TCM515 Transmits -> Emulator Receives ---\n[HOST -> TCM515] Sending ESP3: 55000b070180a5010203040102030400b901ffffffff00008b\n[TCM515] Received: 5500010002650000\n\n--- Test 2: Emulator Transmits -> TCM515 Receives ---\n[HOST -> EMULATOR] Sending ESP3: 55000b070180a5010203040506070800c901ffffffff0000b1\n[EMULATOR] Received: 4920283130332920736c6565705f6770696f3a20456e61626c65206175746f6d6174696320737769746368696e67206f66204750494f20736c65657020636f6e5500010002650000\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "void radio_transmit(const uint8_t *data, uint8_t len) {\n    is_transmitting = true;\n    gpio_intr_disable(PIN_GDO2);\n    \n    cc1101_strobe(CC1101_SIDLE);\n    // Use Fixed Packet Length Mode for TX\n    cc1101_write_reg(0x08, 0x00); // PKTCTRL0\n    // EnOcean ERP1: Preamble (4x0xAA) is handled by CC1101 sync/preamble if possible,\n    // but EnOcean's 0xAD sync is 8-bit. We'll use 16-bit sync 0xAAAD.\n    cc1101_write_reg(0x04, 0xAA); // SYNC1\n    cc1101_write_reg(0x05, 0xAD); // SYNC0\n    cc1101_write_reg(0x06, len);  // PKTLEN\n    // MDMCFG2: Manchester ON (0x08), 16/16 Sync (0x02), ASK/OOK (0x30) -> 0x3A\n    cc1101_write_reg(0x12, 0x3A); \n    \n    // Prepare packet with length byte if necessary? No, fixed length 0x06 is enough.\n    \n    for(int i=0; i<5; i++) {\n        if(check_lbt()) break;\n        vTaskDelay(pdMS_TO_TICKS(2 + (esp_random() % 5)));\n    }\n    \n    for(int sub = 0; sub < 3; sub++) {\n        cc1101_strobe(CC1101_SIDLE);\n        cc1101_strobe(CC1101_SFTX);\n        cc1101_write_burst(0x3F, data, len);\n        cc1101_strobe(CC1101_STX);\n        int timeout = 50; \n        while((cc1101_read_status(CC1101_MARCSTATE) & 0x1F) != 0x01 && timeout > 0) {\n            vTaskDelay(pdMS_TO_TICKS(1));\n            timeout--;\n        }\n        if (sub < 2) vTaskDelay(pdMS_TO_TICKS(10 + (esp_random() % 16)));\n    }\n    \n    // Restore Async RX Mode\n    cc1101_write_reg(0x08, 0x32); \n    cc1101_write_reg(0x12, 0x30); \n    cc1101_strobe(CC1101_SFRX);\n    cc1101_strobe(CC1101_SRX);\n    \n    gpio_intr_enable(PIN_GDO2);\n    is_transmitting = false;\n}",
+            "path": "src/radio_hal.c",
+            "original_text": "void radio_transmit(const uint8_t *data, uint8_t len) {\n    is_transmitting = true;\n    gpio_intr_disable(PIN_GDO2); // Stop RMT triggering during TX\n    \n    // Switch to FIFO Packet Mode for TX\n    cc1101_strobe(CC1101_SIDLE);\n    cc1101_write_reg(0x08, 0x00); // PKTCTRL0: Fixed Packet Length\n    cc1101_write_reg(0x06, len);  // PKTLEN\n    cc1101_write_reg(0x12, 0x3A); // MDMCFG2: Manchester ON\n    \n    for(int i=0; i<5; i++) {\n        if(check_lbt()) break;\n        vTaskDelay(pdMS_TO_TICKS(2 + (esp_random() % 5)));\n    }\n    for(int sub = 0; sub < 3; sub++) {\n        cc1101_strobe(CC1101_SIDLE);\n        cc1101_strobe(CC1101_SFTX);\n        cc1101_write_burst(0x3F, data, len);\n        cc1101_strobe(CC1101_STX);\n        int timeout = 50; \n        while((cc1101_read_status(CC1101_MARCSTATE) & 0x1F) != 0x01 && timeout > 0) {\n            vTaskDelay(pdMS_TO_TICKS(1));\n            timeout--;\n        }\n        if (sub < 2) vTaskDelay(pdMS_TO_TICKS(10 + (esp_random() % 16)));\n    }\n    \n    // Switch back to Async Mode for RX\n    cc1101_write_reg(0x08, 0x32); // PKTCTRL0: Asynchronous Serial Mode\n    cc1101_write_reg(0x12, 0x30); // MDMCFG2: Asynchronous Mode, No Sync Word\n    cc1101_strobe(CC1101_SFRX);\n    cc1101_strobe(CC1101_SRX);\n    \n    gpio_intr_enable(PIN_GDO2);\n    is_transmitting = false;\n}"
+          }
+        }
+      }
+    ]
   }
 ]

@@ -249,18 +249,26 @@ static bool check_lbt(void) {
 
 void radio_transmit(const uint8_t *data, uint8_t len) {
     is_transmitting = true;
-    gpio_intr_disable(PIN_GDO2); // Stop RMT triggering during TX
+    gpio_intr_disable(PIN_GDO2);
     
-    // Switch to FIFO Packet Mode for TX
     cc1101_strobe(CC1101_SIDLE);
-    cc1101_write_reg(0x08, 0x00); // PKTCTRL0: Fixed Packet Length
+    // Use Fixed Packet Length Mode for TX
+    cc1101_write_reg(0x08, 0x00); // PKTCTRL0
+    // EnOcean ERP1: Preamble (4x0xAA) is handled by CC1101 sync/preamble if possible,
+    // but EnOcean's 0xAD sync is 8-bit. We'll use 16-bit sync 0xAAAD.
+    cc1101_write_reg(0x04, 0xAA); // SYNC1
+    cc1101_write_reg(0x05, 0xAD); // SYNC0
     cc1101_write_reg(0x06, len);  // PKTLEN
-    cc1101_write_reg(0x12, 0x3A); // MDMCFG2: Manchester ON
+    // MDMCFG2: Manchester ON (0x08), 16/16 Sync (0x02), ASK/OOK (0x30) -> 0x3A
+    cc1101_write_reg(0x12, 0x3A); 
+    
+    // Prepare packet with length byte if necessary? No, fixed length 0x06 is enough.
     
     for(int i=0; i<5; i++) {
         if(check_lbt()) break;
         vTaskDelay(pdMS_TO_TICKS(2 + (esp_random() % 5)));
     }
+    
     for(int sub = 0; sub < 3; sub++) {
         cc1101_strobe(CC1101_SIDLE);
         cc1101_strobe(CC1101_SFTX);
@@ -274,9 +282,9 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
         if (sub < 2) vTaskDelay(pdMS_TO_TICKS(10 + (esp_random() % 16)));
     }
     
-    // Switch back to Async Mode for RX
-    cc1101_write_reg(0x08, 0x32); // PKTCTRL0: Asynchronous Serial Mode
-    cc1101_write_reg(0x12, 0x30); // MDMCFG2: Asynchronous Mode, No Sync Word
+    // Restore Async RX Mode
+    cc1101_write_reg(0x08, 0x32); 
+    cc1101_write_reg(0x12, 0x30); 
     cc1101_strobe(CC1101_SFRX);
     cc1101_strobe(CC1101_SRX);
     
