@@ -191,7 +191,7 @@ static void rf_rx_task_impl(void *pvParameters) {
     };
     while (1) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        // esp_rom_printf("CS\n");
+        esp_rom_printf("CS\n");
         ESP_ERROR_CHECK(rmt_receive(rx_channel, rmt_rx_buffer, sizeof(rmt_rx_buffer), &rec_config));
         if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(50)) == pdTRUE) {
             size_t rx_symbols_count = 0;

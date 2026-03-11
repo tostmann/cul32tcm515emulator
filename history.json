@@ -1977,5 +1977,33 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);\n        esp_rom_printf(\"CS\\n\");\n        ESP_ERROR_CHECK(rmt_receive(rx_channel, rmt_rx_buffer, sizeof(rmt_rx_buffer), &rec_config));",
+            "path": "src/radio_hal.c",
+            "original_text": "        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);\n        // esp_rom_printf(\"CS\\n\");\n        ESP_ERROR_CHECK(rmt_receive(rx_channel, rmt_rx_buffer, sizeof(rmt_rx_buffer), &rec_config));"
+          }
+        }
+      }
+    ]
   }
 ]
