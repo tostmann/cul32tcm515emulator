@@ -269,7 +269,7 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
     }
 
     is_transmitting = true;
-    gpio_intr_disable(PIN_GDO0);
+    gpio_intr_disable(PIN_GDO2);
     
     cc1101_strobe(CC1101_SIDLE);
     
