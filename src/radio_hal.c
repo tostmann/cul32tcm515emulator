@@ -79,15 +79,15 @@ static void handle_complete_telegram(const uint8_t *data, uint16_t length) {
     if (checksum != data[length - 1]) return;
 
     uint8_t r_org = data[0];
-    uint32_t sender_id = (data[length-5] << 24) | (data[length-4] << 16) | 
-                         (data[length-3] << 8)  | data[length-2];
+    uint32_t sender_id = (data[length-6] << 24) | (data[length-5] << 16) | 
+                         (data[length-4] << 8)  | data[length-3];
+    uint8_t status = data[length-2];
 
     if ((r_org == 0x30 || r_org == 0x31) && length >= 15) {
         enocean_sec_device_t dev;
         if (enocean_nvs_get_device(sender_id, &dev) == ESP_OK) {
             uint32_t rlc_rx = (data[2] << 16) | (data[3] << 8) | data[4];
             const uint8_t *mac_rx = &data[5];
-            uint8_t status = data[13];
             uint16_t payload_len = length - 14; 
             
             uint8_t *payload = malloc(payload_len);
@@ -96,7 +96,7 @@ static void handle_complete_telegram(const uint8_t *data, uint16_t length) {
                 if (r_org == 0x31) enocean_sec_decrypt_ctr(&dev, payload, payload_len, rlc_rx);
                 
                 uint8_t mi[64]; uint16_t mi_idx = 0;
-                mi[mi_idx++] = (rlc_rx >> 24) & 0xFF; // assuming MSB 0 for now
+                mi[mi_idx++] = (rlc_rx >> 24) & 0xFF; 
                 mi[mi_idx++] = (rlc_rx >> 16) & 0xFF;
                 mi[mi_idx++] = (rlc_rx >> 8) & 0xFF;
                 mi[mi_idx++] = rlc_rx & 0xFF;
@@ -112,7 +112,6 @@ static void handle_complete_telegram(const uint8_t *data, uint16_t length) {
                     dev.rlc = rlc_rx;
                     enocean_nvs_save_device(&dev);
                     
-                    // Diag: send cleartext byte
                     uint8_t diag[2] = { 0xCC, payload[0] };
                     esp3_send_packet(0x35, diag, 2, NULL, 0);
 
