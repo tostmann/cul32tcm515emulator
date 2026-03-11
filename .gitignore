@@ -1,0 +1,30 @@
+# PlatformIO
+.pio
+.pioenvs
+.piolibdeps
+lib/README
+test/README
+
+# ESP-IDF
+sdkconfig
+sdkconfig.old
+build/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+
+# Project Specific
+binaries/
+last_execution.log
+
+# Deploy Keys
+.deploy_key
+.deploy_key.pub
+
+# OS files
+.DS_Store
+.vscode/
