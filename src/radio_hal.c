@@ -119,35 +119,30 @@ static void rmt_to_manchester_decode(const rmt_symbol_word_t *symbols, size_t nu
             int d = durations[p];
             int l = levels[p];
             if (d == 0) continue;
-            if (d >= THRESHOLD_SHORT_MIN && d <= THRESHOLD_SHORT_MAX) {
-                if (hb_count < sizeof(half_bits)) half_bits[hb_count++] = l;
-            } else if (d >= THRESHOLD_LONG_MIN && d <= THRESHOLD_LONG_MAX) {
-                if (hb_count < sizeof(half_bits) - 1) {
-                    half_bits[hb_count++] = l;
-                    half_bits[hb_count++] = l;
-                }
-            } else {
-                goto DECODE_PHASE;
+            // Filter short glitches (< 2us = 8 ticks)
+            if (d < 8) continue;
+            
+            int n = (d + 8) / 16; // 4us = 16 ticks
+            if (n > 4) n = 4; // Cap
+            for (int k = 0; k < n && hb_count < sizeof(half_bits); k++) {
+                half_bits[hb_count++] = l;
             }
         }
     }
-DECODE_PHASE:
     if (hb_count < 32) return;
+
     uint8_t payload[64];
     int payload_len = 0;
-    uint16_t sync_window = 0;
     bool synced = false;
     uint8_t current_byte = 0;
     int bit_count = 0;
 
-    // Search for Sync Byte 0xAD in raw 125kbps (which is 1100110011110011 in half-bits)
-    // Or just look for the first Manchester transition after a long sequence of 8us pulses.
     int sync_idx = -1;
     uint32_t pattern = 0;
     for (int i = 0; i < hb_count; i++) {
         pattern = (pattern << 1) | half_bits[i];
-        // Pattern for 0xAD (raw): 11 00 11 00 11 11 00 11 = 0xCCCCF3
-        if ((pattern & 0xFFFF) == 0xCCF3) { // 0xAD is 10101101 -> 1100110011110011 = CCF3
+        // Raw EnOcean Sync Byte 0xAD = 1100110011110011 = 0xCCF3 (in half-bits)
+        if ((pattern & 0xFFFF) == 0xCCF3) { 
             sync_idx = i + 1;
             synced = true;
             break;
@@ -159,13 +154,10 @@ DECODE_PHASE:
             uint8_t hb1 = half_bits[i];
             uint8_t hb2 = half_bits[i+1];
             int decoded_bit = -1;
-            // Manchester: 01=1, 10=0 (or vice versa)
-            if (hb1 == 0 && hb2 == 1) decoded_bit = 1;
-            else if (hb1 == 1 && hb2 == 0) decoded_bit = 0;
-            else {
-                // Try to resync
-                i--; continue;
-            }
+            // EnOcean Manchester: 1 -> 10, 0 -> 01
+            if (hb1 == 1 && hb2 == 0) decoded_bit = 1;
+            else if (hb1 == 0 && hb2 == 1) decoded_bit = 0;
+            else { i--; continue; } // Try resync
             
             current_byte = (current_byte << 1) | decoded_bit;
             bit_count++;
@@ -176,7 +168,6 @@ DECODE_PHASE:
         }
     }
     if (synced && payload_len > 0) {
-        // Construct ESP3 Packet
         uint8_t rssi_raw = cc1101_read_status(0x34);
         int dbm = (rssi_raw >= 128) ? (rssi_raw - 256) / 2 - 74 : rssi_raw / 2 - 74;
         uint8_t opt_data[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, (uint8_t)(-dbm), 0x00 };
