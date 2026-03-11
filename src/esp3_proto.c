@@ -11,7 +11,7 @@ typedef enum {
 static esp3_state_t rx_state = STATE_SYNC;
 static uint8_t header_buf[4];
 static uint8_t header_idx = 0;
-static uint8_t *payload_buf = NULL;
+static uint8_t payload_static_buf[512];
 static uint16_t payload_idx = 0;
 static esp3_packet_t current_packet;
 
