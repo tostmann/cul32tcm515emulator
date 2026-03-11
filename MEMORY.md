@@ -4,7 +4,7 @@
 Entwicklung einer Firmware für den ESP32-C6, die ein EnOcean TCM515 (ESP3-Protokoll) USB-Gateway emuliert. Die Hardware-Basis besteht aus einem ESP32-C6-Modul und einem CC1101 Transceiver für das 868-MHz-Band.
 
 ### Aktueller Stand
-Die Software-Architektur des Empfängers ist auf **Produktionsniveau**, der **PLL-basierte Decoder mit Clock-Recovery** ist integriert. Die Validierung hat die **kritische Hardware-Schwäche als definitive Wurzelursache bestätigt**: Obwohl der Carrier-Sense (GDO2) korrekt auslöst, liegt der gemessene RSSI-Wert bei 10 cm Abstand bei ca. **-102 dBm** (Grundrauschen). Dies beweist eine **massive Signal-Dämpfung von >60 dB**, die charakteristisch für ein **inkorrektes Antennen-Matching des CC1101-Moduls** ist (ein für 433 MHz bestücktes Modul wird bei 868 MHz betrieben). **Alle Software-Validierungsarbeiten sind dadurch hart blockiert.**
+Die Software-Architektur des Empfängers ist auf **Produktionsniveau**, der **PLL-basierte Decoder mit Clock-Recovery** ist integriert. Die Validierung hat die **kritische Hardware-Schwäche als definitive Wurzelursache bestätigt**: Obwohl der Carrier-Sense (GDO2) korrekt auslöst, liegt der gemessene RSSI-Wert bei 10 cm Abstand bei ca. **-102 dBm** (Grundrauschen). Dies beweist eine **massive Signal-Dämpfung von >60 dB**, die charakteristisch für ein **inkorrektes Antennen-Matching des CC1101-Moduls** ist (ein für 433 MHz bestücktes Modul wird bei 868 MHz betrieben). **Alle Software-Validierungsarbeiten am Empfänger sind dadurch hart blockiert.**
 
 ### Nächste Schritte
 *   **Hardware-Austausch (BLOCKER)**: Beschaffung und Austausch des CC1101-Moduls durch ein verifiziertes, korrekt für 868 MHz bestücktes Modul. **Dies ist die einzige und absolut höchste Priorität.**
