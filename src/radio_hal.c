@@ -270,7 +270,7 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
     }
 
     is_transmitting = true;
-    gpio_intr_disable(PIN_GDO2);
+    gpio_intr_disable(PIN_GDO0);
     
     cc1101_strobe(CC1101_SIDLE);
     
@@ -304,13 +304,13 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
     }
     
     // Restore Async RX Mode (125kbps filters)
-    cc1101_write_reg(0x10, 0x19); // MDMCFG4: 125kbps filters
-    cc1101_write_reg(0x11, 0x83); // MDMCFG3
+    cc1101_write_reg(0x10, 0x4C); // Optimized MDMCFG4 for RX
+    cc1101_write_reg(0x11, 0x3B); // Optimized MDMCFG3 for RX
     cc1101_write_reg(0x08, 0x32); 
     cc1101_write_reg(0x12, 0x30); 
     cc1101_strobe(CC1101_SFRX);
     cc1101_strobe(CC1101_SRX);
     
-    gpio_intr_enable(PIN_GDO2);
+    gpio_intr_enable(PIN_GDO0);
     is_transmitting = false;
 }

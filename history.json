@@ -1004,5 +1004,33 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "void radio_transmit(const uint8_t *data, uint8_t len) {\n    if (len > 31) return; \n    uint8_t encoded_len = len * 2;\n    uint8_t encoded_data[64];\n\n    for (uint8_t i = 0; i < len; i++) {\n        encoded_data[i * 2]     = manchester_lut[data[i] >> 4];\n        encoded_data[i * 2 + 1] = manchester_lut[data[i] & 0x0F];\n    }\n\n    is_transmitting = true;\n    gpio_intr_disable(PIN_GDO0);\n    \n    cc1101_strobe(CC1101_SIDLE);\n    \n    // Set Baudrate to 250kbps for raw chip transmission (since 125kbps Manchester = 250kbps chips)\n    cc1101_write_reg(0x10, 0x2D); // MDMCFG4: 250kbps\n    cc1101_write_reg(0x11, 0x3B); // MDMCFG3\n    \n    cc1101_write_reg(0x08, 0x00);        // PKTCTRL0: Fixed Packet Length\n    cc1101_write_reg(0x06, encoded_len); // PKTLEN\n    cc1101_write_reg(0x13, 0x22);        // MDMCFG1: 4 bytes preamble\n    cc1101_write_reg(0x04, 0xAA);        // SYNC1\n    cc1101_write_reg(0x05, 0xAD);        // SYNC0\n    cc1101_write_reg(0x12, 0x32);        // MDMCFG2: ASK/OOK, No HW Manchester, 16/16 sync\n    \n    for(int i = 0; i < 5; i++) {\n        if(check_lbt()) break;\n        vTaskDelay(pdMS_TO_TICKS(2 + (esp_random() % 5)));\n    }\n    \n    for(int sub = 0; sub < 3; sub++) {\n        cc1101_strobe(CC1101_SIDLE);\n        cc1101_strobe(CC1101_SFTX);\n        cc1101_write_burst(0x3F, encoded_data, encoded_len);\n        cc1101_strobe(CC1101_STX);\n        int timeout = 50; \n        while((cc1101_read_status(CC1101_MARCSTATE) & 0x1F) != 0x01 && timeout > 0) {\n            vTaskDelay(pdMS_TO_TICKS(1));\n            timeout--;\n        }\n        if (sub < 2) vTaskDelay(pdMS_TO_TICKS(10 + (esp_random() % 16)));\n    }\n    \n    // Restore Async RX Mode (125kbps filters)\n    cc1101_write_reg(0x10, 0x4C); // Optimized MDMCFG4 for RX\n    cc1101_write_reg(0x11, 0x3B); // Optimized MDMCFG3 for RX\n    cc1101_write_reg(0x08, 0x32); \n    cc1101_write_reg(0x12, 0x30); \n    cc1101_strobe(CC1101_SFRX);\n    cc1101_strobe(CC1101_SRX);\n    \n    gpio_intr_enable(PIN_GDO0);\n    is_transmitting = false;\n}",
+            "path": "src/radio_hal.c",
+            "original_text": "void radio_transmit(const uint8_t *data, uint8_t len) {\n    if (len > 31) return; \n    uint8_t encoded_len = len * 2;\n    uint8_t encoded_data[64];\n\n    for (uint8_t i = 0; i < len; i++) {\n        encoded_data[i * 2]     = manchester_lut[data[i] >> 4];\n        encoded_data[i * 2 + 1] = manchester_lut[data[i] & 0x0F];\n    }\n\n    is_transmitting = true;\n    gpio_intr_disable(PIN_GDO2);\n    \n    cc1101_strobe(CC1101_SIDLE);\n    \n    // Set Baudrate to 250kbps for raw chip transmission (since 125kbps Manchester = 250kbps chips)\n    cc1101_write_reg(0x10, 0x2D); // MDMCFG4: 250kbps\n    cc1101_write_reg(0x11, 0x3B); // MDMCFG3\n    \n    cc1101_write_reg(0x08, 0x00);        // PKTCTRL0: Fixed Packet Length\n    cc1101_write_reg(0x06, encoded_len); // PKTLEN\n    cc1101_write_reg(0x13, 0x22);        // MDMCFG1: 4 bytes preamble\n    cc1101_write_reg(0x04, 0xAA);        // SYNC1\n    cc1101_write_reg(0x05, 0xAD);        // SYNC0\n    cc1101_write_reg(0x12, 0x32);        // MDMCFG2: ASK/OOK, No HW Manchester, 16/16 sync\n    \n    for(int i = 0; i < 5; i++) {\n        if(check_lbt()) break;\n        vTaskDelay(pdMS_TO_TICKS(2 + (esp_random() % 5)));\n    }\n    \n    for(int sub = 0; sub < 3; sub++) {\n        cc1101_strobe(CC1101_SIDLE);\n        cc1101_strobe(CC1101_SFTX);\n        cc1101_write_burst(0x3F, encoded_data, encoded_len);\n        cc1101_strobe(CC1101_STX);\n        int timeout = 50; \n        while((cc1101_read_status(CC1101_MARCSTATE) & 0x1F) != 0x01 && timeout > 0) {\n            vTaskDelay(pdMS_TO_TICKS(1));\n            timeout--;\n        }\n        if (sub < 2) vTaskDelay(pdMS_TO_TICKS(10 + (esp_random() % 16)));\n    }\n    \n    // Restore Async RX Mode (125kbps filters)\n    cc1101_write_reg(0x10, 0x19); // MDMCFG4: 125kbps filters\n    cc1101_write_reg(0x11, 0x83); // MDMCFG3\n    cc1101_write_reg(0x08, 0x32); \n    cc1101_write_reg(0x12, 0x30); \n    cc1101_strobe(CC1101_SFRX);\n    cc1101_strobe(CC1101_SRX);\n    \n    gpio_intr_enable(PIN_GDO2);\n    is_transmitting = false;\n}"
+          }
+        }
+      }
+    ]
   }
 ]
