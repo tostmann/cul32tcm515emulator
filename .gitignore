@@ -30,3 +30,6 @@ sdkconfig.*
 # OS files
 .DS_Store
 .vscode/
+# Sensible Konfigurationen
+project_config.json
+*.log
