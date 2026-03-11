@@ -388,6 +388,7 @@ void hal_inject_virtual_rmt(const char* hex_pulses) {
                        (hex2int(hex_pulses[i+3]));
         int level = (val & 0x8000) ? 1 : 0;
         int duration = val & 0x7FFF;
-        erp1_decode_pulse(&global_decoder, level, duration);
+        erp1_decode_pulse(&global_decoder, level, duration, false);
     }
+    erp1_decode_pulse(&global_decoder, 0, 0, true);
 }
