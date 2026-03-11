@@ -43,6 +43,8 @@ void app_main(void) {
     
     // Main loop does nothing
     while (1) {
+        // uint8_t marcstate = cc1101_read_status(0x35);
+        // esp_rom_printf("M:0x%02X\n", marcstate);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
