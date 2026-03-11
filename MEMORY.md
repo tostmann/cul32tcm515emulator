@@ -4,10 +4,13 @@
 Entwicklung einer Firmware für den ESP32-C6, die ein EnOcean TCM515 (ESP3-Protokoll) USB-Gateway emuliert. Die Hardware-Basis besteht aus einem ESP32-C6-Modul und einem CC1101 Transceiver für das 868-MHz-Band.
 
 ### Aktueller Stand
-Die Firmware ist architektonisch fertiggestellt und stabilisiert. Nach einer tiefgreifenden Fehleranalyse wurden kritische Probleme wie Reboot-Schleifen (`rst:0xc SW_CPU`) und Watchdog-Timeouts (verursacht durch Interrupt-Stürme) behoben. Sowohl der Sende- als auch der Empfangspfad sind nun auf die spezifischen Anforderungen des 125-kbps-OOK-Betriebs optimiert und gehärtet. Die Basis für einen erfolgreichen Differentialtest ist gelegt.
+Die Firmware wurde architektonisch gehärtet. Kritische Reboot-Schleifen (`rst:0xc SW_CPU`), verursacht durch Interrupt-Stürme, wurden durch die Implementierung eines **Carrier-Sense-Gating-Mechanismus** behoben. Die SPI-Kommunikation ist nun durch einen Mutex abgesichert. Die grundlegende Stabilität ist wiederhergestellt, jedoch treten unter Last im finalen Differentialtest weiterhin Resets auf.
 
 ### Offene Punkte / Aktuelle Probleme
-*   **Validierung ausstehend**: Nach der kompletten Überarbeitung der Radio-Abstraktionsschicht muss ein finaler Differentialtest gegen die TCM515-Referenzhardware durchgeführt werden, um die Korrektheit der Sende- und Empfangslogik endgültig zu bestätigen.
+*   **Reboot-Schleife unter Last**: Trotz der Stabilisierungsmaßnahmen startet das Gerät während des finalen Differentialtests (`diff_test_enocean.py`) bei der Verarbeitung von Funktelegrammen neu.
+*   **Ursachenforschung**:
+    1.  **USB-Konflikt (Hauptverdacht)**: Es besteht der Verdacht, dass der ESP-IDF Panic-Handler versucht, auf den USB-JTAG-Port zu schreiben, der bereits vom ESP3-Protokoll-Treiber belegt ist.
+    2.  **Speichermanagement**: `malloc` im Protokoll-Parser könnte unter Last zur Heap-Fragmentierung führen.
 
 ### Architektur-Entscheidungen
 
@@ -24,12 +27,15 @@ Die Firmware ist architektonisch fertiggestellt und stabilisiert. Nach einer tie
     *   **Architektur**: Ein **Carrier-Sense-Gating-Mechanismus** wurde implementiert, um die CPU vor Interrupt-Stürmen durch OOK-Rauschen zu schützen.
     *   **CC1101-Modus**: Asynchroner, transparenter serieller Modus. Die Register für Datenrate (`MDMCFG3/4`), Filter und AGC sind auf TI Best-Practices für 125 kbps OOK optimiert.
     *   **ESP32-Peripherie & Gating-Logik**:
-        *   Der **Carrier Sense (CS) Pin (GDO2)** löst einen GPIO-Interrupt aus und signalisiert den Beginn eines potenziellen Pakets.
+        *   Der **Carrier Sense (CS) Pin (GDO2)** löst einen GPIO-Interrupt aus und signalisiert den Beginn eines potenziellen Pakets. Der Interrupt wird im ISR sofort deaktiviert, um Flankenstürme zu verhindern.
         *   Das **RMT-Modul** wird erst **nach** diesem Interrupt aktiviert und lauscht am Datenpin **GDO0**.
         *   Sobald der Carrier Sense abfällt oder der RMT einen Timeout hat, wird der RMT-Kanal sofort deaktiviert, was Watchdog-Resets verhindert.
-    *   **Robuster RX-Task**: Der kritische Reboot-Bug (`rst:0xc SW_CPU`), verursacht durch `ESP_ERR_INVALID_STATE` im RMT-Treiber, wurde durch defensive Fehlerbehandlung behoben. Die Task-Logik fängt Fehler und Timeouts nun ab und setzt den RMT-Kanal (`rmt_disable`/`rmt_enable`) zurück, anstatt abzustürzen.
     *   **DMA-Puffer**: Der RMT-Empfangspuffer wurde auf **1024 Symbole** vergrößert und auf DMA-fähigen Speicher (`heap_caps_calloc`) umgestellt, um die hohe Datenrate stabil zu verarbeiten.
     *   **Hardware-Anpassung**: Der RMT-Parameter `mem_block_symbols` wurde auf den korrekten Wert von **48** für den ESP32-C6 korrigiert.
+7.  **Concurrency Management (Neu)**:
+    *   Die gesamte SPI-Kommunikation mit dem CC1101 wird durch einen **Mutex** geschützt. Dies verhindert Race Conditions zwischen dem USB-Task (der Sende-Befehle auslöst) und dem RF-Empfangstask (der den RSSI-Wert liest).
+8.  **Task Management (Neu)**:
+    *   Der Stack des USB-Empfangstasks wurde präventiv auf **8192 Bytes** erhöht, um Stack Overflows bei tiefen Funktionsaufrufen in der Radio-HAL zu vermeiden.
 
 ### Abgeschlossene Aufgaben (Development Log)
 
@@ -50,3 +56,5 @@ Die Firmware ist architektonisch fertiggestellt und stabilisiert. Nach einer tie
 *   **DONE**: **Kritischen Reboot-Fehler (`rst:0xc SW_CPU`) im RMT-Empfangstask behoben** durch defensive Fehlerbehandlung und manuelles Zurücksetzen des RMT-Kanals.
 *   **DONE**: RMT-Empfangspuffer auf 1024 Symbole vergrößert und auf **DMA-fähigen Speicher** umgestellt.
 *   **DONE**: RMT-Hardware-Parameter (`mem_block_symbols`) an die Spezifikationen des ESP32-C6 (48) angepasst.
+*   **DONE**: SPI-Kommunikation mit einem **Mutex** abgesichert, um Race Conditions zu verhindern.
+*   **DONE**: Stack-Größe des USB-Empfangstasks präventiv auf **8192 Bytes** erhöht.
