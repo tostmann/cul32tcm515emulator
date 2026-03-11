@@ -703,5 +703,33 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "CONFIG_ESP_CONSOLE_NONE=y\nCONFIG_ESP_CONSOLE_SECONDARY_NONE=y\nCONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=n\nCONFIG_ESP_CONSOLE_UART_DEFAULT=n\nCONFIG_ESP_CONSOLE_UART=n",
+            "path": "sdkconfig.defaults",
+            "original_text": "CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y\nCONFIG_ESP_CONSOLE_SECONDARY_NONE=y\nCONFIG_ESP_CONSOLE_UART_DEFAULT=n\nCONFIG_ESP_CONSOLE_UART=n"
+          }
+        }
+      }
+    ]
   }
 ]
