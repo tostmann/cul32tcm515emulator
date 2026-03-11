@@ -514,5 +514,85 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "$HOME/.platformio/penv/bin/pio run -t upload --upload-port /dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:90:B0-if00"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 1\nOutput:\n\n... [OUTPUT TRUNCATED. Total size: 2006 bytes. Showing last 1500 bytes. Full output saved in 'last_execution.log'. Use 'grep' or 'read_file last_execution.log' to analyze!]\nPACKAGES: \n - contrib-piohome @ 3.4.4 \n - framework-espidf @ 3.50502.0 (5.5.2) \n - tool-cmake @ 4.0.3 \n - tool-esp-rom-elfs @ 2024.10.11 \n - tool-esptoolpy @ 5.1.2 \n - tool-ninja @ 1.13.1 \n - tool-scons @ 4.40801.0 (4.8.1) \n - toolchain-riscv32-esp @ 14.2.0+20251107\nReading CMake configuration...\nWarning! Flash memory size mismatch detected. Expected 8MB, found 2MB!\nPlease select a proper value in your `sdkconfig.defaults` or via the `menuconfig` target!\nLDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf\nLDF Modes: Finder ~ chain, Compatibility ~ soft\nFound 0 compatible libraries\nScanning dependencies...\nNo dependencies\nBuilding in release mode\nCompiling .pio/build/esp32-c6-mini/src/radio_hal.c.o\nCompiling .pio/build/esp32-c6-mini/src/esp3_proto.c.o\nsrc/esp3_proto.c: In function 'esp3_process_byte':\nsrc/esp3_proto.c:122:62: error: 'ESP3_TYPE_COMMON_COMMAND' undeclared (first use in this function)\n  122 |                     } else if (current_packet.packet_type == ESP3_TYPE_COMMON_COMMAND) {\n      |                                                              ^~~~~~~~~~~~~~~~~~~~~~~~\nsrc/esp3_proto.c:122:62: note: each undeclared identifier is reported only once for each function it appears in\n*** [.pio/build/esp32-c6-mini/src/esp3_proto.c.o] Error 1\n========================= [FAILED] Took 17.52 seconds =========================\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "read_file",
+          "args": {
+            "path": "include/esp3_proto.h"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "read_file",
+          "response": {
+            "result": "#ifndef ESP3_PROTO_H\n#define ESP3_PROTO_H\n\n#include <stdint.h>\n#include <stdbool.h>\n\n#define ESP3_SYNC_BYTE 0x55\n\n// ESP3 Packet Types\n#define ESP3_TYPE_RADIO_ERP1 0x01\n#define ESP3_TYPE_RESPONSE   0x02\n\n// Response Codes\n#define RET_OK 0x00\n\ntypedef struct {\n    uint16_t data_len;\n    uint8_t opt_len;\n    uint8_t packet_type;\n    uint8_t *data;\n    uint8_t *opt_data;\n} esp3_packet_t;\n\n// API\nvoid esp3_init(void);\nvoid esp3_process_byte(uint8_t byte);\nvoid esp3_send_packet(uint8_t type, const uint8_t *data, uint16_t data_len, const uint8_t *opt, uint8_t opt_len);\nvoid esp3_send_response(uint8_t ret_code);\n\n#endif // ESP3_PROTO_H\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "// ESP3 Packet Types\n#define ESP3_TYPE_RADIO_ERP1 0x01\n#define ESP3_TYPE_RESPONSE   0x02\n#define ESP3_TYPE_COMMON_COMMAND 0x05\n\n// Response Codes",
+            "path": "include/esp3_proto.h",
+            "original_text": "// ESP3 Packet Types\n#define ESP3_TYPE_RADIO_ERP1 0x01\n#define ESP3_TYPE_RESPONSE   0x02\n\n// Response Codes"
+          }
+        }
+      }
+    ]
   }
 ]

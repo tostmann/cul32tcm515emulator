@@ -9,6 +9,7 @@
 // ESP3 Packet Types
 #define ESP3_TYPE_RADIO_ERP1 0x01
 #define ESP3_TYPE_RESPONSE   0x02
+#define ESP3_TYPE_COMMON_COMMAND 0x05
 
 // Response Codes
 #define RET_OK 0x00
