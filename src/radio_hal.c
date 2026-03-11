@@ -102,11 +102,16 @@ static void rmt_to_manchester_decode(const rmt_symbol_word_t *symbols, size_t nu
         uint8_t l[2] = {symbols[i].level0, symbols[i].level1};
         for (int p = 0; p < 2; p++) {
             if (d[p] == 0) continue;
-            int count = (d[p] + 2) / 4; if (count > 4) count = 4;
+            int count = (d[p] + 1) / 4; // Slightly more aggressive 4us chip detection
+            if (count < 1) count = 1; 
+            if (count > 4) count = 4;
             for (int c = 0; c < count; c++) {
                 sync_reg = (sync_reg << 1) | l[p];
                 if (!in_frame) {
-                    if ((sync_reg & 0x0F) == 0x09) { // transition 10 -> 01
+                    // EnOcean ERP1 SOF is bit '0' which is chips '01'.
+                    // Preamble is '1' which is '10'.
+                    // We look for '...101001' which means SOF '01' arrived.
+                    if ((sync_reg & 0x0F) == 0x09) { 
                         in_frame = true; chip_pair = 0; bit_cnt = 0; payload_len = 0; cur_byte = 0;
                     }
                 } else {
@@ -117,7 +122,11 @@ static void rmt_to_manchester_decode(const rmt_symbol_word_t *symbols, size_t nu
                         if (bit != -1) {
                             cur_byte = (cur_byte << 1) | bit; bit_cnt++;
                             if (bit_cnt == 8) { if (payload_len < sizeof(payload)) payload[payload_len++] = cur_byte; bit_cnt = 0; }
-                        } else { in_frame = false; goto end; }
+                        } else { 
+                            // Manchester error. But if we have enough data, send it anyway for debug.
+                            if (payload_len >= 7) goto end;
+                            in_frame = false; 
+                        }
                         chip_pair = 0;
                     }
                 }
@@ -141,7 +150,7 @@ static void rf_rx_task_impl(void *pvParameters) {
             if (rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t), &cfg) == ESP_OK) {
                 if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(50)) == pdTRUE) {
                     size_t cnt = 0; while (cnt < MAX_RMT_SYMBOLS && rmt_rx_buffer[cnt].duration0 != 0) cnt++;
-                    if (cnt > 15) rmt_to_manchester_decode(rmt_rx_buffer, cnt);
+                    if (cnt > 10) rmt_to_manchester_decode(rmt_rx_buffer, cnt);
                 }
             }
             int t = 100; while (gpio_get_level(PIN_GDO2) == 1 && t-- > 0) vTaskDelay(1);
@@ -169,17 +178,29 @@ void radio_hal_init(void) {
     gpio_config_t io_led = { .pin_bit_mask = (1ULL << PIN_LED), .mode = GPIO_MODE_OUTPUT };
     gpio_config(&io_led); gpio_set_level(PIN_LED, 1);
     cc1101_strobe(CC1101_SRES); vTaskDelay(10);
-    for (int i = 0; i < sizeof(erp1_config)/sizeof(cc1101_cfg_t); i++) cc1101_write_reg(erp1_config[i].addr, erp1_config[i].val);
     
-    // Expert overrides (868.300 MHz, 250k OOK)
-    cc1101_write_reg(0x0D, 0x21); cc1101_write_reg(0x0E, 0x65); cc1101_write_reg(0x0F, 0xD4); 
-    cc1101_write_reg(0x10, 0x2D); cc1101_write_reg(0x11, 0x3B); cc1101_write_reg(0x12, 0x30); 
-    cc1101_write_reg(0x22, 0x11); cc1101_write_reg(0x1B, 0x0B); cc1101_write_reg(0x1D, 0x92); cc1101_write_reg(0x18, 0x18);
+    // Frequency: 868.300 MHz (Calculated for 26MHz: 0x21656A)
+    cc1101_write_reg(0x0D, 0x21); 
+    cc1101_write_reg(0x0E, 0x65); 
+    cc1101_write_reg(0x0F, 0x6A); 
+    
+    // Modem: 250kbps OOK, No Sync/Preamble HW
+    cc1101_write_reg(0x10, 0x2D); // MDMCFG4: BW=541kHz, DRATE_E=13
+    cc1101_write_reg(0x11, 0x3B); // MDMCFG3: DRATE_M=59
+    cc1101_write_reg(0x12, 0x30); // MDMCFG2: ASK/OOK, No Sync
+    
+    // OOK Power & AGC
+    cc1101_write_reg(0x22, 0x11); // FREND0: Index 1 for '1'
+    cc1101_write_reg(0x1B, 0x0B); // AGCCTRL2: MAX_LNA_GAIN
+    cc1101_write_reg(0x1D, 0x92); // AGCCTRL0
+    cc1101_write_reg(0x18, 0x18); // MCSM0: Auto-cal
+    
     cc1101_write_burst(0x3E, patable_ook, 2);
     
-    gpio_install_isr_service(0); radio_rmt_rx_init();
+    gpio_install_isr_service(0); 
+    radio_rmt_rx_init();
     
-    // Set to Async RX mode initially
+    // Async RX mode
     cc1101_strobe(CC1101_SIDLE);
     cc1101_write_reg(0x08, 0x32); // Asynchronous
     cc1101_write_reg(0x02, 0x0D); // GDO0 = Serial Out
@@ -193,22 +214,29 @@ static void push_m(bit_s *s, int b) { if (b) push_c(s, 0x02, 2); else push_c(s, 
 void radio_transmit(const uint8_t *data, uint8_t len) {
     if (len > 31) return; 
     uint8_t chip_buf[128]; memset(chip_buf, 0, 128); bit_s s = { .buf = chip_buf, .pos = 0 };
-    push_c(&s, 0xAA, 8); push_c(&s, 0xAA, 8); // Warmup chips (Raw)
-    for (int i = 0; i < 8; i++) push_m(&s, 1); // EnOcean Preamble (8x '1')
-    push_m(&s, 0); // SOF ('0')
+    // Warmup 5 bytes 0xAA (raw chips)
+    for (int i = 0; i < 5; i++) push_c(&s, 0xAA, 8);
+    // EnOcean Preamble (8x '1')
+    for (int i = 0; i < 8; i++) push_m(&s, 1); 
+    // SOF ('0')
+    push_m(&s, 0); 
+    // Payload
     for (int i = 0; i < len; i++) { for (int j = 7; j >= 0; j--) push_m(&s, (data[i] >> j) & 1); }
+    
     int byte_len = (s.pos + 7) / 8;
     is_transmitting = true; gpio_intr_disable(PIN_GDO2);
     cc1101_strobe(CC1101_SIDLE);
     cc1101_write_reg(0x08, 0x00); // Fixed Packet length
     cc1101_write_reg(0x06, byte_len); 
-    for(int i = 0; i < 5; i++) { if (cc1101_read_status(0x34) < 140) break; vTaskDelay(pdMS_TO_TICKS(5)); }
+    
+    for(int i = 0; i < 10; i++) { if (cc1101_read_status(0x34) < 140) break; vTaskDelay(pdMS_TO_TICKS(5)); }
+    
     for(int sub = 0; sub < 3; sub++) {
         cc1101_strobe(CC1101_SIDLE); cc1101_strobe(CC1101_SFTX); cc1101_write_burst(0x3F, chip_buf, byte_len); cc1101_strobe(CC1101_STX);
         int t = 50; while((cc1101_read_status(CC1101_MARCSTATE) & 0x1F) != 0x01 && t-- > 0) vTaskDelay(1);
-        if (sub < 2) vTaskDelay(pdMS_TO_TICKS(15));
+        if (sub < 2) vTaskDelay(pdMS_TO_TICKS(20));
     }
-    // Restore Async RX
+    
     cc1101_strobe(CC1101_SIDLE);
     cc1101_write_reg(0x08, 0x32); cc1101_strobe(CC1101_SFRX); cc1101_strobe(CC1101_SRX);
     gpio_intr_enable(PIN_GDO2); is_transmitting = false;
