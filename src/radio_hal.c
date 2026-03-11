@@ -172,55 +172,58 @@ static void rmt_to_manchester_decode(const rmt_symbol_word_t *symbols, size_t nu
 
 static void rf_rx_task_impl(void *pvParameters) {
     rmt_receive_config_t rec_config = {
-        .signal_range_min_ns = 2000,
+        .signal_range_min_ns = 1000,
         .signal_range_max_ns = 40000,
     };
     while (1) {
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        esp_err_t err = rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS, &rec_config);
-        if (err != ESP_OK) {
-            rmt_disable(rx_channel);
-            vTaskDelay(pdMS_TO_TICKS(1));
+        if (xSemaphoreTake(carrier_sense_sem, portMAX_DELAY) == pdTRUE) {
             rmt_enable(rx_channel);
             rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS, &rec_config);
-        }
-        
-        if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(100)) == pdTRUE) {
-            size_t rx_symbols_count = 0;
-            for(int i=0; i<MAX_RMT_SYMBOLS; i++) {
-                if(rmt_rx_buffer[i].duration0 == 0) break;
-                rx_symbols_count++;
+            
+            if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(30)) == pdTRUE) {
+                size_t rx_symbols_count = 0;
+                for(int i=0; i<MAX_RMT_SYMBOLS; i++) {
+                    if(rmt_rx_buffer[i].duration0 == 0) break;
+                    rx_symbols_count++;
+                }
+                if (rx_symbols_count > 10) {
+                    rmt_to_manchester_decode(rmt_rx_buffer, rx_symbols_count);
+                }
             }
-            if (rx_symbols_count > 10) {
-                rmt_to_manchester_decode(rmt_rx_buffer, rx_symbols_count);
-            }
-        } else {
-            // Timeout: Force stop
             rmt_disable(rx_channel);
-            vTaskDelay(pdMS_TO_TICKS(1));
-            rmt_enable(rx_channel);
+            // Wait for carrier to clear or timeout
+            int wait_tout = 50;
+            while (gpio_get_level(PIN_GDO2) == 1 && wait_tout > 0) {
+                vTaskDelay(pdMS_TO_TICKS(1));
+                wait_tout--;
+            }
+            vTaskDelay(pdMS_TO_TICKS(2));
+            xSemaphoreTake(carrier_sense_sem, 0); // Clear any pending interrupt
         }
-        
-        while (gpio_get_level(PIN_GDO2) == 1) vTaskDelay(pdMS_TO_TICKS(1));
-        vTaskDelay(pdMS_TO_TICKS(5)); 
-        gpio_intr_enable(PIN_GDO2);
     }
 }
 
 void radio_rmt_rx_init(void) {
     rmt_done_sem = xSemaphoreCreateBinary();
+    carrier_sense_sem = xSemaphoreCreateBinary();
+    
+    rmt_rx_buffer = (rmt_symbol_word_t *)heap_caps_calloc(
+        MAX_RMT_SYMBOLS, 
+        sizeof(rmt_symbol_word_t), 
+        MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL
+    );
+
     rmt_rx_channel_config_t rx_chan_config = {
         .clk_src = RMT_CLK_SRC_DEFAULT,
         .resolution_hz = RMT_RESOLUTION_HZ,
-        .mem_block_symbols = 64, // Internal FIFO size
+        .mem_block_symbols = 48, 
         .gpio_num = PIN_GDO0,
         .flags.invert_in = false,
-        .flags.with_dma = true // Use DMA to handle 1024 symbols
+        .flags.with_dma = true
     };
     ESP_ERROR_CHECK(rmt_new_rx_channel(&rx_chan_config, &rx_channel));
     rmt_rx_event_callbacks_t cbs = { .on_recv_done = rmt_rx_done_callback };
     ESP_ERROR_CHECK(rmt_rx_register_event_callbacks(rx_channel, &cbs, NULL));
-    ESP_ERROR_CHECK(rmt_enable(rx_channel));
     
     xTaskCreate(rf_rx_task_impl, "rf_rx_task", 4096, NULL, 5, &rf_task_handle);
     
