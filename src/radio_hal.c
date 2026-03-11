@@ -106,10 +106,15 @@ static void handle_complete_telegram(const uint8_t *data, uint16_t length) {
                     dev.rlc = rlc;
                     enocean_nvs_save_device(&dev);
                     
-                    // Send decrypted/verified packet to host as pseudo R-ORG (e.g. original R-ORG if known)
-                    // For now, send as is but marked as verified
-                    uint8_t opt[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x40, 0x01 }; // Bit 0 of RSSI/Status as verified flag
-                    esp3_send_packet(ESP3_TYPE_RADIO_ERP1, data, length, opt, 7);
+                    // Construct decrypted packet for host
+                    uint8_t *dec_data = malloc(length);
+                    if (dec_data) {
+                        memcpy(dec_data, data, length);
+                        memcpy(&dec_data[1], payload, payload_len); // Replace encrypted with decrypted
+                        uint8_t opt[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x40, 0x01 }; 
+                        esp3_send_packet(ESP3_TYPE_RADIO_ERP1, dec_data, length, opt, 7);
+                        free(dec_data);
+                    }
                 } else {
                     ESP_LOGW(TAG, "Security MAC verification failed for %08lX", sender_id);
                 }
