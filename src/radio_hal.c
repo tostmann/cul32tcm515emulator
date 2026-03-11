@@ -41,6 +41,7 @@ static bool IRAM_ATTR rmt_rx_done_callback(rmt_channel_handle_t channel, const r
 
 static void IRAM_ATTR gdo2_cs_isr_handler(void* arg) {
     BaseType_t high_task_wakeup = pdFALSE;
+    gpio_intr_disable(PIN_GDO2);
     xSemaphoreGiveFromISR(carrier_sense_sem, &high_task_wakeup);
     if (high_task_wakeup) portYIELD_FROM_ISR();
 }
