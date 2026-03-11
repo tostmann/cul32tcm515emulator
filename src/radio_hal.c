@@ -222,22 +222,12 @@ static void rf_rx_task_impl(void *pvParameters) {
             if (rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS, &cfg) == ESP_OK) {
                 if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(500)) == pdTRUE) {
                     size_t cnt = 0; while (cnt < MAX_RMT_SYMBOLS && rmt_rx_buffer[cnt].duration0 != 0) cnt++;
-                    uint16_t debug_data[2] = { (uint16_t)cnt, (uint16_t)global_decoder.sync_pulses };
+                    uint16_t debug_data[2] = { (uint16_t)cnt, (uint16_t)(global_decoder.state) };
                     esp3_send_packet(0x34, (uint8_t*)debug_data, 4, NULL, 0);
                     for (size_t i = 0; i < cnt; i++) {
                         erp1_decode_pulse(&global_decoder, rmt_rx_buffer[i].level0, rmt_rx_buffer[i].duration0);
-                        if (global_decoder.packet_ready) {
-                            uint8_t opt[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x40, 0x00 };
-                            esp3_send_packet(ESP3_TYPE_RADIO_ERP1, global_decoder.buffer, global_decoder.byte_idx, opt, 7);
-                            erp1_decoder_reset(&global_decoder);
-                        }
                         if (rmt_rx_buffer[i].duration1 > 0) {
                             erp1_decode_pulse(&global_decoder, rmt_rx_buffer[i].level1, rmt_rx_buffer[i].duration1);
-                            if (global_decoder.packet_ready) {
-                                uint8_t opt[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x40, 0x00 };
-                                esp3_send_packet(ESP3_TYPE_RADIO_ERP1, global_decoder.buffer, global_decoder.byte_idx, opt, 7);
-                                erp1_decoder_reset(&global_decoder);
-                            }
                         }
                     }
                 }
