@@ -91,12 +91,16 @@ void esp3_process_byte(uint8_t byte) {
                 current_packet.opt_len = header_buf[2];
                 current_packet.packet_type = header_buf[3];
                 uint16_t total_len = current_packet.data_len + current_packet.opt_len;
-                if (total_len > 0) {
+                if (total_len > 0 && total_len < 1024) {
                     payload_buf = malloc(total_len);
                     if (!payload_buf) { rx_state = STATE_SYNC; return; }
                     payload_idx = 0;
                     rx_state = STATE_DATA;
+                } else if (total_len == 0) {
+                    rx_state = STATE_CRC8D;
                 } else {
+                    rx_state = STATE_SYNC;
+                }
                     rx_state = STATE_CRC8D;
                 }
             } else {

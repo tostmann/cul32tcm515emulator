@@ -659,5 +659,33 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "                uint16_t total_len = current_packet.data_len + current_packet.opt_len;\n                if (total_len > 0 && total_len < 1024) {\n                    payload_buf = malloc(total_len);\n                    if (!payload_buf) { rx_state = STATE_SYNC; return; }\n                    payload_idx = 0;\n                    rx_state = STATE_DATA;\n                } else if (total_len == 0) {\n                    rx_state = STATE_CRC8D;\n                } else {\n                    rx_state = STATE_SYNC;\n                }",
+            "path": "src/esp3_proto.c",
+            "original_text": "                uint16_t total_len = current_packet.data_len + current_packet.opt_len;\n                if (total_len > 0) {\n                    payload_buf = malloc(total_len);\n                    if (!payload_buf) { rx_state = STATE_SYNC; return; }\n                    payload_idx = 0;\n                    rx_state = STATE_DATA;\n                } else {"
+          }
+        }
+      }
+    ]
   }
 ]
