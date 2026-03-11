@@ -1386,5 +1386,33 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "void app_main(void) {\n    // Logging will now go to UART0 (TX/RX Pins)\n    esp_log_level_set(\"*\", ESP_LOG_INFO);\n    \n    // Initialize USB Serial JTAG driver\n    usb_serial_jtag_driver_config_t usb_config = {\n        .tx_buffer_size = 512,\n        .rx_buffer_size = 512,\n    };\n    usb_serial_jtag_driver_install(&usb_config);\n\n    // Initialize ESP3 parser\n    esp3_init();\n    \n    // Initialize Radio HAL (SPI, GPIO, CC1101, RMT RX Task)\n    radio_hal_init();\n\n    // Start USB RX Task\n    xTaskCreate(usb_rx_task, \"usb_rx\", 8192, NULL, 5, NULL);\n    \n    // Main loop does nothing\n    while (1) {\n        vTaskDelay(pdMS_TO_TICKS(1000));\n    }\n}",
+            "path": "src/main.c",
+            "original_text": "void app_main(void) {\n    // Disable logging to USB CDC to avoid corrupting ESP3 stream\n    esp_log_level_set(\"*\", ESP_LOG_NONE);\n    \n    // Initialize USB Serial JTAG driver\n    usb_serial_jtag_driver_config_t usb_config = {\n        .tx_buffer_size = 512,\n        .rx_buffer_size = 512,\n    };\n    usb_serial_jtag_driver_install(&usb_config);\n\n    // Initialize ESP3 parser\n    esp3_init();\n    \n    // Initialize Radio HAL (SPI, GPIO, CC1101, RMT RX Task)\n    radio_hal_init();\n\n    // Start USB RX Task\n    xTaskCreate(usb_rx_task, \"usb_rx\", 8192, NULL, 5, NULL);\n    \n    // Main loop does nothing\n    while (1) {\n        vTaskDelay(pdMS_TO_TICKS(1000));\n    }\n}"
+          }
+        }
+      }
+    ]
   }
 ]

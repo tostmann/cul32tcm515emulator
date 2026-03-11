@@ -22,8 +22,8 @@ void usb_rx_task(void *pvParameters) {
 }
 
 void app_main(void) {
-    // Disable logging to USB CDC to avoid corrupting ESP3 stream
-    esp_log_level_set("*", ESP_LOG_NONE);
+    // Logging will now go to UART0 (TX/RX Pins)
+    esp_log_level_set("*", ESP_LOG_INFO);
     
     // Initialize USB Serial JTAG driver
     usb_serial_jtag_driver_config_t usb_config = {
