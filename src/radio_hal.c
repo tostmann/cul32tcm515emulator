@@ -261,24 +261,38 @@ static bool check_lbt(void) {
     return true;
 }
 
+static const uint8_t manchester_lut[16] = {
+    0x55, 0x56, 0x59, 0x5A, 0x65, 0x66, 0x69, 0x6A,
+    0x95, 0x96, 0x99, 0x9A, 0xA5, 0xA6, 0xA9, 0xAA
+};
+
 void radio_transmit(const uint8_t *data, uint8_t len) {
+    if (len > 31) return; 
+    uint8_t encoded_len = len * 2;
+    uint8_t encoded_data[64];
+
+    for (uint8_t i = 0; i < len; i++) {
+        encoded_data[i * 2]     = manchester_lut[data[i] >> 4];
+        encoded_data[i * 2 + 1] = manchester_lut[data[i] & 0x0F];
+    }
+
     is_transmitting = true;
     gpio_intr_disable(PIN_GDO2);
     
     cc1101_strobe(CC1101_SIDLE);
-    // Use Fixed Packet Length Mode for TX
-    cc1101_write_reg(0x08, 0x00); // PKTCTRL0
-    // EnOcean ERP1: Preamble (4x0xAA) is handled by CC1101 sync/preamble if possible,
-    // but EnOcean's 0xAD sync is 8-bit. We'll use 16-bit sync 0xAAAD.
-    cc1101_write_reg(0x04, 0xAA); // SYNC1
-    cc1101_write_reg(0x05, 0xAD); // SYNC0
-    cc1101_write_reg(0x06, len);  // PKTLEN
-    // MDMCFG2: Manchester ON (0x08), 16/16 Sync (0x02), ASK/OOK (0x30) -> 0x3A
-    cc1101_write_reg(0x12, 0x3A); 
     
-    // Prepare packet with length byte if necessary? No, fixed length 0x06 is enough.
+    // Set Baudrate to 250kbps for raw chip transmission (since 125kbps Manchester = 250kbps chips)
+    cc1101_write_reg(0x10, 0x2D); // MDMCFG4: 250kbps
+    cc1101_write_reg(0x11, 0x3B); // MDMCFG3
     
-    for(int i=0; i<5; i++) {
+    cc1101_write_reg(0x08, 0x00);        // PKTCTRL0: Fixed Packet Length
+    cc1101_write_reg(0x06, encoded_len); // PKTLEN
+    cc1101_write_reg(0x13, 0x22);        // MDMCFG1: 4 bytes preamble
+    cc1101_write_reg(0x04, 0xAA);        // SYNC1
+    cc1101_write_reg(0x05, 0xAD);        // SYNC0
+    cc1101_write_reg(0x12, 0x32);        // MDMCFG2: ASK/OOK, No HW Manchester, 16/16 sync
+    
+    for(int i = 0; i < 5; i++) {
         if(check_lbt()) break;
         vTaskDelay(pdMS_TO_TICKS(2 + (esp_random() % 5)));
     }
@@ -286,7 +300,7 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
     for(int sub = 0; sub < 3; sub++) {
         cc1101_strobe(CC1101_SIDLE);
         cc1101_strobe(CC1101_SFTX);
-        cc1101_write_burst(0x3F, data, len);
+        cc1101_write_burst(0x3F, encoded_data, encoded_len);
         cc1101_strobe(CC1101_STX);
         int timeout = 50; 
         while((cc1101_read_status(CC1101_MARCSTATE) & 0x1F) != 0x01 && timeout > 0) {
@@ -296,7 +310,9 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
         if (sub < 2) vTaskDelay(pdMS_TO_TICKS(10 + (esp_random() % 16)));
     }
     
-    // Restore Async RX Mode
+    // Restore Async RX Mode (125kbps filters)
+    cc1101_write_reg(0x10, 0x19); // MDMCFG4: 125kbps filters
+    cc1101_write_reg(0x11, 0x83); // MDMCFG3
     cc1101_write_reg(0x08, 0x32); 
     cc1101_write_reg(0x12, 0x30); 
     cc1101_strobe(CC1101_SFRX);
