@@ -191,11 +191,7 @@ static void rf_rx_task_impl(void *pvParameters) {
     };
     while (1) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        // Toggle LED to indicate CS trigger
-        static bool led_v = false;
-        gpio_set_level(PIN_LED, led_v);
-        led_v = !led_v;
-
+        // esp_rom_printf("CS\n");
         ESP_ERROR_CHECK(rmt_receive(rx_channel, rmt_rx_buffer, sizeof(rmt_rx_buffer), &rec_config));
         if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(50)) == pdTRUE) {
             size_t rx_symbols_count = 0;
@@ -203,7 +199,8 @@ static void rf_rx_task_impl(void *pvParameters) {
                 if(rmt_rx_buffer[i].duration0 == 0) break;
                 rx_symbols_count++;
             }
-            if (rx_symbols_count > 10) {
+            if (rx_symbols_count > 0) {
+                // esp_rom_printf("RX:%d\n", rx_symbols_count);
                 rmt_to_manchester_decode(rmt_rx_buffer, rx_symbols_count);
             }
         }
