@@ -15,12 +15,10 @@ typedef struct {
 
 /**
  * @brief Verifies the AES-128 CMAC of an EnOcean telegram.
- * @return true if MAC is valid, false otherwise.
  */
-bool enocean_sec_verify_mac(const enocean_sec_device_t *device, 
-                            const uint8_t *payload, size_t payload_len, 
-                            uint32_t received_rlc, 
-                            const uint8_t *received_mac, size_t mac_len);
+bool enocean_sec_verify_mac_raw(const enocean_sec_device_t *device, 
+                               const uint8_t *mac_input, size_t mi_len, 
+                               const uint8_t *received_mac, size_t mac_len);
 
 /**
  * @brief Decrypts payload using AES-128 CTR (Standard for VAES).
