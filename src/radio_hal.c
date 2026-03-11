@@ -103,22 +103,24 @@ uint8_t cc1101_read_status(uint8_t addr) {
 }
 
 void cc1101_write_burst(uint8_t addr, const uint8_t *data, uint8_t len) {
+    if (len > 63) return; 
     xSemaphoreTake(spi_mutex, portMAX_DELAY);
-    uint8_t header = addr | 0x40;
-    spi_transaction_t t = { .length = 8, .tx_data = {header}, .flags = SPI_TRANS_USE_TXDATA };
+    uint8_t buf[65];
+    buf[0] = addr | 0x40;
+    memcpy(&buf[1], data, len);
+    spi_transaction_t t = { .length = (len + 1) * 8, .tx_buffer = buf };
     spi_device_polling_transmit(spi_handle, &t);
-    spi_transaction_t t_data = { .length = len * 8, .tx_buffer = data };
-    spi_device_polling_transmit(spi_handle, &t_data);
     xSemaphoreGive(spi_mutex);
 }
 
 void cc1101_read_burst(uint8_t addr, uint8_t *data, uint8_t len) {
+    if (len > 63) return;
     xSemaphoreTake(spi_mutex, portMAX_DELAY);
-    uint8_t header = addr | 0xC0;
-    spi_transaction_t t = { .length = 8, .tx_data = {header}, .flags = SPI_TRANS_USE_TXDATA };
+    uint8_t tx_buf[65] = { (uint8_t)(addr | 0xC0) };
+    uint8_t rx_buf[65] = { 0 };
+    spi_transaction_t t = { .length = (len + 1) * 8, .tx_buffer = tx_buf, .rx_buffer = rx_buf };
     spi_device_polling_transmit(spi_handle, &t);
-    spi_transaction_t t_data = { .length = len * 8, .rx_buffer = data };
-    spi_device_polling_transmit(spi_handle, &t_data);
+    memcpy(data, &rx_buf[1], len);
     xSemaphoreGive(spi_mutex);
 }
 
