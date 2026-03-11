@@ -30,19 +30,30 @@ volatile bool is_transmitting = false;
 #define TICK_LONG_MAX        85
 #define NOISE_RESET          200
 
+// --- Timing & Toleranzen (Basis: 8MHz, 1 Tick = 125ns) ---
+#define ERP1_PULSE_SHORT_MIN  12    // ~1.5 µs
+#define ERP1_PULSE_SHORT_MAX  47    // ~5.8 µs
+#define ERP1_PULSE_LONG_MIN   48    // ~6.0 µs
+#define ERP1_PULSE_LONG_MAX   95    // ~11.8 µs
+#define ERP1_MIN_PREAMBLE     6     
+#define ERP1_MAX_PAYLOAD      64    
+#define ERP1_MIN_LENGTH       7     
+#define NOISE_RESET           200
+
 typedef enum {
-    DEC_IDLE,
-    DEC_SYNCING,
-    DEC_MID_BIT,
-    DEC_EDGE
-} dec_state_t;
+    ERP1_STATE_SYNC,   
+    ERP1_STATE_DATA    
+} erp1_state_t;
 
 typedef struct {
-    dec_state_t state;
-    uint8_t buffer[64];
-    uint16_t bit_count;
-    uint32_t sync_register;
-    bool packet_ready;
+    erp1_state_t state;
+    uint8_t  half;           
+    uint8_t  c1_val;         
+    uint32_t preamble_bits;  
+    uint8_t  buffer[ERP1_MAX_PAYLOAD];
+    uint16_t byte_idx;
+    uint8_t  bit_idx;
+    bool packet_ready; // kept for legacy if needed
 } erp1_decoder_t;
 
 static erp1_decoder_t global_decoder;
@@ -59,90 +70,95 @@ enocean_sec_device_t* get_device_by_id(uint32_t sender_id) {
 }
 
 static void erp1_decoder_reset(erp1_decoder_t *dec) {
-    dec->state = DEC_IDLE;
-    dec->bit_count = 0;
-    dec->sync_register = 0;
+    dec->state = ERP1_STATE_SYNC;
+    dec->half = 0;
+    dec->c1_val = 0;
+    dec->preamble_bits = 0;
+    dec->byte_idx = 0;
+    dec->bit_idx = 0;
     dec->packet_ready = false;
-    memset(dec->buffer, 0, sizeof(dec->buffer));
 }
 
-static void handle_complete_telegram(uint8_t *raw_data, uint16_t len) {
-    if (len < 7) return;
+static void handle_complete_telegram(const uint8_t *data, uint16_t length) {
+    if (length < ERP1_MIN_LENGTH) return;
     
     // Check checksum (last byte is sum of all previous bytes)
-    uint8_t sum = 0;
-    for (int i = 0; i < len - 1; i++) sum += raw_data[i];
-    if (sum != raw_data[len - 1]) return;
+    uint8_t checksum = 0;
+    for (int i = 0; i < length - 1; i++) checksum += data[i];
+    if (checksum != data[length - 1]) return;
 
-    uint8_t r_org = raw_data[1];
-    uint32_t sender_id = (raw_data[len-5] << 24) | (raw_data[len-4] << 16) | 
-                         (raw_data[len-3] << 8)  | raw_data[len-2];
-
-    if (r_org == 0x30 || r_org == 0x31) {
-        enocean_sec_device_t *dev = get_device_by_id(sender_id);
-        if (dev) {
-            // Placeholder for real security processing
-            // For now, just pass through if MAC matches or send raw to host
-        }
-    }
-
+    // Send as ESP3 ERP1 Packet
+    // Option: 1 subtelegram, FF..FF Destination, RSSI -64, unencrypted
     uint8_t opt[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x40, 0x00 };
-    esp3_send_packet(ESP3_TYPE_RADIO_ERP1, &raw_data[1], len - 1, opt, 7);
+    esp3_send_packet(ESP3_TYPE_RADIO_ERP1, data, length, opt, 7);
 }
 
-static void erp1_decode_pulse(erp1_decoder_t *dec, int level, int duration) {
-    bool is_short = (duration >= TICK_TOLERANCE_LOW && duration <= TICK_SHORT_MAX);
-    bool is_long  = (duration > TICK_SHORT_MAX && duration <= TICK_LONG_MAX);
+static void erp1_push_bit(erp1_decoder_t *dec, uint8_t bit) {
+    if (dec->state == ERP1_STATE_SYNC) {
+        if (bit == 1) {
+            dec->preamble_bits++;
+        } else if (bit == 0) {
+            if (dec->preamble_bits >= ERP1_MIN_PREAMBLE) {
+                dec->state = ERP1_STATE_DATA;
+                dec->byte_idx = 0;
+                dec->bit_idx = 0;
+                memset(dec->buffer, 0, sizeof(dec->buffer));
+            } else {
+                erp1_decoder_reset(dec);
+            }
+        }
+    } else if (dec->state == ERP1_STATE_DATA) {
+        if (dec->byte_idx < ERP1_MAX_PAYLOAD) {
+            if (bit) dec->buffer[dec->byte_idx] |= (1 << (7 - dec->bit_idx));
+            dec->bit_idx++;
+            if (dec->bit_idx >= 8) {
+                dec->bit_idx = 0;
+                dec->byte_idx++;
+            }
+        } else {
+            erp1_decoder_reset(dec);
+        }
+    }
+}
 
-    if (duration > NOISE_RESET || (!is_short && !is_long)) {
-        dec->state = DEC_IDLE;
+static void erp1_decode_pulse(erp1_decoder_t *dec, int level, int duration, bool noise_reset) {
+    if (noise_reset) {
+        if (dec->state == ERP1_STATE_DATA && dec->byte_idx >= ERP1_MIN_LENGTH) {
+            handle_complete_telegram(dec->buffer, dec->byte_idx);
+        }
+        erp1_decoder_reset(dec);
         return;
     }
 
-    uint8_t decoded_bit = 0;
-    bool bit_ready = false;
+    bool is_short = (duration >= ERP1_PULSE_SHORT_MIN && duration <= ERP1_PULSE_SHORT_MAX);
+    bool is_long  = (duration >= ERP1_PULSE_LONG_MIN && duration <= ERP1_PULSE_LONG_MAX);
 
-    switch (dec->state) {
-        case DEC_IDLE:
-        case DEC_SYNCING:
-            dec->sync_register = (dec->sync_register << 1) | (level & 0x01);
-            if ((dec->sync_register & 0xFFFFFF) == 0xAAAAAA) {
-                dec->state = DEC_SYNCING;
-            } else if (dec->state == DEC_SYNCING && (dec->sync_register & 0xFF) == 0xA5) {
-                dec->state = DEC_MID_BIT;
-                dec->bit_count = 0;
-            }
-            break;
-        case DEC_MID_BIT:
-            if (is_short) {
-                dec->state = DEC_EDGE;
-            } else if (is_long) {
-                decoded_bit = level;
-                bit_ready = true;
-            }
-            break;
-        case DEC_EDGE:
-            if (is_short) {
-                decoded_bit = level;
-                bit_ready = true;
-                dec->state = DEC_MID_BIT;
-            } else {
-                dec->state = DEC_IDLE;
-            }
-            break;
+    if (!is_short && !is_long) {
+        erp1_decoder_reset(dec);
+        return;
     }
 
-    if (bit_ready) {
-        int byte_idx = dec->bit_count / 8;
-        int bit_offset = 7 - (dec->bit_count % 8);
-        if (decoded_bit) dec->buffer[byte_idx] |= (1 << bit_offset);
-        else dec->buffer[byte_idx] &= ~(1 << bit_offset);
-        dec->bit_count++;
-
-        if (dec->bit_count >= 8) {
-            uint8_t packet_len = dec->buffer[0];
-            if (dec->bit_count >= (packet_len + 1) * 8) {
-                handle_complete_telegram(dec->buffer, packet_len + 1);
+    if (is_short) {
+        if (dec->half == 0) {
+            dec->c1_val = level;
+            dec->half = 1;
+        } else {
+            if (dec->c1_val != level) {
+                erp1_push_bit(dec, dec->c1_val);
+                dec->half = 0;
+            } else {
+                erp1_decoder_reset(dec);
+            }
+        }
+    } else { // is_long
+        if (dec->half == 0) {
+            erp1_decoder_reset(dec);
+        } else {
+            if (dec->c1_val != level) {
+                erp1_push_bit(dec, dec->c1_val);
+                dec->c1_val = level;
+                dec->half = 1;
+            } else {
                 erp1_decoder_reset(dec);
             }
         }
