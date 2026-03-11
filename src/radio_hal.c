@@ -97,20 +97,22 @@ static void rmt_to_manchester_decode(const rmt_symbol_word_t *symbols, size_t nu
     uint8_t cur_byte = 0; int bit_cnt = 0;
     int chip_pair = 0; uint8_t chip1 = 0;
 
+    // DEBUG: Send first 8 levels to host
+    uint8_t debug_buf[8];
+    for(int i=0; i<8 && i<num_symbols; i++) debug_buf[i] = symbols[i].level0;
+    esp3_send_packet(0x33, debug_buf, 8, NULL, 0);
+
     for (size_t i = 0; i < num_symbols; i++) {
         uint32_t d[2] = {symbols[i].duration0, symbols[i].duration1};
         uint8_t l[2] = {symbols[i].level0, symbols[i].level1};
         for (int p = 0; p < 2; p++) {
             if (d[p] == 0) continue;
-            int count = (d[p] + 1) / 4; // Slightly more aggressive 4us chip detection
+            int count = (d[p] + 1) / 4; 
             if (count < 1) count = 1; 
             if (count > 4) count = 4;
             for (int c = 0; c < count; c++) {
                 sync_reg = (sync_reg << 1) | l[p];
                 if (!in_frame) {
-                    // EnOcean ERP1 SOF is bit '0' which is chips '01'.
-                    // Preamble is '1' which is '10'.
-                    // We look for '...101001' which means SOF '01' arrived.
                     if ((sync_reg & 0x0F) == 0x09) { 
                         in_frame = true; chip_pair = 0; bit_cnt = 0; payload_len = 0; cur_byte = 0;
                     }
@@ -123,7 +125,6 @@ static void rmt_to_manchester_decode(const rmt_symbol_word_t *symbols, size_t nu
                             cur_byte = (cur_byte << 1) | bit; bit_cnt++;
                             if (bit_cnt == 8) { if (payload_len < sizeof(payload)) payload[payload_len++] = cur_byte; bit_cnt = 0; }
                         } else { 
-                            // Manchester error. But if we have enough data, send it anyway for debug.
                             if (payload_len >= 7) goto end;
                             in_frame = false; 
                         }
