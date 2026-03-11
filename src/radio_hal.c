@@ -141,12 +141,12 @@ end:
 }
 
 static void rf_rx_task_impl(void *pvParameters) {
-    rmt_receive_config_t cfg = { .signal_range_min_ns = 1000, .signal_range_max_ns = 60000 };
+    rmt_receive_config_t cfg = { .signal_range_min_ns = 1000, .signal_range_max_ns = 600000 }; // 600us for idle detection
     rmt_enable(rx_channel);
     while (1) {
         memset(rmt_rx_buffer, 0, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t));
-        if (rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t), &cfg) == ESP_OK) {
-            if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(500)) == pdTRUE) {
+        if (rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS, &cfg) == ESP_OK) {
+            if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(1000)) == pdTRUE) {
                 size_t cnt = 0; while (cnt < MAX_RMT_SYMBOLS && rmt_rx_buffer[cnt].duration0 != 0) cnt++;
                 if (cnt > 0) rmt_to_manchester_decode(rmt_rx_buffer, cnt);
             }
