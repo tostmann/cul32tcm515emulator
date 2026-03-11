@@ -241,11 +241,12 @@ static void rf_rx_task_impl(void *pvParameters) {
                     uint16_t debug_data[2] = { (uint16_t)cnt, (uint16_t)(global_decoder.state) };
                     esp3_send_packet(0x34, (uint8_t*)debug_data, 4, NULL, 0);
                     for (size_t i = 0; i < cnt; i++) {
-                        erp1_decode_pulse(&global_decoder, rmt_rx_buffer[i].level0, rmt_rx_buffer[i].duration0);
+                        erp1_decode_pulse(&global_decoder, rmt_rx_buffer[i].level0, rmt_rx_buffer[i].duration0, false);
                         if (rmt_rx_buffer[i].duration1 > 0) {
-                            erp1_decode_pulse(&global_decoder, rmt_rx_buffer[i].level1, rmt_rx_buffer[i].duration1);
+                            erp1_decode_pulse(&global_decoder, rmt_rx_buffer[i].level1, rmt_rx_buffer[i].duration1, false);
                         }
                     }
+                    erp1_decode_pulse(&global_decoder, 0, 0, true); // Trigger evaluation at end of sequence
                 }
             }
             xSemaphoreTake(carrier_sense_sem, 0); 
