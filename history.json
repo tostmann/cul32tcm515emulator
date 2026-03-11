@@ -920,5 +920,33 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "static void IRAM_ATTR gdo0_data_isr_handler(void* arg) {\n    BaseType_t high_task_wakeup = pdFALSE;\n    gpio_intr_disable(PIN_GDO0);\n    vTaskNotifyGiveFromISR(rf_task_handle, &high_task_wakeup);\n    if (high_task_wakeup) portYIELD_FROM_ISR();\n}",
+            "path": "src/radio_hal.c",
+            "original_text": "static void IRAM_ATTR gdo2_cs_isr_handler(void* arg) {\n    BaseType_t high_task_wakeup = pdFALSE;\n    gpio_intr_disable(PIN_GDO2);\n    vTaskNotifyGiveFromISR(rf_task_handle, &high_task_wakeup);\n    if (high_task_wakeup) portYIELD_FROM_ISR();\n}"
+          }
+        }
+      }
+    ]
   }
 ]
