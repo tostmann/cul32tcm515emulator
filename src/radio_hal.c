@@ -142,7 +142,8 @@ static void rf_rx_task_impl(void *pvParameters) {
     rmt_enable(rx_channel);
     while (1) {
         if (xSemaphoreTake(carrier_sense_sem, portMAX_DELAY) == pdTRUE) {
-            if (is_transmitting) { gpio_intr_enable(PIN_GDO2); continue; }
+            gpio_set_level(PIN_LED, 0); // LED ON
+            if (is_transmitting) { gpio_intr_enable(PIN_GDO2); gpio_set_level(PIN_LED, 1); continue; }
             memset(rmt_rx_buffer, 0, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t));
             if (rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t), &cfg) == ESP_OK) {
                 if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(50)) == pdTRUE) {
@@ -152,6 +153,7 @@ static void rf_rx_task_impl(void *pvParameters) {
             }
             int t = 100; while (gpio_get_level(PIN_GDO2) == 1 && t-- > 0) vTaskDelay(1);
             vTaskDelay(5); xSemaphoreTake(carrier_sense_sem, 0); gpio_intr_enable(PIN_GDO2);
+            gpio_set_level(PIN_LED, 1); // LED OFF
         }
     }
 }
