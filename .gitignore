@@ -20,6 +20,8 @@ venv/
 # Project Specific
 binaries/
 last_execution.log
+history.json
+sdkconfig.*
 
 # Deploy Keys
 .deploy_key
