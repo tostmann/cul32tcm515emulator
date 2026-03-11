@@ -256,13 +256,13 @@ void radio_hal_init(void) {
     cc1101_strobe(CC1101_SRES); vTaskDelay(10);
     cc1101_write_reg(0x00, 0x0E); // Carrier Sense
     cc1101_write_reg(0x02, 0x0D); // Async Serial Out
-    // Correct Freq for 868.300 MHz (26.0 MHz Crystal): 0x215E63
-    cc1101_write_reg(0x0D, 0x21); cc1101_write_reg(0x0E, 0x5E); cc1101_write_reg(0x0F, 0x63); 
-    cc1101_write_reg(0x10, 0x8D); // MDMCFG4: BW ~406kHz
+    // Correct Freq for 868.302 MHz (26.0 MHz Crystal): 0x21656A
+    cc1101_write_reg(0x0D, 0x21); cc1101_write_reg(0x0E, 0x65); cc1101_write_reg(0x0F, 0x6A); 
+    cc1101_write_reg(0x10, 0x4C); // MDMCFG4: BW ~406kHz (E=1, M=0) for 26MHz
     cc1101_write_reg(0x11, 0x3B); // MDMCFG3: 250kbps
     cc1101_write_reg(0x12, 0x30); // MDMCFG2: OOK, No Sync
     cc1101_write_reg(0x22, 0x11); cc1101_write_reg(0x21, 0xB6); 
-    cc1101_write_reg(0x1B, 0x03); // AGCCTRL2: MAX_LNA_GAIN (Highest sensitivity)
+    cc1101_write_reg(0x1B, 0x03); // AGCCTRL2: MAX_LNA_GAIN
     cc1101_write_reg(0x1C, 0x00); // AGCCTRL1: Max CS Sensitivity
     cc1101_write_reg(0x1D, 0x91); // AGCCTRL0: Freeze on CS
     cc1101_write_reg(0x18, 0x18); 
