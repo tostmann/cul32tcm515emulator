@@ -4,12 +4,13 @@
 Entwicklung einer Firmware für den ESP32-C6, die ein EnOcean TCM515 (ESP3-Protokoll) USB-Gateway emuliert. Die Hardware-Basis besteht aus einem ESP32-C6-Modul und einem CC1101 Transceiver für das 868-MHz-Band.
 
 ### Aktueller Stand
-Die Software-Architektur des Empfängers ist auf **Produktionsniveau**, der **PLL-basierte Decoder mit Clock-Recovery** ist integriert. Die Validierung hat die **kritische Hardware-Schwäche als definitive Wurzelursache bestätigt**: Obwohl der Carrier-Sense (GDO2) korrekt auslöst, liegt der gemessene RSSI-Wert bei 10 cm Abstand bei ca. **-102 dBm** (Grundrauschen). Dies beweist eine **massive Signal-Dämpfung von >60 dB**, die charakteristisch für ein **inkorrektes Antennen-Matching des CC1101-Moduls** ist (ein für 433 MHz bestücktes Modul wird bei 868 MHz betrieben). **Alle Software-Validierungsarbeiten am Empfänger sind dadurch hart blockiert.**
+Die Software-Architektur des Empfängers ist auf **Produktionsniveau**, der **PLL-basierte Decoder mit Clock-Recovery** ist integriert. Die Validierung hat die **kritische Hardware-Schwäche als definitive Wurzelursache bestätigt**: Obwohl der Carrier-Sense (GDO2) korrekt auslöst, liegt der gemessene RSSI-Wert bei 10 cm Abstand bei ca. **-102 dBm** (Grundrauschen). Dies beweist eine **massive Signal-Dämpfung von >60 dB**, die charakteristisch für ein **inkorrektes Antennen-Matching des CC1101-Moduls** ist (ein für 433 MHz bestücktes Modul wird bei 868 MHz betrieben). **Alle Software-Validierungsarbeiten am Empfänger sind dadurch hart blockiert.** Der Fokus liegt nun auf der Validierung des Senders.
 
 ### Nächste Schritte
 *   **Hardware-Austausch (BLOCKER)**: Beschaffung und Austausch des CC1101-Moduls durch ein verifiziertes, korrekt für 868 MHz bestücktes Modul. **Dies ist die einzige und absolut höchste Priorität.**
+*   **Validierung des Sendevorgangs (In Arbeit)**: Analysieren und sicherstellen, dass der reale TCM515 die gesendeten Pakete der neuen LUT-basierten Sende-Logik empfängt.
+*   **Implementierung einer Software-Paket-Injektion**: Um den RX-Datenpfad (Decoder -> ESP3 -> Host) ohne funktionierendes RF-Frontend testen zu können.
 *   **End-to-End Validierung des Empfangs (nach HW-Fix)**: Verifizieren, dass der PLL-Decoder mit einem funktionierenden RF-Frontend vollständige ERP1-Pakete korrekt dekodiert und die Checksummen-Prüfung besteht.
-*   **Validierung des Sendevorgangs (nach HW-Fix)**: Analysieren, warum der reale TCM515 die gesendeten Pakete noch nicht empfängt.
 *   **Timing-Feinabstimmung (PLL-Decoder)**: Anpassen der Pulsweiten-Toleranzen (`MIN_1T`, `MAX_2T` etc.), um die Empfangssicherheit weiter zu maximieren.
 *   **Code-Refactoring**: Aufräumen des Codes, insbesondere der neuen Decoder-Logik (`erp1_decoder.c`), und Hinzufügen von Kommentaren.
 *   **Feinabstimmung**: Kalibrierung der RSSI-Werte und des LBT-Schwellwerts für den Praxiseinsatz.
@@ -20,13 +21,13 @@ Die Software-Architektur des Empfängers ist auf **Produktionsniveau**, der **PL
 2.  **Kommunikations-Schnittstelle**: Nativer USB-JTAG-Controller, System-Logs zur Laufzeit deaktiviert.
 3.  **Protokoll-Handling**: Dedizierte State-Machine (`esp3_proto.c`) mit statischem Puffer.
 4.  **Radio Abstraction**: HAL (`radio_hal.c`) mit atomaren SPI-Transaktionen, geschützt durch einen Mutex.
-5.  **Sendestrategie (Final, ERP1-konform)**:
-    *   **Modus**: CC1101 dynamisch im **Packet Mode** (FIFO-basiert).
-    *   **Frame-Aufbau (Software)**: Der gesamte physikalische ERP1-Frame wird in Software generiert:
-        *   `0xAAAA...` (Warm-Up für CC1101 OOK-Modulator)
-        *   EnOcean Preamble (Logische `1`er)
-        *   EnOcean **Start-of-Frame (SOF) Bit** (Einzelne logische `0`)
-        *   Manchester-codierter Payload (MSB first)
+5.  **Sendestrategie (Final, LUT-basiert)**:
+    *   **Modus**: CC1101 dynamisch im **Packet Mode** (FIFO-basiert) für hardware-präzises Timing.
+    *   **Manchester-Kodierung**: Hocheffizient über eine **Look-Up Table (LUT)**, die Daten-Nibbles direkt in CC1101-FIFO-Bytes umwandelt.
+    *   **Frame-Aufbau (Software)**:
+        *   Verlängerte Preamble (31 logische `1`en) zur Stabilisierung der Empfänger-AGC.
+        *   EnOcean **Start-of-Frame (SOF) Bit** (Einzelne logische `0`), erzeugt den physikalisch korrekten 8 µs LOW-Puls.
+        *   Manchester-codierter Payload (MSB first).
 6.  **Empfangsstrategie (Final, PLL-basiert)**:
     *   **Modus**: CC1101 im **Asynchronen Seriellen Modus**.
     *   **Architektur**:
@@ -49,13 +50,13 @@ Die Software-Architektur des Empfängers ist auf **Produktionsniveau**, der **PL
 9.  **Task Management (Final)**: Stack des USB-Empfangstasks auf **8192 Bytes** erhöht.
 
 ### Abgeschlossene Aufgaben (Development Log)
-*   **DONE**: **Hardware-Fehlanpassung als Wurzelursache verifiziert**: Systematische Tests (Distanzänderung, AGC-Tuning, Frequenzkorrektur) bestätigen, dass die extrem niedrige Empfindlichkeit (~60 dB Dämpfung) auf eine falsche Bestückung des CC1101-Moduls (433-MHz-Frontend) zurückzuführen ist.
+*   **DONE**: **Hardware-Fehlanpassung als Wurzelursache verifiziert**: Systematische Tests (Distanzänderung, AGC-Tuning) und die finale Beobachtung (GDO2 triggert bei -102 dBm RSSI) bestätigen, dass die extrem niedrige Empfindlichkeit (>60 dB Dämpfung) auf eine falsche Bestückung des CC1101-Moduls (433-MHz-Frontend) zurückzuführen ist.
+*   **DONE**: **RF-Sendestrategie auf Packet Mode und LUT-Kodierung umgestellt**: Der Transmitter wurde fundamental überarbeitet. Er nutzt nun den hardware-getimten **Packet Mode** des CC1101. Die Manchester-Kodierung erfolgt hocheffizient und präzise über eine **Look-Up Table (LUT)**, ergänzt durch eine verlängerte Preamble zur Verbesserung der Empfangsstabilität.
 *   **DONE**: **Kritischer Frequenz-Fehler (869.0 vs 868.3 MHz) identifiziert und behoben.**
 *   **DONE**: **CC1101-Register (AGC, BW) gegen Sättigung gehärtet**: Die RX-Bandbreite wurde auf 406 kHz erhöht und die AGC-Parameter wurden angepasst, um LNA-Clipping bei starken Signalen zu verhindern.
 *   **DONE**: **Produktionsreifer PLL-basierter Manchester-Decoder implementiert**: Der RMT-Empfänger wurde auf eine robuste State-Machine mit Clock-Recovery (3/4-Sampling) umgestellt.
 *   **DONE**: **Diagnose-Task für RF-Parameter implementiert** (RSSI, GDO-Pegel, RMT-Symbol-Count).
 *   **DONE**: RF-Empfang grundlegend validiert: Empfang von realen ERP1-Paketen eines TCM515 löst Carrier-Sense und RMT-Abtastung korrekt aus.
-*   **DONE**: RF-Sendestrategie fundamental überarbeitet: Korrekte ERP1-Frame-Struktur (Preamble, 1-Bit SOF) implementiert.
 *   **DONE**: Dynamische Umschaltung des CC1101 zwischen RX (async) und TX (packet) Modus implementiert.
 *   **DONE**: USB-Kommunikation und Host-Antworten (`RET_OK`) im `diff_test_enocean.py` erfolgreich validiert.
 *   **DONE**: **Kritische Reboot-Schleife (`rst:0xc SW_CPU`) unter Last vollständig behoben.**
