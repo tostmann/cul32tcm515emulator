@@ -1336,5 +1336,33 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "    gpio_install_isr_service(0); radio_rmt_rx_init();\n    xTaskCreate(radio_diag_task, \"diag\", 2048, NULL, 1, NULL);\n    cc1101_strobe(CC1101_SIDLE);\n    cc1101_write_reg(0x08, 0x32); cc1101_strobe(CC1101_SRX);\n}",
+            "path": "src/radio_hal.c",
+            "original_text": "    gpio_install_isr_service(0); radio_rmt_rx_init();\n    cc1101_strobe(CC1101_SIDLE);\n    cc1101_write_reg(0x08, 0x32); cc1101_strobe(CC1101_SRX);\n}"
+          }
+        }
+      }
+    ]
   }
 ]
