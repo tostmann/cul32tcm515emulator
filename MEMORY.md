@@ -8,7 +8,8 @@ Die Kernfunktionalität ist vollständig implementiert und getestet. Die Firmwar
 
 Der Empfang von EnOcean-Telegrammen ist ebenfalls implementiert und setzt auf eine robuste Software-Dekodierung, um Jitter-anfällige Sensoren (z.B. PTM-Schalter) zuverlässig zu empfangen. Eingehende EnOcean-Telegramme werden korrekt dekodiert und als ESP3-Pakete an den Host gesendet.
 
-Ein Python-Testskript hat die Sende- und Empfangs-Funktionalität erfolgreich validiert.
+### Offene Punkte / Aktuelle Probleme
+*   **BUG**: Bei einem Differentialtest gegen die TCM515-Referenzhardware wurde ein Fehler im Empfangspfad entdeckt: Wenn die Referenzhardware sendet, empfängt der Emulator das Paket korrekt, aber es scheint auch eine unerwünschte Rücksendung oder ein Echo auf Funkebene stattzufinden, das von der Referenzhardware empfangen wird. Dies deutet auf einen Fehler in der Zustandsverwaltung oder Ereignisbehandlung hin und muss noch analysiert werden.
 
 ### Architektur-Entscheidungen
 
@@ -42,3 +43,5 @@ Ein Python-Testskript hat die Sende- und Empfangs-Funktionalität erfolgreich va
 *   **DONE**: Jitter-toleranten Manchester-Software-Decoder ("Half-Bit-Extractor") implementiert.
 *   **DONE**: Anwendungslogik zur Weiterleitung empfangener EnOcean-Pakete an den Host über das ESP3-Protokoll implementiert.
 *   **DONE**: Kompilierte Binärdateien (`factory.bin`) und ein `manifest.json` für die Veröffentlichung bereitgestellt.
+*   **DONE**: Differentialtest-Skript (`diff_test_enocean.py`) zur Validierung gegen TCM515-Referenzhardware erstellt.
+*   **DONE**: Problem mit störenden System-Logs auf dem USB-Datenstrom identifiziert und durch Anpassung von `sdkconfig.defaults` nachhaltig behoben.
