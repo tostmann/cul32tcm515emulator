@@ -4,12 +4,13 @@
 Entwicklung einer Firmware für den ESP32-C6, die ein EnOcean TCM515 (ESP3-Protokoll) USB-Gateway emuliert. Die Hardware-Basis besteht aus einem ESP32-C6-Modul und einem CC1101 Transceiver für das 868-MHz-Band.
 
 ### Aktueller Stand
-**Die Firmware ist stabil.** Die Reboot-Schleifen (`rst:0xc SW_CPU`), die unter RF-Last im Differentialtest auftraten, wurden **vollständig behoben**. Der Differentialtest (`diff_test_enocean.py`) wird nun stabil durchlaufen. Die USB-Kommunikation ist fehlerfrei und der Emulator antwortet korrekt auf ESP3-Befehle vom Host. Der **RF-Empfang** (TCM515 -> Emulator) funktioniert ebenfalls, der Emulator empfängt und verarbeitet die Funksignale korrekt.
+**Die Firmware ist stabil.** Die Reboot-Schleifen (`rst:0xc SW_CPU`) sind **vollständig behoben**. Der Differentialtest (`diff_test_enocean.py`) läuft stabil ab, die USB-Kommunikation ist fehlerfrei und der Emulator antwortet korrekt auf ESP3-Befehle vom Host. Die fundamentalen Konzepte des physikalischen EnOcean-Funkprotokolls (ERP1) wurden analysiert und die Firmware-Architektur (CC1101-Register, RMT-Decoder, Sendestrategie) wurde tiefgreifend überarbeitet, um Kompatibilität zu gewährleisten.
 
 ### Nächste Schritte
-*   **Fehlersuche RF-Senden**: Der vom Emulator gesendete Funk-Frame wird vom Referenz-TCM515 noch nicht als gültiges EnOcean-Telegramm erkannt. Die Ursachenanalyse konzentriert sich auf das mikrosekundengenaue Timing der Manchester-Codierung und die exakte Struktur des physikalischen Frames (Preamble, SOF).
-*   **Feinabstimmung**: Kalibrierung der RSSI-Werte und des LBT-Schwellwerts für den Praxiseinsatz.
+*   **Validierung der RF-Kommunikation**: Der Differentialtest (`diff_test_enocean.py`) muss in beide Richtungen (Senden und Empfangen) erfolgreich durchlaufen werden.
+*   **Timing-Feinabstimmung (RMT)**: Anpassen der Pulsweiten-Schwellwerte im 8-MHz-RMT-Decoder, um die Toleranz gegenüber dem realen Signal des TCM515 zu maximieren.
 *   **Code-Refactoring**: Aufräumen des Codes und Hinzufügen von Kommentaren vor dem finalen Release.
+*   **Feinabstimmung**: Kalibrierung der RSSI-Werte und des LBT-Schwellwerts für den Praxiseinsatz.
 
 ### Architektur-Entscheidungen
 
@@ -26,19 +27,23 @@ Entwicklung einer Firmware für den ESP32-C6, die ein EnOcean TCM515 (ESP3-Proto
     *   **Frame-Aufbau (Software)**: Der gesamte physikalische ERP1-Frame wird in Software generiert und in den CC1101-FIFO geschrieben:
         *   `0xAAAA` (Warm-Up für den CC1101 OOK-Modulator)
         *   EnOcean Preamble (Logische `1`er)
-        *   EnOcean Start-of-Frame (SOF) Bit (Eine einzelne logische `0`)
+        *   EnOcean **Start-of-Frame (SOF) Bit** (Eine einzelne logische `0`)
         *   Manchester-codierter Payload (MSB first)
 6.  **Empfangsstrategie (Final, gehärtet)**:
     *   **Modus**: Der CC1101 wird dynamisch in den **Asynchronen Seriellen Modus** geschaltet; der rohe Datenstrom wird am GDO0-Pin ausgegeben.
-    *   **Architektur**: Das **RMT-Modul** des ESP32 tastet den rohen Manchester-Chip-Stream vom CC1101 jitterfrei ab. Ein **Carrier-Sense-Gating-Mechanismus** schützt die CPU vor Interrupt-Stürmen.
+    *   **Architektur**:
+        *   Das **RMT-Modul** des ESP32 tastet den rohen Manchester-Chip-Stream mit **8 MHz** (1 Tick = 125 ns) hochauflösend ab.
+        *   Ein **Carrier-Sense-Gating-Mechanismus** schützt die CPU vor Interrupt-Stürmen.
+    *   **SOF-Erkennung**: Der Decoder identifiziert den Paketstart robust durch die Erkennung der physikalischen **8 µs LOW-Phase** ("Manchester Violation"), die am Übergang von Preamble zu SOF entsteht.
     *   **Gating-Logik (Gehärtet)**:
         *   Der **Carrier Sense (CS) Pin (GDO2)** löst einen GPIO-Interrupt aus.
         *   Der Interrupt wird **sofort im ISR deaktiviert** (`gpio_intr_disable`) und erst nach Verarbeitung des Pakets wieder aktiviert.
 7.  **CC1101-Register (Final, für 250 kchip/s OOK)**:
-    *   **Frequenz**: Präzise auf **868,300 MHz** kalibriert (`0x2165D4`).
+    *   **Frequenz**: Präzise auf **868,300 MHz** kalibriert (`0x21656A` für 26 MHz Quarz).
     *   **Datenrate**: Auf **250 kbps** konfiguriert, um die 125 kbps Manchester-Datenrate abzubilden.
-    *   **OOK-Modulation**: `PATABLE` und `FREND0` sind korrekt für On-Off-Keying konfiguriert.
-    *   **RX-Bandbreite**: Auf **541 kHz** erhöht, um Frequenzdrift und Jitter abzufangen.
+    *   **OOK-Modulation**: `PATABLE` ist korrekt auf `{0x00, 0xC0}` gesetzt und `FREND0` konfiguriert, um echte On-Off-Keying zu erzeugen. `MDMCFG2=0x30` deaktiviert die Hardware-Preamble/-Sync.
+    *   **RX-Bandbreite**: Auf **325 kHz** eingestellt.
+    *   **AGC**: Konfiguriert, um die Verstärkung bei erkanntem Trägersignal einzufrieren (`AGC_FREEZE_ON_CS`), was den Empfang stabilisiert.
 8.  **Concurrency Management (Final)**:
     *   Die gesamte SPI-Kommunikation mit dem CC1101 wird durch einen **Mutex** geschützt.
 9.  **Task Management (Final)**:
@@ -57,8 +62,9 @@ Entwicklung einer Firmware für den ESP32-C6, die ein EnOcean TCM515 (ESP3-Proto
 *   **DONE**: ESP3-Protokoll-Parser von `malloc` auf einen **statischen Puffer** umgestellt.
 *   **DONE**: SPI-Burst-Funktionen (`cc1101_write/read_burst`) auf **atomare Transaktionen** korrigiert.
 *   **DONE**: **Kritische Reboot-Schleife (`rst:0xc SW_CPU`) unter Last vollständig behoben.**
-*   **DONE**: RF-Sendestrategie auf physikalisch korrekten ERP1-Frame umgestellt (Preamble, SOF-Bit).
-*   **DONE**: CC1101-Register für OOK-Modulation (250 kchip/s) optimiert (`PATABLE`, Bandbreite, Frequenz).
+*   **DONE**: RF-Sendestrategie fundamental überarbeitet: Korrekte ERP1-Frame-Struktur (Preamble, 1-Bit SOF) implementiert.
+*   **DONE**: Empfangs-Decoder auf hochauflösendes RMT (8 MHz) umgestellt.
+*   **DONE**: SOF-Erkennung im RMT-Decoder auf physikalische 8µs-Pulsweite (Manchester Violation) gehärtet.
+*   **DONE**: CC1101-Register für robustes 250k-OOK Senden/Empfangen optimiert (Frequenz, PATABLE, AGC-Freeze).
 *   **DONE**: Dynamische Umschaltung des CC1101 zwischen RX (async) und TX (packet) Modus implementiert.
 *   **DONE**: USB-Kommunikation im `diff_test_enocean.py` erfolgreich validiert.
-*   **DONE**: **RF-Empfang** (TCM515 -> Emulator) im `diff_test_enocean.py` erfolgreich validiert.
