@@ -178,24 +178,25 @@ static void rmt_to_manchester_decode(const rmt_symbol_word_t *symbols, size_t nu
 static void rf_rx_task_impl(void *pvParameters) {
     rmt_receive_config_t rec_config = {
         .signal_range_min_ns = 2000,
-        .signal_range_max_ns = 20000,
+        .signal_range_max_ns = 40000,
     };
     while (1) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         ESP_ERROR_CHECK(rmt_receive(rx_channel, rmt_rx_buffer, sizeof(rmt_rx_buffer), &rec_config));
-        if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(50)) == pdTRUE) {
+        if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(100)) == pdTRUE) {
             size_t rx_symbols_count = 0;
             for(int i=0; i<MAX_RMT_SYMBOLS; i++) {
                 if(rmt_rx_buffer[i].duration0 == 0) break;
                 rx_symbols_count++;
             }
-            if (rx_symbols_count > 0) {
-                // esp_rom_printf("RX:%d\n", rx_symbols_count);
+            if (rx_symbols_count > 10) {
                 rmt_to_manchester_decode(rmt_rx_buffer, rx_symbols_count);
             }
         }
-        while (gpio_get_level(PIN_GDO2) == 1) vTaskDelay(pdMS_TO_TICKS(1));
-        gpio_intr_enable(PIN_GDO2);
+        // Use GDO0 level to check if channel is clear
+        while (gpio_get_level(PIN_GDO0) == 1) vTaskDelay(pdMS_TO_TICKS(1));
+        vTaskDelay(pdMS_TO_TICKS(5)); 
+        gpio_intr_enable(PIN_GDO0);
     }
 }
 
