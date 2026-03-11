@@ -22,10 +22,6 @@ volatile bool is_transmitting = false;
 // RMT Configuration
 #define RMT_RESOLUTION_HZ   1000000 // 1 MHz -> 1 µs
 #define MAX_RMT_SYMBOLS     1024
-#define THRESHOLD_SHORT_MIN 3   // 3.0 µs
-#define THRESHOLD_SHORT_MAX 5   // 5.0 µs
-#define THRESHOLD_LONG_MIN  6   // 6.0 µs
-#define THRESHOLD_LONG_MAX  10  // 10.0 µs
 
 static rmt_channel_handle_t rx_channel = NULL;
 static TaskHandle_t rf_task_handle = NULL;
@@ -55,13 +51,13 @@ static void spi_init(void) {
         .sclk_io_num = PIN_SCK,
         .quadwp_io_num = -1,
         .quadhd_io_num = -1,
-        .max_transfer_sz = 64
+        .max_transfer_sz = 256
     };
     spi_device_interface_config_t devcfg = {
         .clock_speed_hz = 5000000,
         .mode = 0,
         .spics_io_num = PIN_SS,
-        .queue_size = 3,
+        .queue_size = 7,
         .flags = 0
     };
     ESP_ERROR_CHECK(spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_DISABLED));
@@ -104,9 +100,9 @@ uint8_t cc1101_read_status(uint8_t addr) {
 }
 
 void cc1101_write_burst(uint8_t addr, const uint8_t *data, uint8_t len) {
-    if (len > 63) return; 
+    if (len > 128) return; 
     xSemaphoreTake(spi_mutex, portMAX_DELAY);
-    uint8_t buf[65];
+    uint8_t buf[129];
     buf[0] = addr | 0x40;
     memcpy(&buf[1], data, len);
     spi_transaction_t t = { .length = (len + 1) * 8, .tx_buffer = buf };
@@ -115,10 +111,10 @@ void cc1101_write_burst(uint8_t addr, const uint8_t *data, uint8_t len) {
 }
 
 void cc1101_read_burst(uint8_t addr, uint8_t *data, uint8_t len) {
-    if (len > 63) return;
+    if (len > 128) return;
     xSemaphoreTake(spi_mutex, portMAX_DELAY);
-    uint8_t tx_buf[65] = { (uint8_t)(addr | 0xC0) };
-    uint8_t rx_buf[65] = { 0 };
+    uint8_t tx_buf[129] = { (uint8_t)(addr | 0xC0) };
+    uint8_t rx_buf[129] = { 0 };
     spi_transaction_t t = { .length = (len + 1) * 8, .tx_buffer = tx_buf, .rx_buffer = rx_buf };
     spi_device_polling_transmit(spi_handle, &t);
     memcpy(data, &rx_buf[1], len);
@@ -126,63 +122,78 @@ void cc1101_read_burst(uint8_t addr, uint8_t *data, uint8_t len) {
 }
 
 // Manchester Decoding
+// 1 -> 10 (High Low)
+// 0 -> 01 (Low High)
+// Sync Word: 0xA55A
 static void rmt_to_manchester_decode(const rmt_symbol_word_t *symbols, size_t num_symbols) {
-    static uint8_t half_bits[MAX_RMT_SYMBOLS * 2];
-    int hb_count = 0;
-
-    for (size_t i = 0; i < num_symbols; i++) {
-        int durations[2] = {symbols[i].duration0, symbols[i].duration1};
-        int levels[2]    = {symbols[i].level0, symbols[i].level1};
-        for (int p = 0; p < 2; p++) {
-            int d = durations[p];
-            int l = levels[p];
-            if (d == 0) continue;
-            if (d < 2) continue; // Noise filter at 1MHz
-            
-            int n = (d + 2) / 4; // 4us = 4 ticks at 1MHz
-            if (n > 4) n = 4;
-            for (int k = 0; k < n && hb_count < (MAX_RMT_SYMBOLS * 2); k++) {
-                half_bits[hb_count++] = l;
-            }
-        }
-    }
-    if (hb_count < 32) return;
-
+    uint16_t sync_shift_reg = 0;
+    bool sync_found = false;
     uint8_t payload[64];
     int payload_len = 0;
-    bool synced = false;
     uint8_t current_byte = 0;
     int bit_count = 0;
+    int chip_state = 0; // 0: Expect first chip of pair, 1: Expect second chip
 
-    int sync_idx = -1;
-    uint32_t pattern = 0;
-    for (int i = 0; i < hb_count; i++) {
-        pattern = (pattern << 1) | half_bits[i];
-        if ((pattern & 0xFFFF) == 0xCCF3) { 
-            sync_idx = i + 1;
-            synced = true;
-            break;
-        }
-    }
-
-    if (synced && sync_idx != -1) {
-        for (int i = sync_idx; i < hb_count - 1; i += 2) {
-            uint8_t hb1 = half_bits[i];
-            uint8_t hb2 = half_bits[i+1];
-            int decoded_bit = -1;
-            if (hb1 == 1 && hb2 == 0) decoded_bit = 1;
-            else if (hb1 == 0 && hb2 == 1) decoded_bit = 0;
-            else { i--; continue; } 
+    for (size_t i = 0; i < num_symbols; i++) {
+        uint32_t durations[2] = {symbols[i].duration0, symbols[i].duration1};
+        uint8_t levels[2]    = {symbols[i].level0, symbols[i].level1};
+        
+        for (int p = 0; p < 2; p++) {
+            uint32_t d = durations[p];
+            if (d == 0) continue;
             
-            current_byte = (current_byte << 1) | decoded_bit;
-            bit_count++;
-            if (bit_count == 8) {
-                if (payload_len < sizeof(payload)) payload[payload_len++] = current_byte;
-                bit_count = 0;
+            int chip_count = 0;
+            if (d >= 2 && d <= 6) chip_count = 1;
+            else if (d > 6 && d <= 11) chip_count = 2;
+            else {
+                sync_shift_reg = 0;
+                sync_found = false;
+                continue;
+            }
+
+            for (int c = 0; c < chip_count; c++) {
+                sync_shift_reg = (sync_shift_reg << 1) | levels[p];
+                
+                if (!sync_found) {
+                    if (sync_shift_reg == 0xA55A) {
+                        sync_found = true;
+                        chip_state = 0;
+                        bit_count = 0;
+                        payload_len = 0;
+                    }
+                } else {
+                    // We are in payload. Process chips in pairs.
+                    static uint8_t first_chip;
+                    if (chip_state == 0) {
+                        first_chip = levels[p];
+                        chip_state = 1;
+                    } else {
+                        uint8_t second_chip = levels[p];
+                        int bit = -1;
+                        if (first_chip == 1 && second_chip == 0) bit = 1;
+                        else if (first_chip == 0 && second_chip == 1) bit = 0;
+                        
+                        if (bit != -1) {
+                            current_byte = (current_byte << 1) | bit;
+                            bit_count++;
+                            if (bit_count == 8) {
+                                if (payload_len < sizeof(payload)) payload[payload_len++] = current_byte;
+                                bit_count = 0;
+                            }
+                        } else {
+                            // Manchester error -> End of packet
+                            sync_found = false;
+                            goto packet_end;
+                        }
+                        chip_state = 0;
+                    }
+                }
             }
         }
     }
-    if (synced && payload_len > 0) {
+
+packet_end:
+    if (payload_len > 0) {
         uint8_t opt_data[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x40, 0x00 };
         esp3_send_packet(ESP3_TYPE_RADIO_ERP1, payload, payload_len, opt_data, 7);
     }
@@ -191,7 +202,7 @@ static void rmt_to_manchester_decode(const rmt_symbol_word_t *symbols, size_t nu
 static void rf_rx_task_impl(void *pvParameters) {
     rmt_receive_config_t rec_config = {
         .signal_range_min_ns = 1000,
-        .signal_range_max_ns = 50000,
+        .signal_range_max_ns = 60000,
     };
     rmt_enable(rx_channel);
     while (1) {
@@ -286,17 +297,24 @@ void radio_hal_init(void) {
     for (int i = 0; i < sizeof(erp1_config)/sizeof(cc1101_cfg_t); i++) {
         cc1101_write_reg(erp1_config[i].addr, erp1_config[i].val);
     }
+    
+    // Expert overrides for TCM515 compatibility
+    cc1101_write_reg(0x0D, 0x21); // FREQ2
+    cc1101_write_reg(0x0E, 0x65); // FREQ1
+    cc1101_write_reg(0x0F, 0x6A); // FREQ0 (868.299 MHz)
+    cc1101_write_reg(0x10, 0x2D); // MDMCFG4: 541kHz BW
+    cc1101_write_reg(0x11, 0x3B); // MDMCFG3: 250kbps
+    cc1101_write_reg(0x12, 0x30); // MDMCFG2: OOK, No HW Sync
+    
     cc1101_write_burst(0x3E, patable_ook, 2);
     
     esp_err_t err = gpio_install_isr_service(0);
-    if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {
-        // Handle error
-    }
+    if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) { }
     
-    // radio_rmt_rx_init();
+    radio_rmt_rx_init();
     
-    // cc1101_strobe(CC1101_SRX);
-    ESP_LOGI(TAG, "CC1101 Initialized (RX Task Disabled for Debug)");
+    cc1101_strobe(CC1101_SRX);
+    ESP_LOGI(TAG, "CC1101 Initialized in 250kbps OOK mode");
 }
 
 static bool check_lbt(void) {
@@ -305,19 +323,33 @@ static bool check_lbt(void) {
     return true;
 }
 
-static const uint8_t manchester_lut[16] = {
-    0x55, 0x56, 0x59, 0x5A, 0x65, 0x66, 0x69, 0x6A,
-    0x95, 0x96, 0x99, 0x9A, 0xA5, 0xA6, 0xA9, 0xAA
-};
+static uint16_t encode_manchester_byte(uint8_t b) {
+    uint16_t result = 0;
+    for (int i = 7; i >= 0; i--) {
+        if ((b >> i) & 1) result = (result << 2) | 0x02; // 1 -> 10
+        else result = (result << 2) | 0x01; // 0 -> 01
+    }
+    return result;
+}
 
 void radio_transmit(const uint8_t *data, uint8_t len) {
     if (len > 31) return; 
-    uint8_t encoded_len = len * 2;
-    uint8_t encoded_data[64];
-
+    
+    uint8_t tx_buf[128];
+    uint8_t idx = 0;
+    
+    // Preamble 2 bytes (0xAA = 10101010 chips)
+    tx_buf[idx++] = 0xAA;
+    tx_buf[idx++] = 0xAA;
+    
+    // Sync Word (0xA55A chips)
+    tx_buf[idx++] = 0xA5;
+    tx_buf[idx++] = 0x5A;
+    
     for (uint8_t i = 0; i < len; i++) {
-        encoded_data[i * 2]     = manchester_lut[data[i] >> 4];
-        encoded_data[i * 2 + 1] = manchester_lut[data[i] & 0x0F];
+        uint16_t encoded = encode_manchester_byte(data[i]);
+        tx_buf[idx++] = (encoded >> 8) & 0xFF;
+        tx_buf[idx++] = encoded & 0xFF;
     }
 
     is_transmitting = true;
@@ -325,16 +357,12 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
     
     cc1101_strobe(CC1101_SIDLE);
     
-    // Set Baudrate to 250kbps for raw chip transmission (since 125kbps Manchester = 250kbps chips)
-    cc1101_write_reg(0x10, 0x2D); // MDMCFG4: 250kbps
-    cc1101_write_reg(0x11, 0x3B); // MDMCFG3
-    
-    cc1101_write_reg(0x08, 0x00);        // PKTCTRL0: Fixed Packet Length
-    cc1101_write_reg(0x06, encoded_len); // PKTLEN
-    cc1101_write_reg(0x13, 0x22);        // MDMCFG1: 4 bytes preamble
-    cc1101_write_reg(0x04, 0xAA);        // SYNC1
-    cc1101_write_reg(0x05, 0xAD);        // SYNC0
-    cc1101_write_reg(0x12, 0x32);        // MDMCFG2: ASK/OOK, No HW Manchester, 16/16 sync
+    // Config for TX: 250kbps OOK, Fixed length, No preamble/sync in HW
+    cc1101_write_reg(0x10, 0x2D); 
+    cc1101_write_reg(0x11, 0x3B); 
+    cc1101_write_reg(0x08, 0x00);        // Fixed length
+    cc1101_write_reg(0x06, idx);         // Packet length
+    cc1101_write_reg(0x12, 0x30);        // OOK, No HW Sync
     
     for(int i = 0; i < 5; i++) {
         if(check_lbt()) break;
@@ -344,7 +372,7 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
     for(int sub = 0; sub < 3; sub++) {
         cc1101_strobe(CC1101_SIDLE);
         cc1101_strobe(CC1101_SFTX);
-        cc1101_write_burst(0x3F, encoded_data, encoded_len);
+        cc1101_write_burst(0x3F, tx_buf, idx);
         cc1101_strobe(CC1101_STX);
         int timeout = 50; 
         while((cc1101_read_status(CC1101_MARCSTATE) & 0x1F) != 0x01 && timeout > 0) {
@@ -354,9 +382,8 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
         if (sub < 2) vTaskDelay(pdMS_TO_TICKS(10 + (esp_random() % 16)));
     }
     
-    // Restore Async RX Mode (125kbps filters)
-    cc1101_write_reg(0x10, 0x4C); // Optimized MDMCFG4 for RX
-    cc1101_write_reg(0x11, 0x3B); // Optimized MDMCFG3 for RX
+    // Restore Async RX Mode
+    cc1101_write_reg(0x10, 0x2D); 
     cc1101_write_reg(0x08, 0x32); 
     cc1101_write_reg(0x12, 0x30); 
     cc1101_strobe(CC1101_SFRX);
