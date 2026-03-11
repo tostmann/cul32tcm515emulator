@@ -145,16 +145,13 @@ static void rf_rx_task_impl(void *pvParameters) {
     rmt_receive_config_t cfg = { .signal_range_min_ns = 1000, .signal_range_max_ns = 60000 };
     rmt_enable(rx_channel);
     while (1) {
-        // Just keep receiving in a loop, Carrier Sense only triggers the decoder start if needed
-        // But RMT can buffer. Let's try continuous receive for a bit.
         memset(rmt_rx_buffer, 0, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t));
         if (rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t), &cfg) == ESP_OK) {
-            if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(100)) == pdTRUE) {
+            if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(500)) == pdTRUE) {
                 size_t cnt = 0; while (cnt < MAX_RMT_SYMBOLS && rmt_rx_buffer[cnt].duration0 != 0) cnt++;
-                if (cnt > 5) rmt_to_manchester_decode(rmt_rx_buffer, cnt);
+                if (cnt > 0) rmt_to_manchester_decode(rmt_rx_buffer, cnt);
             }
         }
-        vTaskDelay(1);
     }
 }
 
