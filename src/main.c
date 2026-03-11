@@ -22,26 +22,19 @@ void usb_rx_task(void *pvParameters) {
 }
 
 void app_main(void) {
-    // Logging will now go to UART0 (TX/RX Pins)
-    esp_log_level_set("*", ESP_LOG_INFO);
+    esp_log_level_set("*", ESP_LOG_NONE);
     
-    // Initialize USB Serial JTAG driver
     usb_serial_jtag_driver_config_t usb_config = {
-        .tx_buffer_size = 512,
-        .rx_buffer_size = 512,
+        .tx_buffer_size = 1024,
+        .rx_buffer_size = 1024,
     };
     usb_serial_jtag_driver_install(&usb_config);
 
-    // Initialize Radio HAL first
+    esp3_init();
     radio_hal_init();
 
-    // Initialize ESP3 parser
-    esp3_init();
+    xTaskCreate(usb_rx_task, "usb_rx", 4096, NULL, 5, NULL);
     
-    // Start USB RX Task
-    xTaskCreate(usb_rx_task, "usb_rx", 8192, NULL, 5, NULL);
-    
-    // Main loop does nothing
     while (1) {
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
