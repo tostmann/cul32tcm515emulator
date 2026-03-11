@@ -262,9 +262,9 @@ void radio_hal_init(void) {
     cc1101_write_reg(0x11, 0x3B); // MDMCFG3: 250kbps
     cc1101_write_reg(0x12, 0x30); // MDMCFG2: OOK, No Sync
     cc1101_write_reg(0x22, 0x11); cc1101_write_reg(0x21, 0xB6); 
-    cc1101_write_reg(0x1B, 0x43); // AGCCTRL2: Reduzierter MAX_LNA_GAIN
-    cc1101_write_reg(0x1C, 0x40); // AGCCTRL1: LNA Priorität
-    cc1101_write_reg(0x1D, 0x91); // AGCCTRL0: Freeze on CS (Wait 16)
+    cc1101_write_reg(0x1B, 0x03); // AGCCTRL2: MAX_LNA_GAIN (Highest sensitivity)
+    cc1101_write_reg(0x1C, 0x00); // AGCCTRL1: Max CS Sensitivity
+    cc1101_write_reg(0x1D, 0x91); // AGCCTRL0: Freeze on CS
     cc1101_write_reg(0x18, 0x18); 
     cc1101_write_reg(0x23, 0x81); cc1101_write_reg(0x24, 0x35); cc1101_write_reg(0x25, 0x09); 
     static const uint8_t patable_ook[] = {0x00, 0xC0};

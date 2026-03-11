@@ -1218,5 +1218,28 @@
         "text": "Ich sehe die Ver\u00e4nderung deutlich: Das Signal des TCM515 ist im Emulator-Log **gar nicht mehr sichtbar** (konstant bei ca. -104 dBm Grundrauschen, kein GDO2-Ausschlag).\n\n### Analyse\n*   **Vorher (10 cm)**: RSSI ca. **-85 dBm**. Das war bereits extrem schwach f\u00fcr diese Distanz (normal w\u00e4re -30 dBm), was auf ein massives Hardware-Problem hindeutet (falsches Antennen-Matching/Balun f\u00fcr 433 MHz statt 868 MHz auf dem CC1101-Modul).\n*   **Jetzt (gr\u00f6\u00dfere Entfernung)**: Das Signal f\u00e4llt unter die Empfangsschwelle des CC1101.\n\n### Fazit & Empfehlung\nWir haben ein **Hardware-Problem mit der RF-Frontend-Effizienz**. Das Modul \"taub\".\n1.  **Bitte stelle die Ger\u00e4te wieder so dicht wie m\u00f6glich zusammen (10-20 cm).** Bei diesem spezifischen Modul scheint die S\u00e4ttigung unser kleinstes Problem zu sein; wir brauchen jedes Qu\u00e4ntchen Signalst\u00e4rke, um \u00fcberhaupt den Carrier-Sense zu triggern.\n2.  **Pr\u00fcfe die Antennenverbindung**: Ist die Antenne am CC1101 fest verl\u00f6tet/verschraubt?\n3.  **Hardware-Verdacht**: Wenn der RSSI bei 10 cm nur -85 dBm erreicht, ist das Modul h\u00f6chstwahrscheinlich ein falsch best\u00fccktes 433-MHz-Modul. \n\n**Plan**: Sobald die Ger\u00e4te wieder dicht beisammen stehen, werde ich die Empfangsschwelle (`Carrier Sense Threshold`) im Code extrem empfindlich einstellen, um trotz der Hardware-Schw\u00e4che eine Dekodierung zu erzwingen.\n\n**Bitte gib Bescheid, wenn sie wieder nah beieinander stehen.**"
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "text": "probiere jetzt!"
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "    cc1101_write_reg(0x22, 0x11); cc1101_write_reg(0x21, 0xB6); \n    cc1101_write_reg(0x1B, 0x03); // AGCCTRL2: MAX_LNA_GAIN (Highest sensitivity)\n    cc1101_write_reg(0x1C, 0x00); // AGCCTRL1: Max CS Sensitivity\n    cc1101_write_reg(0x1D, 0x91); // AGCCTRL0: Freeze on CS\n    cc1101_write_reg(0x18, 0x18); \n    cc1101_write_reg(0x23, 0x81); cc1101_write_reg(0x24, 0x35); cc1101_write_reg(0x25, 0x09); \n    static const uint8_t patable_ook[] = {0x00, 0xC0};\n    cc1101_write_burst(0x3E, patable_ook, 2);",
+            "path": "src/radio_hal.c",
+            "original_text": "    cc1101_write_reg(0x22, 0x11); cc1101_write_reg(0x21, 0xB6); \n    cc1101_write_reg(0x1B, 0x43); // AGCCTRL2: Reduzierter MAX_LNA_GAIN\n    cc1101_write_reg(0x1C, 0x40); // AGCCTRL1: LNA Priorit\u00e4t\n    cc1101_write_reg(0x1D, 0x91); // AGCCTRL0: Freeze on CS (Wait 16)\n    cc1101_write_reg(0x18, 0x18); \n    cc1101_write_reg(0x23, 0x81); cc1101_write_reg(0x24, 0x35); cc1101_write_reg(0x25, 0x09); \n    static const uint8_t patable_ook[] = {0x00, 0xC0};\n    cc1101_write_burst(0x3E, patable_ook, 2);"
+          }
+        }
+      }
+    ]
   }
 ]
