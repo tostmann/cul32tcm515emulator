@@ -228,8 +228,8 @@ static void rf_rx_task_impl(void *pvParameters) {
 }
 
 void radio_rmt_rx_init(void) {
-    rmt_done_sem = xSemaphoreCreateBinary();
-    carrier_sense_sem = xSemaphoreCreateBinary();
+    if (carrier_sense_sem == NULL) carrier_sense_sem = xSemaphoreCreateBinary();
+    if (rmt_done_sem == NULL) rmt_done_sem = xSemaphoreCreateBinary();
     
     if (rmt_rx_buffer == NULL) {
         rmt_rx_buffer = (rmt_symbol_word_t *)heap_caps_calloc(
@@ -255,7 +255,7 @@ void radio_rmt_rx_init(void) {
     rmt_rx_event_callbacks_t cbs = { .on_recv_done = rmt_rx_done_callback };
     ESP_ERROR_CHECK(rmt_rx_register_event_callbacks(rx_channel, &cbs, NULL));
     
-    xTaskCreate(rf_rx_task_impl, "rf_rx_task", 4096, NULL, 5, &rf_task_handle);
+    xTaskCreate(rf_rx_task_impl, "rf_rx_task", 8192, NULL, 5, &rf_task_handle);
     
     gpio_config_t io_conf = {
         .pin_bit_mask = (1ULL << PIN_GDO2),
