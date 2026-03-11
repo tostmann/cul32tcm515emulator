@@ -205,7 +205,7 @@ void radio_rmt_rx_init(void) {
     rmt_rx_channel_config_t rx_chan_config = {
         .clk_src = RMT_CLK_SRC_DEFAULT,
         .resolution_hz = RMT_RESOLUTION_HZ,
-        .mem_block_symbols = 64,
+        .mem_block_symbols = MAX_RMT_SYMBOLS,
         .gpio_num = PIN_GDO0,
         .flags.invert_in = false,
         .flags.with_dma = false
@@ -214,16 +214,18 @@ void radio_rmt_rx_init(void) {
     rmt_rx_event_callbacks_t cbs = { .on_recv_done = rmt_rx_done_callback };
     ESP_ERROR_CHECK(rmt_rx_register_event_callbacks(rx_channel, &cbs, NULL));
     ESP_ERROR_CHECK(rmt_enable(rx_channel));
+    
     xTaskCreate(rf_rx_task_impl, "rf_rx_task", 4096, NULL, 5, &rf_task_handle);
+    
     gpio_config_t io_conf = {
-        .pin_bit_mask = (1ULL << PIN_GDO2),
+        .pin_bit_mask = (1ULL << PIN_GDO0),
         .mode = GPIO_MODE_INPUT,
         .pull_up_en = 0,
-        .pull_down_en = 1,
+        .pull_down_en = 0,
         .intr_type = GPIO_INTR_POSEDGE
     };
     gpio_config(&io_conf);
-    gpio_isr_handler_add(PIN_GDO2, gdo2_cs_isr_handler, NULL);
+    gpio_isr_handler_add(PIN_GDO0, gdo0_data_isr_handler, NULL);
 }
 
 void radio_hal_init(void) {
