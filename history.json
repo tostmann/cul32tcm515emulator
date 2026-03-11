@@ -675,5 +675,33 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "    // Main loop does nothing\n    while (1) {\n        vTaskDelay(pdMS_TO_TICKS(1000));\n    }\n}",
+            "path": "src/main.c",
+            "original_text": "    // Main loop does nothing\n    while (1) {\n        esp_rom_printf(\"GDO2:%d\\n\", gpio_get_level(PIN_GDO2));\n        vTaskDelay(pdMS_TO_TICKS(500));\n    }\n}"
+          }
+        }
+      }
+    ]
   }
 ]

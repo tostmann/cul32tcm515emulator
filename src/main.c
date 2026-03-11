@@ -43,7 +43,6 @@ void app_main(void) {
     
     // Main loop does nothing
     while (1) {
-        esp_rom_printf("GDO2:%d\n", gpio_get_level(PIN_GDO2));
-        vTaskDelay(pdMS_TO_TICKS(500));
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
