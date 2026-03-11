@@ -39,7 +39,7 @@ Die **Hardware-Schwäche (falsches 433-MHz-Matching-Netzwerk) ist als definitive
     *   **Puls-Injektion**: Schnittstelle via `COMMON_COMMAND` (Opcode `0x7F`), um virtuelle RMT-Pulse in den Decoder einzuspeisen. **IMPLEMENTIERT & MECHANISMUS VERIFIZIERT** (Decoder-Logik noch fehlerhaft).
 
 ### Abgeschlossene Aufgaben (Development Log)
-*   **DONE**: **GitHub-Repository erstellt und konfiguriert**: Projekt auf GitHub (`cul32tcm515emulator`) initialisiert, inkl. projektspezifischem Deploy-Key, `README.md` und `.gitignore`.
+*   **DONE**: **GitHub-Repository aufgesetzt und bereinigt**: Projekt auf GitHub (`cul32tcm515emulator`) initialisiert. Ein projektspezifischer Deploy-Key wurde konfiguriert, eine `.gitignore` erstellt und das Repository bereinigt, um sensible Daten (`project_config.json`) und transiente Dateien (`*.log`, `sdkconfig`) auszuschließen. Test-Skripte wurden in ein `tests/`-Verzeichnis verschoben.
 *   **DONE**: **Software-Loopback-Test erfolgreich validiert**: Der interne Loopback-Modus (via `COMMON_COMMAND` 0x7E) bestätigt die korrekte Funktion des gesamten Host-Kommunikations-Stacks (Host -> ESP3-Parser -> TX-Pfad -> RX-Pfad -> Host).
 *   **DONE**: **Protokoll-Parser für Test-Schnittstellen erweitert**: Der ESP3-Protokoll-Handler wurde um `ESP3_TYPE_COMMON_COMMAND` (Opcode `0x05`) erweitert, um Loopback (`0x7E`) und Puls-Injektion (`0x7F`) zu steuern.
 *   **DONE**: **Physikalische Ursache für Decoder-Fehler identifiziert**: Experten-Analyse bestätigt, dass das 433-MHz-Matching-Netzwerk die 868-MHz-Pulsformen durch *Ringing* und Gruppenlaufzeitverzerrung zerstört.
