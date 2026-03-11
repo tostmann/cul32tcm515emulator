@@ -193,10 +193,9 @@ static void rf_rx_task_impl(void *pvParameters) {
                 rmt_to_manchester_decode(rmt_rx_buffer, rx_symbols_count);
             }
         }
-        // Use GDO0 level to check if channel is clear
-        while (gpio_get_level(PIN_GDO0) == 1) vTaskDelay(pdMS_TO_TICKS(1));
+        while (gpio_get_level(PIN_GDO2) == 1) vTaskDelay(pdMS_TO_TICKS(1));
         vTaskDelay(pdMS_TO_TICKS(5)); 
-        gpio_intr_enable(PIN_GDO0);
+        gpio_intr_enable(PIN_GDO2);
     }
 }
 

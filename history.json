@@ -1270,5 +1270,33 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "static void rf_rx_task_impl(void *pvParameters) {\n    rmt_receive_config_t rec_config = {\n        .signal_range_min_ns = 2000,\n        .signal_range_max_ns = 40000,\n    };\n    while (1) {\n        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);\n        ESP_ERROR_CHECK(rmt_receive(rx_channel, rmt_rx_buffer, sizeof(rmt_rx_buffer), &rec_config));\n        if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(100)) == pdTRUE) {\n            size_t rx_symbols_count = 0;\n            for(int i=0; i<MAX_RMT_SYMBOLS; i++) {\n                if(rmt_rx_buffer[i].duration0 == 0) break;\n                rx_symbols_count++;\n            }\n            if (rx_symbols_count > 10) {\n                rmt_to_manchester_decode(rmt_rx_buffer, rx_symbols_count);\n            }\n        }\n        while (gpio_get_level(PIN_GDO2) == 1) vTaskDelay(pdMS_TO_TICKS(1));\n        vTaskDelay(pdMS_TO_TICKS(5)); \n        gpio_intr_enable(PIN_GDO2);\n    }\n}",
+            "path": "src/radio_hal.c",
+            "original_text": "static void rf_rx_task_impl(void *pvParameters) {\n    rmt_receive_config_t rec_config = {\n        .signal_range_min_ns = 2000,\n        .signal_range_max_ns = 40000,\n    };\n    while (1) {\n        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);\n        ESP_ERROR_CHECK(rmt_receive(rx_channel, rmt_rx_buffer, sizeof(rmt_rx_buffer), &rec_config));\n        if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(100)) == pdTRUE) {\n            size_t rx_symbols_count = 0;\n            for(int i=0; i<MAX_RMT_SYMBOLS; i++) {\n                if(rmt_rx_buffer[i].duration0 == 0) break;\n                rx_symbols_count++;\n            }\n            if (rx_symbols_count > 10) {\n                rmt_to_manchester_decode(rmt_rx_buffer, rx_symbols_count);\n            }\n        }\n        // Use GDO0 level to check if channel is clear\n        while (gpio_get_level(PIN_GDO0) == 1) vTaskDelay(pdMS_TO_TICKS(1));\n        vTaskDelay(pdMS_TO_TICKS(5)); \n        gpio_intr_enable(PIN_GDO0);\n    }\n}"
+          }
+        }
+      }
+    ]
   }
 ]
