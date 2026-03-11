@@ -1867,5 +1867,33 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "                if pkt_type == 0x33:\n                    rssi_raw = payload[0]\n                    rssi_dbm = payload[1]\n                    if rssi_dbm > 127: rssi_dbm -= 256\n                    gdo2 = payload[2]\n                    gdo0 = payload[3]\n                    print(f\"RSSI: {rssi_dbm} dBm, GDO2: {gdo2}, GDO0: {gdo0}\")\n                elif pkt_type == 0x34:\n                    cnt = (payload[1] << 8) | payload[0]\n                    sync = (payload[3] << 8) | payload[2]\n                    print(f\"RMT Capture: {cnt} symbols, Last Sync Pulses: {sync}\")\n                elif pkt_type == 0x07:\n                    print(f\"*** RADIO PACKET RECEIVED: {payload.hex()} ***\")",
+            "path": "monitor_emu.py",
+            "original_text": "                if pkt_type == 0x33:\n                    rssi_raw = payload[0]\n                    rssi_dbm = payload[1]\n                    if rssi_dbm > 127: rssi_dbm -= 256\n                    gdo2 = payload[2]\n                    gdo0 = payload[3]\n                    print(f\"RSSI: {rssi_dbm} dBm, GDO2: {gdo2}, GDO0: {gdo0}\")\n                elif pkt_type == 0x07:\n                    print(f\"*** RADIO PACKET RECEIVED: {payload.hex()} ***\")"
+          }
+        }
+      }
+    ]
   }
 ]

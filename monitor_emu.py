@@ -40,6 +40,10 @@ try:
                     gdo2 = payload[2]
                     gdo0 = payload[3]
                     print(f"RSSI: {rssi_dbm} dBm, GDO2: {gdo2}, GDO0: {gdo0}")
+                elif pkt_type == 0x34:
+                    cnt = (payload[1] << 8) | payload[0]
+                    sync = (payload[3] << 8) | payload[2]
+                    print(f"RMT Capture: {cnt} symbols, Last Sync Pulses: {sync}")
                 elif pkt_type == 0x07:
                     print(f"*** RADIO PACKET RECEIVED: {payload.hex()} ***")
 except KeyboardInterrupt:
