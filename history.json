@@ -1736,5 +1736,33 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "#include \"esp_log.h\"\n#include \"esp_random.h\"\n#include \"esp_rom_sys.h\"\n#include \"freertos/FreeRTOS.h\"\n#include \"freertos/task.h\"\n#include \"freertos/semphr.h\"\n#include \"esp_heap_caps.h\"\n#include <string.h>",
+            "path": "src/radio_hal.c",
+            "original_text": "#include \"esp_log.h\"\n#include \"esp_random.h\"\n#include \"esp_rom_sys.h\"\n#include \"freertos/FreeRTOS.h\"\n#include \"freertos/task.h\"\n#include \"freertos/semphr.h\"\n#include \"esp_heap_caps.h\""
+          }
+        }
+      }
+    ]
   }
 ]

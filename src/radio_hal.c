@@ -11,6 +11,7 @@
 #include "freertos/task.h"
 #include "freertos/semphr.h"
 #include "esp_heap_caps.h"
+#include <string.h>
 
 static const char *TAG = "RADIO_HAL";
 static spi_device_handle_t spi_handle;
