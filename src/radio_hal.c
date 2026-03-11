@@ -182,7 +182,16 @@ static void rf_rx_task_impl(void *pvParameters) {
     };
     while (1) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        ESP_ERROR_CHECK(rmt_receive(rx_channel, rmt_rx_buffer, sizeof(rmt_rx_buffer), &rec_config));
+        esp_err_t err = rmt_receive(rx_channel, rmt_rx_buffer, sizeof(rmt_rx_buffer), &rec_config);
+        if (err != ESP_OK) {
+            // If already receiving, stop it
+            rmt_disable(rx_channel);
+            vTaskDelay(pdMS_TO_TICKS(1));
+            rmt_enable(rx_channel);
+            // Try again
+            rmt_receive(rx_channel, rmt_rx_buffer, sizeof(rmt_rx_buffer), &rec_config);
+        }
+        
         if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(100)) == pdTRUE) {
             size_t rx_symbols_count = 0;
             for(int i=0; i<MAX_RMT_SYMBOLS; i++) {
@@ -192,7 +201,13 @@ static void rf_rx_task_impl(void *pvParameters) {
             if (rx_symbols_count > 10) {
                 rmt_to_manchester_decode(rmt_rx_buffer, rx_symbols_count);
             }
+        } else {
+            // Timeout: Force stop
+            rmt_disable(rx_channel);
+            vTaskDelay(pdMS_TO_TICKS(1));
+            rmt_enable(rx_channel);
         }
+        
         while (gpio_get_level(PIN_GDO2) == 1) vTaskDelay(pdMS_TO_TICKS(1));
         vTaskDelay(pdMS_TO_TICKS(5)); 
         gpio_intr_enable(PIN_GDO2);
