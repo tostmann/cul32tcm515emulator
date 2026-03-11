@@ -166,8 +166,8 @@ void radio_rmt_rx_init(void) {
     rmt_rx_event_callbacks_t cbs = { .on_recv_done = rmt_rx_done_callback };
     rmt_rx_register_event_callbacks(rx_channel, &cbs, NULL);
     xTaskCreate(rf_rx_task_impl, "rf_rx", 4096, NULL, 5, &rf_task_handle);
-    gpio_config_t io = { .pin_bit_mask = (1ULL << PIN_GDO2), .mode = GPIO_MODE_INPUT, .pull_down_en = 1, .intr_type = GPIO_INTR_POSEDGE };
-    gpio_config(&io); gpio_isr_handler_add(PIN_GDO2, gdo2_cs_isr_handler, NULL);
+    // gpio_config_t io = { .pin_bit_mask = (1ULL << PIN_GDO2), .mode = GPIO_MODE_INPUT, .pull_down_en = 1, .intr_type = GPIO_INTR_POSEDGE };
+    // gpio_config(&io); gpio_isr_handler_add(PIN_GDO2, gdo2_cs_isr_handler, NULL);
 }
 
 void radio_hal_init(void) {
