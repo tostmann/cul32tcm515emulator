@@ -119,6 +119,24 @@ void esp3_process_byte(uint8_t byte) {
                     if (current_packet.packet_type == ESP3_TYPE_RADIO_ERP1) {
                         radio_transmit(current_packet.data, current_packet.data_len);
                         esp3_send_response(RET_OK);
+                    } else if (current_packet.packet_type == ESP3_TYPE_COMMON_COMMAND) {
+                        extern bool g_radio_loopback_enabled;
+                        extern void hal_inject_virtual_rmt(const char* hex_pulses);
+                        uint8_t opcode = current_packet.data[0];
+                        if (opcode == 0x7E) {
+                            g_radio_loopback_enabled = (current_packet.data[1] == 0x01);
+                            esp3_send_response(RET_OK);
+                        } else if (opcode == 0x7F) {
+                            // Inject ASCII hex pulses
+                            char *tmp = malloc(current_packet.data_len);
+                            if (tmp) {
+                                memcpy(tmp, &current_packet.data[1], current_packet.data_len - 1);
+                                tmp[current_packet.data_len - 1] = '\0';
+                                hal_inject_virtual_rmt(tmp);
+                                free(tmp);
+                                esp3_send_response(RET_OK);
+                            }
+                        }
                     }
                 }
             }
