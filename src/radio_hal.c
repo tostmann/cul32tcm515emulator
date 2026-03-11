@@ -261,7 +261,13 @@ void radio_rmt_rx_init(void) {
 }
 
 void radio_hal_init(void) {
-    spi_mutex = xSemaphoreCreateMutex();
+    if (spi_mutex == NULL) {
+        spi_mutex = xSemaphoreCreateMutex();
+    }
+    if (spi_mutex == NULL) {
+        return; 
+    }
+    
     spi_init();
     gpio_config_t io_led = { .pin_bit_mask = (1ULL << PIN_LED), .mode = GPIO_MODE_OUTPUT, .pull_up_en = 1 };
     gpio_config(&io_led);
@@ -274,7 +280,11 @@ void radio_hal_init(void) {
     }
     cc1101_write_burst(0x3E, patable_ook, 2);
     
-    gpio_install_isr_service(0);
+    esp_err_t err = gpio_install_isr_service(0);
+    if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {
+        // Handle error
+    }
+    
     radio_rmt_rx_init();
     
     cc1101_strobe(CC1101_SRX);
