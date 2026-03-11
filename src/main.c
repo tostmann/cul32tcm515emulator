@@ -6,6 +6,7 @@
 #include "esp_log.h"
 #include "esp3_proto.h"
 #include "radio_hal.h"
+#include "enocean_nvs.h"
 
 static const char *TAG = "MAIN";
 
