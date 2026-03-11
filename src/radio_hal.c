@@ -74,7 +74,6 @@ static void erp1_decoder_reset(erp1_decoder_t *dec) {
 static void handle_complete_telegram(const uint8_t *data, uint16_t length) {
     if (length < ERP1_MIN_LENGTH) return;
     
-    // Check checksum (last byte is sum of all previous bytes)
     uint8_t checksum = 0;
     for (int i = 0; i < length - 1; i++) checksum += data[i];
     if (checksum != data[length - 1]) return;
@@ -83,40 +82,46 @@ static void handle_complete_telegram(const uint8_t *data, uint16_t length) {
     uint32_t sender_id = (data[length-5] << 24) | (data[length-4] << 16) | 
                          (data[length-3] << 8)  | data[length-2];
 
-    if (r_org == 0x30 || r_org == 0x31) {
+    if ((r_org == 0x30 || r_org == 0x31) && length >= 15) {
         enocean_sec_device_t dev;
         if (enocean_nvs_get_device(sender_id, &dev) == ESP_OK) {
-            // Found secure device!
-            // Assume SLF with 3-byte RLC and 4-byte MAC for now
-            // [R-ORG] [Data...] [RLC(3)] [MAC(4)] [SenderID(4)] [Status] [CRC]
-            // Data starts at data[1]. 
-            // RLC is at data[length - 5 - 4 - 3] = data[length - 12]
-            // MAC is at data[length - 9]
-            uint32_t rlc = (data[length-12] << 16) | (data[length-11] << 8) | data[length-10];
-            const uint8_t *mac = &data[length-9];
-            uint16_t payload_len = length - 1 - 3 - 4 - 4 - 1 - 1; // R-ORG, RLC, MAC, ID, Status, CRC
+            uint32_t rlc_rx = (data[2] << 16) | (data[3] << 8) | data[4];
+            const uint8_t *mac_rx = &data[5];
+            uint8_t status = data[13];
+            uint16_t payload_len = length - 14; 
+            
             uint8_t *payload = malloc(payload_len);
             if (payload) {
                 memcpy(payload, &data[1], payload_len);
-                if (enocean_sec_verify_mac(&dev, payload, payload_len, rlc, mac, 4)) {
-                    if (r_org == 0x31) {
-                        enocean_sec_decrypt_ctr(&dev, payload, payload_len, rlc);
-                    }
-                    // Update RLC
-                    dev.rlc = rlc;
+                if (r_org == 0x31) enocean_sec_decrypt_ctr(&dev, payload, payload_len, rlc_rx);
+                
+                uint8_t mi[64]; uint16_t mi_idx = 0;
+                mi[mi_idx++] = (rlc_rx >> 24) & 0xFF; // assuming MSB 0 for now
+                mi[mi_idx++] = (rlc_rx >> 16) & 0xFF;
+                mi[mi_idx++] = (rlc_rx >> 8) & 0xFF;
+                mi[mi_idx++] = rlc_rx & 0xFF;
+                mi[mi_idx++] = r_org;
+                memcpy(&mi[mi_idx], payload, payload_len); mi_idx += payload_len;
+                mi[mi_idx++] = (sender_id >> 24) & 0xFF;
+                mi[mi_idx++] = (sender_id >> 16) & 0xFF;
+                mi[mi_idx++] = (sender_id >> 8) & 0xFF;
+                mi[mi_idx++] = sender_id & 0xFF;
+                mi[mi_idx++] = status;
+
+                if (enocean_sec_verify_mac_raw(&dev, mi, mi_idx, mac_rx, 4)) {
+                    dev.rlc = rlc_rx;
                     enocean_nvs_save_device(&dev);
                     
-                    // Construct decrypted packet for host
                     uint8_t *dec_data = malloc(length);
                     if (dec_data) {
                         memcpy(dec_data, data, length);
-                        memcpy(&dec_data[1], payload, payload_len); // Replace encrypted with decrypted
+                        memcpy(&dec_data[1], payload, payload_len);
                         uint8_t opt[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x40, 0x01 }; 
                         esp3_send_packet(ESP3_TYPE_RADIO_ERP1, dec_data, length, opt, 7);
                         free(dec_data);
                     }
                 } else {
-                    ESP_LOGW(TAG, "Security MAC verification failed for %08lX", sender_id);
+                    ESP_LOGW(TAG, "MAC fail for %08lX", (unsigned long)sender_id);
                 }
                 free(payload);
             }
@@ -124,7 +129,6 @@ static void handle_complete_telegram(const uint8_t *data, uint16_t length) {
         }
     }
 
-    // Default: Send as ESP3 ERP1 Packet
     uint8_t opt[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x40, 0x00 };
     esp3_send_packet(ESP3_TYPE_RADIO_ERP1, data, length, opt, 7);
 }
