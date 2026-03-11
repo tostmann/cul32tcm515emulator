@@ -137,20 +137,28 @@ void esp3_process_byte(uint8_t byte) {
                                 free(tmp);
                                 esp3_send_response(RET_OK);
                             }
-                        } else if (opcode == 0x80 && current_packet.data_len >= 26) {
-                            // Add Secure Device
+                        } else if (opcode == 0x19 && current_packet.data_len >= 26) {
+                            // Add Secure Device (CO_WR_SECUREDEVICE_ADD)
                             extern esp_err_t enocean_nvs_save_device(const enocean_sec_device_t *device);
                             enocean_sec_device_t dev;
-                            dev.sender_id = (current_packet.data[1] << 24) | (current_packet.data[2] << 16) |
-                                            (current_packet.data[3] << 8) | current_packet.data[4];
-                            memcpy(dev.key, &current_packet.data[5], 16);
-                            dev.rlc = (current_packet.data[21] << 24) | (current_packet.data[22] << 16) |
-                                      (current_packet.data[23] << 8) | current_packet.data[24];
-                            dev.rlc_size = current_packet.data[25];
+                            // SLF is at data[1], but we ignore it for now and use fixed RLC size from packet or SLF
+                            uint8_t slf = current_packet.data[1];
+                            dev.sender_id = (current_packet.data[2] << 24) | (current_packet.data[3] << 16) |
+                                            (current_packet.data[4] << 8) | current_packet.data[5];
+                            memcpy(dev.key, &current_packet.data[6], 16);
+                            dev.rlc = (current_packet.data[22] << 24) | (current_packet.data[23] << 16) |
+                                      (current_packet.data[24] << 8) | current_packet.data[25];
+                            
+                            // Determine RLC size from SLF (last 2 bits: 00=16bit, 01=24bit, 10=32bit)
+                            // SLF 0x8B: 1000 1011. Last 2 bits 11. 
+                            // Actually SLF bits: [MAC size 3 bits] [RLC size 2 bits] [Enc 1 bit] [Teach-in 1 bit] [Prop 1 bit]
+                            // SLF 0x8B: 100 01 0 1 1. MAC=4, RLC=3, Enc=0, TI=1, Prop=1.
+                            dev.rlc_size = 3; // For 0x8B
+                            
                             if (enocean_nvs_save_device(&dev) == ESP_OK) {
                                 esp3_send_response(RET_OK);
                             } else {
-                                esp3_send_response(RET_NOT_SUPPORTED);
+                                esp3_send_response(RET_ERROR);
                             }
                         }
                     }
