@@ -37,14 +37,15 @@ def build_esp3_frame(packet_type: int, data: bytes, opt_data: bytes = b'') -> by
 def encrypt_and_mac(payload_clear: int, rlc: int, sender_id: int, key: bytes):
     backend = default_backend()
     sid_bytes = struct.pack(">I", sender_id)
-    # Nonce construction for CTR (TCM515 style)
-    nonce = sid_bytes + sid_bytes + sid_bytes + struct.pack(">I", rlc)
+    rlc_bytes = struct.pack(">I", rlc)
+    # Nonce: SenderID(4) + RLC(4) + 8 bytes 0x00
+    nonce = sid_bytes + rlc_bytes + (b'\x00' * 8)
     cipher = Cipher(algorithms.AES(key), modes.CTR(nonce), backend=backend)
     encryptor = cipher.encryptor()
     enc_payload = encryptor.update(bytes([payload_clear])) + encryptor.finalize()
     
-    # MAC Input: RLC(3) + Payload(Clear)
-    mac_input = struct.pack(">I", rlc)[1:] + bytes([payload_clear])
+    # MAC Input: [Full RLC (4)] [R-ORG (1)] [Payload_Clear (1)] [SenderID (4)] [Status (1)]
+    mac_input = rlc_bytes + bytes([R_ORG, payload_clear]) + sid_bytes + bytes([STATUS])
     c = cmac.CMAC(algorithms.AES(key), backend=backend)
     c.update(mac_input)
     trunc_mac = c.finalize()[:4]
