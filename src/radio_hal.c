@@ -256,12 +256,15 @@ void radio_hal_init(void) {
     cc1101_strobe(CC1101_SRES); vTaskDelay(10);
     cc1101_write_reg(0x00, 0x0E); // Carrier Sense
     cc1101_write_reg(0x02, 0x0D); // Async Serial Out
-    cc1101_write_reg(0x0D, 0x21); cc1101_write_reg(0x0E, 0x65); cc1101_write_reg(0x0F, 0x6A); 
-    cc1101_write_reg(0x10, 0x5C); cc1101_write_reg(0x11, 0x3B); cc1101_write_reg(0x12, 0x30); 
+    // Correct Freq for 868.300 MHz (26.0 MHz Crystal): 0x215E63
+    cc1101_write_reg(0x0D, 0x21); cc1101_write_reg(0x0E, 0x5E); cc1101_write_reg(0x0F, 0x63); 
+    cc1101_write_reg(0x10, 0x8D); // MDMCFG4: BW ~406kHz
+    cc1101_write_reg(0x11, 0x3B); // MDMCFG3: 250kbps
+    cc1101_write_reg(0x12, 0x30); // MDMCFG2: OOK, No Sync
     cc1101_write_reg(0x22, 0x11); cc1101_write_reg(0x21, 0xB6); 
-    cc1101_write_reg(0x1B, 0x03); // AGCCTRL2: MAGN_TARGET 33dB, MAX_LNA_GAIN 0 (max)
-    cc1101_write_reg(0x1C, 0x00); // AGCCTRL1: Low CS Threshold
-    cc1101_write_reg(0x1D, 0x91); // AGCCTRL0: AGC_FREEZE on CS, Wait 16 samples
+    cc1101_write_reg(0x1B, 0x43); // AGCCTRL2: Reduzierter MAX_LNA_GAIN
+    cc1101_write_reg(0x1C, 0x40); // AGCCTRL1: LNA Priorität
+    cc1101_write_reg(0x1D, 0x91); // AGCCTRL0: Freeze on CS (Wait 16)
     cc1101_write_reg(0x18, 0x18); 
     cc1101_write_reg(0x23, 0x81); cc1101_write_reg(0x24, 0x35); cc1101_write_reg(0x25, 0x09); 
     static const uint8_t patable_ook[] = {0x00, 0xC0};
