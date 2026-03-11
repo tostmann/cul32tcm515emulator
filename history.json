@@ -1150,5 +1150,73 @@
         "text": "Hier ist die Analyse der aktuellen Situation nach der Frequenz-Korrektur und dem Pro-Model-Input:\n\n### 1. Beeinflussung durch N\u00e4he (S\u00e4ttigung vs. Offset)\nJa, die N\u00e4he kann die Erkennung massiv beeinflussen. Wir haben zwei kritische Punkte identifiziert:\n*   **Frequenz-Offset (Behoben)**: Wir hatten einen Fehler von ca. **700 kHz** in der Register-Konfiguration (869,0 MHz statt der korrekten **868,3 MHz** f\u00fcr EnOcean). Das erkl\u00e4rt, warum der RSSI selbst bei 10 cm Abstand nur bei -85 dBm lag \u2013 wir haben das Signal nur auf der \"Flanke\" des Filters empfangen.\n*   **LNA-S\u00e4ttigung**: Bei korrekt eingestellter Frequenz und 10 cm Abstand w\u00fcrde der CC1101 bei maximaler Verst\u00e4rkung (`MAX_LNA_GAIN`) komplett \u00fcbersteuern. Dies f\u00fchrt zu **Pulse Widening**, wodurch der Manchester-Decoder die Bits nicht mehr sauber trennen kann.\n\n### 2. Zufriedenheit mit RSSI/SNR\nMit der Korrektur auf **868,300 MHz** (`0x215E63`) und der Erh\u00f6hung der Bandbreite auf **406 kHz** bin ich deutlich zufriedener, da wir nun:\n1.  Das Signal im Zentrum des Filters haben.\n2.  Genug \"Headroom\" f\u00fcr die steilen Flanken des 125-kbps-Manchester-Signals besitzen.\n3.  Durch die Reduzierung des LNA-Gains (`AGCCTRL2 = 0x43`) S\u00e4ttigungseffekte im Nahbereich minimieren.\n\n### Aktueller Status der Hardware-Anpassung\nIch habe die folgenden Optimierungen in `src/radio_hal.c` vorgenommen:\n*   **Frequenz**: Exakt 868,300 MHz.\n*   **Bandbreite**: Von 325 kHz auf **406 kHz** erh\u00f6ht (bessere Flankensteilheit).\n*   **AGC**: `LNA Priority` aktiviert und `MAX_LNA_GAIN` reduziert, um Clipping zu verhindern.\n*   **Diagnose**: Der `radio_diag_task` liefert nun sek\u00fcndlich RSSI und die GDO-Pegel via ESP3 an den Host.\n\n### N\u00e4chster Schritt zur Validierung\nUm zu sehen, ob der RMT-Decoder nun greift, achte im `diff_test_enocean.py` auf Pakete vom Typ **0x34**. Diese enthalten die Anzahl der erfassten RMT-Symbole. Wenn dieser Wert bei einem Sendeimpuls des TCM515 hochspringt, ist die physikalische Schicht (RF -> RMT) stabil und wir m\u00fcssen nur noch das Bit-Alignment im Decoder finalisieren.\n\n**Empfehlung**: Vergr\u00f6\u00dfere den Abstand der Ger\u00e4te f\u00fcr die n\u00e4chsten Tests auf ca. **1 bis 2 Meter**, um absolut saubere SNR-Bedingungen ohne Frontend-\u00dcbersteuerung zu garantieren."
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "text": "beide Ger\u00e4te liegen jetzt weiter auseinander, schau ob Du die Ver\u00e4nderung sehen kannst, oder ob ich weitere Entferung herstellen soll."
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "python3 monitor_emu.py > monitor_5.log 2>&1 & sleep 10; \npython3 -c \"import serial, time; ser=serial.Serial('/dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:77:28-if00', 57600); \nfor i in range(3):\n    ser.write(bytes.fromhex('55000b070180a5010203040102030400b901ffffffff00008b'))\n    time.sleep(2.0)\";\nsleep 5; kill $!"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "cat monitor_5.log"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\nMonitoring EMU RSSI...\nRSSI: -104 dBm, GDO2: 0, GDO0: 0\nRSSI: -103 dBm, GDO2: 0, GDO0: 0\nRSSI: -105 dBm, GDO2: 0, GDO0: 0\nRSSI: -104 dBm, GDO2: 0, GDO0: 0\nRSSI: -103 dBm, GDO2: 0, GDO0: 0\nRSSI: -102 dBm, GDO2: 0, GDO0: 0\nRSSI: -102 dBm, GDO2: 0, GDO0: 0\nRSSI: -103 dBm, GDO2: 0, GDO0: 0\nRSSI: -101 dBm, GDO2: 0, GDO0: 0\nRSSI: -106 dBm, GDO2: 0, GDO0: 0\nRSSI: -104 dBm, GDO2: 0, GDO0: 0\nRSSI: -103 dBm, GDO2: 0, GDO0: 0\nRSSI: -106 dBm, GDO2: 0, GDO0: 0\nRSSI: -106 dBm, GDO2: 0, GDO0: 0\nRSSI: -105 dBm, GDO2: 0, GDO0: 0\nRSSI: -104 dBm, GDO2: 0, GDO0: 0\nRSSI: -105 dBm, GDO2: 0, GDO0: 0\nRSSI: -106 dBm, GDO2: 0, GDO0: 0\nRSSI: -105 dBm, GDO2: 0, GDO0: 0\nRSSI: -104 dBm, GDO2: 0, GDO0: 0\nRSSI: -103 dBm, GDO2: 0, GDO0: 0\nRSSI: -105 dBm, GDO2: 0, GDO0: 1\nRSSI: -105 dBm, GDO2: 0, GDO0: 0\nRSSI: -106 dBm, GDO2: 0, GDO0: 0\nRSSI: -102 dBm, GDO2: 0, GDO0: 0\nRSSI: -104 dBm, GDO2: 0, GDO0: 0\nRSSI: -102 dBm, GDO2: 0, GDO0: 0\nRSSI: -106 dBm, GDO2: 0, GDO0: 0\nRSSI: -103 dBm, GDO2: 0, GDO0: 0\nRSSI: -104 dBm, GDO2: 0, GDO0: 0\nRSSI: -104 dBm, GDO2: 0, GDO0: 0\nRSSI: -102 dBm, GDO2: 0, GDO0: 0\nRSSI: -104 dBm, GDO2: 0, GDO0: 0\nRSSI: -106 dBm, GDO2: 0, GDO0: 0\nRSSI: -103 dBm, GDO2: 0, GDO0: 0\nRSSI: -104 dBm, GDO2: 0, GDO0: 0\nRSSI: -105 dBm, GDO2: 0, GDO0: 0\nRSSI: -104 dBm, GDO2: 0, GDO0: 0\nRSSI: -106 dBm, GDO2: 0, GDO0: 0\nRSSI: -104 dBm, GDO2: 0, GDO0: 1\nRSSI: -103 dBm, GDO2: 0, GDO0: 0\nRSSI: -105 dBm, GDO2: 0, GDO0: 0\nRSSI: -103 dBm, GDO2: 0, GDO0: 0\nRSSI: -104 dBm, GDO2: 0, GDO0: 0\nRSSI: -104 dBm, GDO2: 0, GDO0: 0\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "text": "Ich sehe die Ver\u00e4nderung deutlich: Das Signal des TCM515 ist im Emulator-Log **gar nicht mehr sichtbar** (konstant bei ca. -104 dBm Grundrauschen, kein GDO2-Ausschlag).\n\n### Analyse\n*   **Vorher (10 cm)**: RSSI ca. **-85 dBm**. Das war bereits extrem schwach f\u00fcr diese Distanz (normal w\u00e4re -30 dBm), was auf ein massives Hardware-Problem hindeutet (falsches Antennen-Matching/Balun f\u00fcr 433 MHz statt 868 MHz auf dem CC1101-Modul).\n*   **Jetzt (gr\u00f6\u00dfere Entfernung)**: Das Signal f\u00e4llt unter die Empfangsschwelle des CC1101.\n\n### Fazit & Empfehlung\nWir haben ein **Hardware-Problem mit der RF-Frontend-Effizienz**. Das Modul \"taub\".\n1.  **Bitte stelle die Ger\u00e4te wieder so dicht wie m\u00f6glich zusammen (10-20 cm).** Bei diesem spezifischen Modul scheint die S\u00e4ttigung unser kleinstes Problem zu sein; wir brauchen jedes Qu\u00e4ntchen Signalst\u00e4rke, um \u00fcberhaupt den Carrier-Sense zu triggern.\n2.  **Pr\u00fcfe die Antennenverbindung**: Ist die Antenne am CC1101 fest verl\u00f6tet/verschraubt?\n3.  **Hardware-Verdacht**: Wenn der RSSI bei 10 cm nur -85 dBm erreicht, ist das Modul h\u00f6chstwahrscheinlich ein falsch best\u00fccktes 433-MHz-Modul. \n\n**Plan**: Sobald die Ger\u00e4te wieder dicht beisammen stehen, werde ich die Empfangsschwelle (`Carrier Sense Threshold`) im Code extrem empfindlich einstellen, um trotz der Hardware-Schw\u00e4che eine Dekodierung zu erzwingen.\n\n**Bitte gib Bescheid, wenn sie wieder nah beieinander stehen.**"
+      }
+    ]
   }
 ]

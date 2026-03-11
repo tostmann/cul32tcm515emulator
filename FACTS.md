@@ -63,7 +63,7 @@ timeout 3s cat /dev/ttyACM0
 1. Native USB-CDC: Configure the ESP32-C6 USB-Serial/JTAG controller to present a clean CDC interface, disabling JTAG/console logging on this port for the production build to ensure transparent ESP3 raw data flow.
 2. ESP3 Protocol Stack: Implement a robust serial parser for ESP3 (Sync-Byte 0x55, Header CRC8, Payload CRC8).
 3. Software EnOcean Stack: Implement EnOcean Listen-Before-Talk (LBT), Subtelegram-Timing, and Software Manchester-Encoding on the ESP32-C6. Do NOT rely on the CC1101 hardware Manchester encoder due to preamble sync issues.
-4. Hardware Abstraction Layer (HAL): Create a strict `radio_hal.h` interface (`hal_init`, `hal_transmit`, `hal_receive`, `hal_get_rssi`). The CC1101 implementation (`cc1101_driver.c`) must be completely isolated behind this HAL.
+4. Hardware Abstraction Layer (HAL): Create a strict `radio_hal.h` interface (`hal_init`, `hal_transmit`, `hal_receive`, `hal_get_rssi`). The CC1101 implementation (`cc1101_driver.c`) must be completely isolated behind this HAL. Plan is to implement CC1200 later as well.
 
 # OUTPUT FORMAT
 - Provide pure, cleanly formatted C/C++ and CMake code.
