@@ -34,12 +34,12 @@ static const cc1101_cfg_t erp1_config[] = {
     {0x0D, 0x21}, // FREQ2: 868.3 MHz
     {0x0E, 0x65}, // FREQ1: 
     {0x0F, 0x6A}, // FREQ0: 
-    {0x10, 0xCB}, // MDMCFG4: optimized for 125kbps OOK
-    {0x11, 0x83}, // MDMCFG3: 
+    {0x10, 0x19}, // MDMCFG4: BW=325kHz, DRATE_E=9
+    {0x11, 0x83}, // MDMCFG3: DRATE_M=131 (125kbps)
     {0x12, 0x30}, // MDMCFG2: ASK/OOK (0x30), Asynchronous Mode, No Sync Word
     {0x17, 0x30}, // MCSM1: IDLE after TX, IDLE after RX
     {0x18, 0x18}, // MCSM0: FS Autocal
-    {0x1B, 0x03}, // AGCCTRL2: 
+    {0x1B, 0x07}, // AGCCTRL2: Maximum gain
     {0x1C, 0x00}, // AGCCTRL1: 
     {0x1D, 0x91}, // AGCCTRL0: 
     {0x21, 0xB6}, // FREND1

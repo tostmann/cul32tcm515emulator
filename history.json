@@ -1653,5 +1653,85 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "$HOME/.platformio/penv/bin/pio run -t upload --upload-port /dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:90:B0-if00"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n\n... [OUTPUT TRUNCATED. Total size: 7538 bytes. Showing last 1500 bytes. Full output saved in 'last_execution.log'. Use 'grep' or 'read_file last_execution.log' to analyze!]\nHash of data verified.\nCompressed 209920 bytes to 106426...\n\nWriting at 0x00010000 [\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]   0.0% 0/106426 bytes... \n\nWriting at 0x0001bb03 [\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  15.4% 16384/106426 bytes... \n\nWriting at 0x00022572 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  30.8% 32768/106426 bytes... \n\nWriting at 0x00029e67 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  46.2% 49152/106426 bytes... \n\nWriting at 0x00030e3e [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  61.6% 65536/106426 bytes... \n\nWriting at 0x00038193 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  77.0% 81920/106426 bytes... \n\nWriting at 0x0003f260 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591]  92.4% 98304/106426 bytes... \n\nWriting at 0x00043400 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588] 100.0% 106426/106426 bytes... \nWrote 209920 bytes (106426 compressed) at 0x00010000 in 1.1 seconds (1506.1 kbit/s).\nHash of data verified.\n\nHard resetting via RTS pin...\n========================= [SUCCESS] Took 12.25 seconds =========================\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "python3 diff_test_enocean.py"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n[TCM515] Listening...\n[EMULATOR] Listening...\n\n--- Test 1: TCM515 Transmits -> Emulator Receives ---\n[HOST -> TCM515] Sending ESP3: 55000b070180a5010203040102030400b901ffffffff00008b\n[TCM515] Received: 55000100026500005500010004770838\n\n--- Test 2: Emulator Transmits -> TCM515 Receives ---\n[HOST -> EMULATOR] Sending ESP3: 55000b070180a5010203040506070800c901ffffffff0000b1\n[EMULATOR] Received: 5500010002650000\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "    {0x10, 0x19}, // MDMCFG4: BW=325kHz, DRATE_E=9\n    {0x11, 0x83}, // MDMCFG3: DRATE_M=131 (125kbps)\n    {0x12, 0x30}, // MDMCFG2: ASK/OOK (0x30), Asynchronous Mode, No Sync Word\n    {0x17, 0x30}, // MCSM1: IDLE after TX, IDLE after RX\n    {0x18, 0x18}, // MCSM0: FS Autocal\n    {0x1B, 0x07}, // AGCCTRL2: Maximum gain\n    {0x1C, 0x00}, // AGCCTRL1: \n    {0x1D, 0x91}, // AGCCTRL0: \n    {0x21, 0xB6}, // FREND1\n    {0x22, 0x11}, // FREND0\n    {0x23, 0xEA}, // FSCAL3\n    {0x24, 0x2A}, // FSCAL2\n    {0x25, 0x00}, // FSCAL1\n    {0x26, 0x1F}, // FSCAL0\n};",
+            "path": "include/cc1101_regs.h",
+            "original_text": "    {0x10, 0xCB}, // MDMCFG4: optimized for 125kbps OOK\n    {0x11, 0x83}, // MDMCFG3: \n    {0x12, 0x30}, // MDMCFG2: ASK/OOK (0x30), Asynchronous Mode, No Sync Word\n    {0x17, 0x30}, // MCSM1: IDLE after TX, IDLE after RX\n    {0x18, 0x18}, // MCSM0: FS Autocal\n    {0x1B, 0x03}, // AGCCTRL2: \n    {0x1C, 0x00}, // AGCCTRL1: \n    {0x1D, 0x91}, // AGCCTRL0: \n    {0x21, 0xB6}, // FREND1\n    {0x22, 0x11}, // FREND0\n    {0x23, 0xEA}, // FSCAL3\n    {0x24, 0x2A}, // FSCAL2\n    {0x25, 0x00}, // FSCAL1\n    {0x26, 0x1F}, // FSCAL0\n};"
+          }
+        }
+      }
+    ]
   }
 ]
