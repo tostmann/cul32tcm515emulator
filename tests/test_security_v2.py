@@ -93,6 +93,7 @@ try:
 
         # 2. Generate and Inject Secure Telegram
         enc_payload, mac = encrypt_and_mac(PAYLOAD_CLEAR, RLC, SENDER_ID, KEY)
+        print(f"Payload Clear: {PAYLOAD_CLEAR:02X}, Enc: {enc_payload[0]:02X}")
         erp1_data = bytes([R_ORG]) + enc_payload + struct.pack(">I", RLC)[1:] + mac + struct.pack(">I", SENDER_ID) + bytes([STATUS])
         crc = sum(erp1_data) % 256
         telegram = erp1_data + bytes([crc])
