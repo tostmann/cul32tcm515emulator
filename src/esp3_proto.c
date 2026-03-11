@@ -136,6 +136,21 @@ void esp3_process_byte(uint8_t byte) {
                                 free(tmp);
                                 esp3_send_response(RET_OK);
                             }
+                        } else if (opcode == 0x80 && current_packet.data_len >= 26) {
+                            // Add Secure Device
+                            extern esp_err_t enocean_nvs_save_device(const enocean_sec_device_t *device);
+                            enocean_sec_device_t dev;
+                            dev.sender_id = (current_packet.data[1] << 24) | (current_packet.data[2] << 16) |
+                                            (current_packet.data[3] << 8) | current_packet.data[4];
+                            memcpy(dev.key, &current_packet.data[5], 16);
+                            dev.rlc = (current_packet.data[21] << 24) | (current_packet.data[22] << 16) |
+                                      (current_packet.data[23] << 8) | current_packet.data[24];
+                            dev.rlc_size = current_packet.data[25];
+                            if (enocean_nvs_save_device(&dev) == ESP_OK) {
+                                esp3_send_response(RET_OK);
+                            } else {
+                                esp3_send_response(RET_NOT_SUPPORTED);
+                            }
                         }
                     }
                 }
