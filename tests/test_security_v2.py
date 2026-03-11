@@ -105,13 +105,30 @@ try:
 
         # 3. Listen for result
         start = time.time()
+        found = False
         while time.time() - start < 3:
             if ser.in_waiting > 0:
                 resp = ser.read(ser.in_waiting)
-                print(f"Response: {resp.hex()}")
-                if b'\x55\x00\x0f' in resp: # 15 bytes ERP1
+                if b'\x55\x00\x0f' in resp: 
                     print("!!! ERFOLG !!! Sicheres Telegramm wurde empfangen!")
+                    found = True
+                    break
             time.sleep(0.1)
+        
+        if found:
+            print("\nVersuche Replay Attacke (selber RLC)...")
+            ser.write(build_esp3_frame(0x05, cmd_data))
+            start = time.time()
+            found_replay = False
+            while time.time() - start < 2:
+                if ser.in_waiting > 0:
+                    resp = ser.read(ser.in_waiting)
+                    if b'\x55\x00\x0f' in resp:
+                        print("FEHLER: Replay Telegramm wurde akzeptiert!")
+                        found_replay = True
+                time.sleep(0.1)
+            if not found_replay:
+                print("ERFOLG: Replay Attacke wurde abgeblockt.")
 
 except Exception as e:
     print(f"Error: {e}")
