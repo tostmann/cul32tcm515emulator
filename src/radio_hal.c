@@ -236,9 +236,10 @@ static void radio_diag_task(void *pv) {
         int rssi_dbm;
         if (rssi_raw >= 128) rssi_dbm = (rssi_raw - 256) / 2 - 74;
         else rssi_dbm = rssi_raw / 2 - 74;
-        bool gdo2 = gpio_get_level(PIN_GDO2);
-        bool gdo0 = gpio_get_level(PIN_GDO0);
-        printf("DIAG: RSSI=%d dBm, GDO2=%d, GDO0=%d\n", rssi_dbm, gdo2, gdo0);
+        uint8_t gdo2 = gpio_get_level(PIN_GDO2);
+        uint8_t gdo0 = gpio_get_level(PIN_GDO0);
+        uint8_t data[4] = { (uint8_t)rssi_raw, (uint8_t)rssi_dbm, gdo2, gdo0 };
+        esp3_send_packet(0x33, data, 4, NULL, 0);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
