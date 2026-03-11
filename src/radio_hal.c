@@ -139,22 +139,33 @@ DECODE_PHASE:
     uint8_t current_byte = 0;
     int bit_count = 0;
 
-    for (int i = 0; i < hb_count - 1; i += 2) {
-        uint8_t hb1 = half_bits[i];
-        uint8_t hb2 = half_bits[i+1];
-        int decoded_bit = -1;
-        if (hb1 == 0 && hb2 == 1) decoded_bit = 1;
-        else if (hb1 == 1 && hb2 == 0) decoded_bit = 0;
-        else { i -= 1; continue; }
+    // Search for Sync Byte 0xAD in raw 125kbps (which is 1100110011110011 in half-bits)
+    // Or just look for the first Manchester transition after a long sequence of 8us pulses.
+    int sync_idx = -1;
+    uint32_t pattern = 0;
+    for (int i = 0; i < hb_count; i++) {
+        pattern = (pattern << 1) | half_bits[i];
+        // Pattern for 0xAD (raw): 11 00 11 00 11 11 00 11 = 0xCCCCF3
+        if ((pattern & 0xFFFF) == 0xCCF3) { // 0xAD is 10101101 -> 1100110011110011 = CCF3
+            sync_idx = i + 1;
+            synced = true;
+            break;
+        }
+    }
 
-        if (!synced) {
-            sync_window = (sync_window << 1) | decoded_bit;
-            if ((sync_window & 0xFFFF) == 0xAAAD) { // EnOcean Sync Word
-                synced = true;
-                bit_count = 0;
-                current_byte = 0;
+    if (synced && sync_idx != -1) {
+        for (int i = sync_idx; i < hb_count - 1; i += 2) {
+            uint8_t hb1 = half_bits[i];
+            uint8_t hb2 = half_bits[i+1];
+            int decoded_bit = -1;
+            // Manchester: 01=1, 10=0 (or vice versa)
+            if (hb1 == 0 && hb2 == 1) decoded_bit = 1;
+            else if (hb1 == 1 && hb2 == 0) decoded_bit = 0;
+            else {
+                // Try to resync
+                i--; continue;
             }
-        } else {
+            
             current_byte = (current_byte << 1) | decoded_bit;
             bit_count++;
             if (bit_count == 8) {

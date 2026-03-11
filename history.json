@@ -1761,5 +1761,85 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "$HOME/.platformio/penv/bin/pio run -t upload --upload-port /dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:90:B0-if00"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n\n... [OUTPUT TRUNCATED. Total size: 7538 bytes. Showing last 1500 bytes. Full output saved in 'last_execution.log'. Use 'grep' or 'read_file last_execution.log' to analyze!]\nHash of data verified.\nCompressed 209952 bytes to 106464...\n\nWriting at 0x00010000 [\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]   0.0% 0/106464 bytes... \n\nWriting at 0x0001bb03 [\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  15.4% 16384/106464 bytes... \n\nWriting at 0x0002253f [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  30.8% 32768/106464 bytes... \n\nWriting at 0x00029e5c [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  46.2% 49152/106464 bytes... \n\nWriting at 0x00030e22 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  61.6% 65536/106464 bytes... \n\nWriting at 0x0003814a [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  76.9% 81920/106464 bytes... \n\nWriting at 0x0003f24c [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591]  92.3% 98304/106464 bytes... \n\nWriting at 0x00043420 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588] 100.0% 106464/106464 bytes... \nWrote 209952 bytes (106464 compressed) at 0x00010000 in 1.1 seconds (1589.0 kbit/s).\nHash of data verified.\n\nHard resetting via RTS pin...\n========================= [SUCCESS] Took 12.12 seconds =========================\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "python3 diff_test_enocean.py"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n[TCM515] Listening...\n[EMULATOR] Listening...\n\n--- Test 1: TCM515 Transmits -> Emulator Receives ---\n[HOST -> TCM515] Sending ESP3: 55000b070180a5010203040102030400b901ffffffff00008b\n[TCM515] Received: 55000100026500005500010004770838\n\n--- Test 2: Emulator Transmits -> TCM515 Receives ---\n[HOST -> EMULATOR] Sending ESP3: 55000b070180a5010203040506070800c901ffffffff0000b1\n[EMULATOR] Received: 5500010002650000\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "    // Search for Sync Byte 0xAD in raw 125kbps (which is 1100110011110011 in half-bits)\n    // Or just look for the first Manchester transition after a long sequence of 8us pulses.\n    int sync_idx = -1;\n    uint32_t pattern = 0;\n    for (int i = 0; i < hb_count; i++) {\n        pattern = (pattern << 1) | half_bits[i];\n        // Pattern for 0xAD (raw): 11 00 11 00 11 11 00 11 = 0xCCCCF3\n        if ((pattern & 0xFFFF) == 0xCCF3) { // 0xAD is 10101101 -> 1100110011110011 = CCF3\n            sync_idx = i + 1;\n            synced = true;\n            break;\n        }\n    }\n\n    if (synced && sync_idx != -1) {\n        for (int i = sync_idx; i < hb_count - 1; i += 2) {\n            uint8_t hb1 = half_bits[i];\n            uint8_t hb2 = half_bits[i+1];\n            int decoded_bit = -1;\n            // Manchester: 01=1, 10=0 (or vice versa)\n            if (hb1 == 0 && hb2 == 1) decoded_bit = 1;\n            else if (hb1 == 1 && hb2 == 0) decoded_bit = 0;\n            else {\n                // Try to resync\n                i--; continue;\n            }\n            \n            current_byte = (current_byte << 1) | decoded_bit;\n            bit_count++;\n            if (bit_count == 8) {\n                if (payload_len < sizeof(payload)) payload[payload_len++] = current_byte;\n                bit_count = 0;\n            }\n        }\n    }",
+            "path": "src/radio_hal.c",
+            "original_text": "    for (int i = 0; i < hb_count - 1; i += 2) {\n        uint8_t hb1 = half_bits[i];\n        uint8_t hb2 = half_bits[i+1];\n        int decoded_bit = -1;\n        if (hb1 == 0 && hb2 == 1) decoded_bit = 1;\n        else if (hb1 == 1 && hb2 == 0) decoded_bit = 0;\n        else { i -= 1; continue; }\n\n        if (!synced) {\n            sync_window = (sync_window << 1) | decoded_bit;\n            if ((sync_window & 0xFFFF) == 0xAAAD) { // EnOcean Sync Word\n                synced = true;\n                bit_count = 0;\n                current_byte = 0;\n            }\n        } else {\n            current_byte = (current_byte << 1) | decoded_bit;\n            bit_count++;\n            if (bit_count == 8) {\n                if (payload_len < sizeof(payload)) payload[payload_len++] = current_byte;\n                bit_count = 0;\n            }\n        }\n    }"
+          }
+        }
+      }
+    ]
   }
 ]
