@@ -18,7 +18,10 @@ static spi_device_handle_t spi_handle;
 static SemaphoreHandle_t spi_mutex = NULL;
 volatile bool is_transmitting = false;
 
-#define RMT_RESOLUTION_HZ   1000000 
+// 8 MHz resolution for RMT (1 tick = 125ns)
+#define RMT_RESOLUTION_HZ   8000000 
+#define CHIP_TICKS          32      // 4µs @ 8MHz
+#define DOUBLE_CHIP_TICKS   64      // 8µs @ 8MHz
 #define MAX_RMT_SYMBOLS     1024
 
 static rmt_channel_handle_t rx_channel = NULL;
@@ -35,7 +38,7 @@ static bool IRAM_ATTR rmt_rx_done_callback(rmt_channel_handle_t channel, const r
 
 static void IRAM_ATTR gdo2_cs_isr_handler(void* arg) {
     BaseType_t high_task_wakeup = pdFALSE;
-    gpio_intr_disable(PIN_GDO2);
+    // For now, we just use it as a trigger. In a more complex setup, we'd start/stop RMT here.
     xSemaphoreGiveFromISR(carrier_sense_sem, &high_task_wakeup);
     if (high_task_wakeup) portYIELD_FROM_ISR();
 }
@@ -91,45 +94,35 @@ void cc1101_write_burst(uint8_t addr, const uint8_t *data, uint8_t len) {
 }
 
 static void rmt_to_manchester_decode(const rmt_symbol_word_t *symbols, size_t num_symbols) {
-    uint32_t sync_reg = 0;
-    bool in_frame = false;
+    // Send raw symbol count for debug
+    uint8_t debug_info[2] = {0xDD, (uint8_t)num_symbols};
+    esp3_send_packet(0x33, debug_info, 2, NULL, 0);
+
+    bool sof_found = false;
     uint8_t payload[64]; int payload_len = 0;
     uint8_t cur_byte = 0; int bit_cnt = 0;
-    int chip_pair = 0; uint8_t chip1 = 0;
-
-    // DEBUG: Send pulse count to host
-    uint8_t debug_count = (uint8_t)num_symbols;
-    esp3_send_packet(0x33, &debug_count, 1, NULL, 0);
-
-    for (size_t i = 0; i < num_symbols; i++) {
-        uint32_t d[2] = {symbols[i].duration0, symbols[i].duration1};
-        uint8_t l[2] = {symbols[i].level0, symbols[i].level1};
-        for (int p = 0; p < 2; p++) {
-            if (d[p] == 0) continue;
-            int count = (d[p] + 1) / 4; 
-            if (count < 1) count = 1; 
-            if (count > 4) count = 4;
-            for (int c = 0; c < count; c++) {
-                sync_reg = (sync_reg << 1) | l[p];
-                if (!in_frame) {
-                    if ((sync_reg & 0x0F) == 0x09) { 
-                        in_frame = true; chip_pair = 0; bit_cnt = 0; payload_len = 0; cur_byte = 0;
-                    }
-                } else {
-                    if (chip_pair == 0) { chip1 = l[p]; chip_pair = 1; }
-                    else {
-                        uint8_t chip2 = l[p]; int bit = -1;
-                        if (chip1 == 1 && chip2 == 0) bit = 1; else if (chip1 == 0 && chip2 == 1) bit = 0;
-                        if (bit != -1) {
-                            cur_byte = (cur_byte << 1) | bit; bit_cnt++;
-                            if (bit_cnt == 8) { if (payload_len < sizeof(payload)) payload[payload_len++] = cur_byte; bit_cnt = 0; }
-                        } else { 
-                            if (payload_len >= 7) goto end;
-                            in_frame = false; 
-                        }
-                        chip_pair = 0;
-                    }
-                }
+    
+    size_t i = 0;
+    while (i < num_symbols) {
+        if (!sof_found) {
+            // Find 8µs LOW transition
+            if (symbols[i].level0 == 0 && symbols[i].duration0 > 50 && symbols[i].duration0 < 80) {
+                sof_found = true; i++; continue;
+            }
+            if (symbols[i].level1 == 0 && symbols[i].duration1 > 50 && symbols[i].duration1 < 80) {
+                sof_found = true; i++; continue;
+            }
+            i++;
+        } else {
+            int level = symbols[i].level0;
+            uint32_t dur = symbols[i].duration0;
+            if (dur >= 20 && dur <= 44) {
+                cur_byte = (cur_byte << 1) | level; bit_cnt++;
+                if (bit_cnt == 8) { if (payload_len < sizeof(payload)) payload[payload_len++] = cur_byte; bit_cnt = 0; }
+                i++; 
+            } else {
+                if (payload_len >= 7) goto end;
+                sof_found = false; i++;
             }
         }
     }
@@ -141,15 +134,20 @@ end:
 }
 
 static void rf_rx_task_impl(void *pvParameters) {
-    rmt_receive_config_t cfg = { .signal_range_min_ns = 1000, .signal_range_max_ns = 600000 }; // 600us for idle detection
+    rmt_receive_config_t cfg = { .signal_range_min_ns = 125, .signal_range_max_ns = 125000 }; // 125us
     rmt_enable(rx_channel);
     while (1) {
-        memset(rmt_rx_buffer, 0, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t));
-        if (rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS, &cfg) == ESP_OK) {
-            if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(1000)) == pdTRUE) {
-                size_t cnt = 0; while (cnt < MAX_RMT_SYMBOLS && rmt_rx_buffer[cnt].duration0 != 0) cnt++;
-                if (cnt > 0) rmt_to_manchester_decode(rmt_rx_buffer, cnt);
+        if (xSemaphoreTake(carrier_sense_sem, portMAX_DELAY) == pdTRUE) {
+            if (is_transmitting) { continue; }
+            memset(rmt_rx_buffer, 0, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t));
+            if (rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS, &cfg) == ESP_OK) {
+                if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(500)) == pdTRUE) {
+                    size_t cnt = 0; while (cnt < MAX_RMT_SYMBOLS && rmt_rx_buffer[cnt].duration0 != 0) cnt++;
+                    if (cnt > 10) rmt_to_manchester_decode(rmt_rx_buffer, cnt);
+                }
             }
+            vTaskDelay(pdMS_TO_TICKS(10));
+            xSemaphoreTake(carrier_sense_sem, 0); 
         }
     }
 }
@@ -158,13 +156,28 @@ void radio_rmt_rx_init(void) {
     if (!carrier_sense_sem) carrier_sense_sem = xSemaphoreCreateBinary();
     if (!rmt_done_sem) rmt_done_sem = xSemaphoreCreateBinary();
     if (!rmt_rx_buffer) rmt_rx_buffer = heap_caps_calloc(MAX_RMT_SYMBOLS, sizeof(rmt_symbol_word_t), MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
-    rmt_rx_channel_config_t rcfg = { .clk_src = RMT_CLK_SRC_DEFAULT, .resolution_hz = RMT_RESOLUTION_HZ, .mem_block_symbols = 48, .gpio_num = PIN_GDO0, .flags.with_dma = true };
+    
+    rmt_rx_channel_config_t rcfg = {
+        .clk_src = RMT_CLK_SRC_DEFAULT,
+        .resolution_hz = RMT_RESOLUTION_HZ,
+        .mem_block_symbols = 128, 
+        .gpio_num = PIN_GDO0,
+        .flags.with_dma = true
+    };
     rmt_new_rx_channel(&rcfg, &rx_channel);
     rmt_rx_event_callbacks_t cbs = { .on_recv_done = rmt_rx_done_callback };
     rmt_rx_register_event_callbacks(rx_channel, &cbs, NULL);
+    
     xTaskCreate(rf_rx_task_impl, "rf_rx", 4096, NULL, 5, &rf_task_handle);
-    // gpio_config_t io = { .pin_bit_mask = (1ULL << PIN_GDO2), .mode = GPIO_MODE_INPUT, .pull_down_en = 1, .intr_type = GPIO_INTR_POSEDGE };
-    // gpio_config(&io); gpio_isr_handler_add(PIN_GDO2, gdo2_cs_isr_handler, NULL);
+    
+    gpio_config_t io_cs = {
+        .pin_bit_mask = (1ULL << PIN_GDO2),
+        .mode = GPIO_MODE_INPUT,
+        .intr_type = GPIO_INTR_POSEDGE,
+        .pull_down_en = 1
+    };
+    gpio_config(&io_cs);
+    gpio_isr_handler_add(PIN_GDO2, gdo2_cs_isr_handler, NULL);
 }
 
 void radio_hal_init(void) {
@@ -172,38 +185,39 @@ void radio_hal_init(void) {
     spi_init();
     gpio_config_t io_led = { .pin_bit_mask = (1ULL << PIN_LED), .mode = GPIO_MODE_OUTPUT };
     gpio_config(&io_led); gpio_set_level(PIN_LED, 1);
+    
     cc1101_strobe(CC1101_SRES); vTaskDelay(10);
     
-    // Frequency: 868.300 MHz (Calculated for 26MHz: 0x21656A)
-    cc1101_write_reg(0x0D, 0x21); 
-    cc1101_write_reg(0x0E, 0x65); 
-    cc1101_write_reg(0x0F, 0x6A); 
+    // Expert OOK Configuration for EnOcean ERP1 (868.3 MHz)
+    cc1101_write_reg(0x00, 0x0E); // IOCFG2: Carrier Sense
+    cc1101_write_reg(0x02, 0x0D); // IOCFG0: Async Serial Out
     
-    // Modem: 250kbps OOK, No Sync/Preamble HW
-    cc1101_write_reg(0x10, 0x2D); // MDMCFG4: BW=541kHz, DRATE_E=13
-    cc1101_write_reg(0x11, 0x3B); // MDMCFG3: DRATE_M=59
-    cc1101_write_reg(0x12, 0x30); // MDMCFG2: ASK/OOK, No Sync
+    cc1101_write_reg(0x0D, 0x21); cc1101_write_reg(0x0E, 0x65); cc1101_write_reg(0x0F, 0x6A); // 868.300 MHz
     
-    // OOK Power & AGC
-    cc1101_write_reg(0x22, 0x11); // FREND0: Index 1 for '1'
+    cc1101_write_reg(0x10, 0x5C); // MDMCFG4: BW ~325kHz
+    cc1101_write_reg(0x11, 0x3B); // MDMCFG3: 250kbps
+    cc1101_write_reg(0x12, 0x30); // MDMCFG2: OOK, No Sync
+    
+    cc1101_write_reg(0x22, 0x11); // FREND0: PA Index 1
+    cc1101_write_reg(0x21, 0xB6); // FREND1: OOK Demod Tuning
+    
     cc1101_write_reg(0x1B, 0x0B); // AGCCTRL2: MAX_LNA_GAIN
-    cc1101_write_reg(0x1D, 0x92); // AGCCTRL0
+    cc1101_write_reg(0x1C, 0x40); // AGCCTRL1: Carrier Sense relative
+    cc1101_write_reg(0x1D, 0x92); // AGCCTRL0: AGC_FREEZE on CS
+    
     cc1101_write_reg(0x18, 0x18); // MCSM0: Auto-cal
+    
+    cc1101_write_reg(0x23, 0x81); // TEST2 (Dummy Magic)
+    cc1101_write_reg(0x24, 0x35); // TEST1
+    cc1101_write_reg(0x25, 0x09); // TEST0
     
     cc1101_write_burst(0x3E, patable_ook, 2);
     
     gpio_install_isr_service(0); 
     radio_rmt_rx_init();
     
-    // Async RX mode
     cc1101_strobe(CC1101_SIDLE);
-    cc1101_write_reg(0x08, 0x32); // Asynchronous
-    cc1101_write_reg(0x02, 0x0D); // GDO0 = Serial Out
-    
-    // Carrier Sense Threshold (GDO2)
-    cc1101_write_reg(0x1E, 0x00); // MAGN_TARGET = 33dB, MAX_LNA_GAIN = 0, MAX_DVGA_GAIN = 0
-    cc1101_write_reg(0x1F, 0x40); // AGC_FREEZE = 0, WAIT_TIME = 0, CS_REL_THR = 6dB, CS_ABS_THR = 0dB
-    
+    cc1101_write_reg(0x08, 0x32); // Async RX
     cc1101_strobe(CC1101_SRX);
 }
 
@@ -214,27 +228,22 @@ static void push_m(bit_s *s, int b) { if (b) push_c(s, 0x02, 2); else push_c(s, 
 void radio_transmit(const uint8_t *data, uint8_t len) {
     if (len > 31) return; 
     uint8_t chip_buf[128]; memset(chip_buf, 0, 128); bit_s s = { .buf = chip_buf, .pos = 0 };
-    for (int i = 0; i < 10; i++) push_c(&s, 0xAA, 8); // Longer Warmup
-    for (int i = 0; i < 12; i++) push_m(&s, 1); // Standard EnOcean Preamble (12 bits)
+    for (int i = 0; i < 10; i++) push_c(&s, 0xAA, 8); // Warmup
+    for (int i = 0; i < 12; i++) push_m(&s, 1); // Preamble
     push_m(&s, 0); // SOF
     for (int i = 0; i < len; i++) { for (int j = 7; j >= 0; j--) push_m(&s, (data[i] >> j) & 1); }
     push_c(&s, 0x00, 16); 
-    
     int byte_len = (s.pos + 7) / 8;
     is_transmitting = true; 
-    // gpio_intr_disable(PIN_GDO2);
     cc1101_strobe(CC1101_SIDLE);
     cc1101_write_reg(0x08, 0x00); 
     cc1101_write_reg(0x06, byte_len); 
-    
     for(int sub = 0; sub < 3; sub++) {
         cc1101_strobe(CC1101_SIDLE); cc1101_strobe(CC1101_SFTX); cc1101_write_burst(0x3F, chip_buf, byte_len); cc1101_strobe(CC1101_STX);
         int t = 50; while((cc1101_read_status(CC1101_MARCSTATE) & 0x1F) != 0x01 && t-- > 0) vTaskDelay(1);
         if (sub < 2) vTaskDelay(pdMS_TO_TICKS(15 + (esp_random() % 10)));
     }
-    
     cc1101_strobe(CC1101_SIDLE);
     cc1101_write_reg(0x08, 0x32); cc1101_strobe(CC1101_SFRX); cc1101_strobe(CC1101_SRX);
-    // gpio_intr_enable(PIN_GDO2); 
     is_transmitting = false;
 }

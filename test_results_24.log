@@ -7,4 +7,3 @@
 
 --- Test 2: Emulator Transmits -> TCM515 Receives ---
 [HOST -> EMULATOR] Sending ESP3: 55000b070180a5010203040506070800c901ffffffff0000b1
-[EMULATOR] Received: 5500010002650000
