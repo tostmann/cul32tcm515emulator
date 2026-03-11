@@ -24,12 +24,6 @@ volatile bool is_transmitting = false;
 #define RMT_RESOLUTION_HZ   8000000 
 #define MAX_RMT_SYMBOLS     1024
 
-// Decoder Timing (8MHz)
-#define TICK_TOLERANCE_LOW   16
-#define TICK_SHORT_MAX       48
-#define TICK_LONG_MAX        85
-#define NOISE_RESET          200
-
 // --- Timing & Toleranzen (Basis: 8MHz, 1 Tick = 125ns) ---
 #define ERP1_PULSE_SHORT_MIN  12    // ~1.5 µs
 #define ERP1_PULSE_SHORT_MAX  47    // ~5.8 µs
@@ -53,7 +47,6 @@ typedef struct {
     uint8_t  buffer[ERP1_MAX_PAYLOAD];
     uint16_t byte_idx;
     uint8_t  bit_idx;
-    bool packet_ready; // kept for legacy if needed
 } erp1_decoder_t;
 
 static erp1_decoder_t global_decoder;
@@ -63,6 +56,10 @@ static TaskHandle_t rf_task_handle = NULL;
 static SemaphoreHandle_t rmt_done_sem = NULL;
 static rmt_symbol_word_t *rmt_rx_buffer = NULL;
 static SemaphoreHandle_t carrier_sense_sem = NULL;
+
+// Forward declarations
+static void erp1_decoder_reset(erp1_decoder_t *dec);
+static void erp1_decode_pulse(erp1_decoder_t *dec, int level, int duration, bool noise_reset);
 
 // Dummy implementation for device lookup
 enocean_sec_device_t* get_device_by_id(uint32_t sender_id) {
@@ -76,7 +73,6 @@ static void erp1_decoder_reset(erp1_decoder_t *dec) {
     dec->preamble_bits = 0;
     dec->byte_idx = 0;
     dec->bit_idx = 0;
-    dec->packet_ready = false;
 }
 
 static void handle_complete_telegram(const uint8_t *data, uint16_t length) {
@@ -88,7 +84,6 @@ static void handle_complete_telegram(const uint8_t *data, uint16_t length) {
     if (checksum != data[length - 1]) return;
 
     // Send as ESP3 ERP1 Packet
-    // Option: 1 subtelegram, FF..FF Destination, RSSI -64, unencrypted
     uint8_t opt[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x40, 0x00 };
     esp3_send_packet(ESP3_TYPE_RADIO_ERP1, data, length, opt, 7);
 }
@@ -246,7 +241,7 @@ static void rf_rx_task_impl(void *pvParameters) {
                             erp1_decode_pulse(&global_decoder, rmt_rx_buffer[i].level1, rmt_rx_buffer[i].duration1, false);
                         }
                     }
-                    erp1_decode_pulse(&global_decoder, 0, 0, true); // Trigger evaluation at end of sequence
+                    erp1_decode_pulse(&global_decoder, 0, 0, true); 
                 }
             }
             xSemaphoreTake(carrier_sense_sem, 0); 
@@ -315,24 +310,18 @@ static const uint8_t manchester_lut[16] = {
 
 bool g_radio_loopback_enabled = true; // Standardmäßig AN zum Testen
 
-static void erp1_decoder_reset(erp1_decoder_t *dec);
-static void erp1_decode_pulse(erp1_decoder_t *dec, int level, int duration);
-
 void radio_transmit(const uint8_t *data, uint8_t len) {
     if (!data || len == 0 || len > 24) return;
 
-    // LOOPBACK: Sofortiges Rücksenden an Host (SIMULATION)
     if (g_radio_loopback_enabled) {
-        uint8_t opt[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x30, 0x00 }; // -48dBm RSSI Marker
+        uint8_t opt[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x30, 0x00 }; 
         esp3_send_packet(ESP3_TYPE_RADIO_ERP1, data, len, opt, 7);
     }
 
     uint8_t tx_buf[64];
     size_t tx_idx = 0;
-
     for(int i=0; i<7; i++) tx_buf[tx_idx++] = 0xAA;
     tx_buf[tx_idx++] = 0xA9;
-
     for (size_t i = 0; i < len; i++) {
         uint8_t byte = data[i];
         tx_buf[tx_idx++] = manchester_lut[byte >> 4];
@@ -341,33 +330,23 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
     tx_buf[tx_idx++] = 0x00;
 
     is_transmitting = true;
-
     for (int sub = 0; sub < 3; sub++) {
         cc1101_strobe(CC1101_SIDLE);
         cc1101_write_reg(0x02, 0x06);
         cc1101_write_reg(0x12, 0x30);
         cc1101_write_reg(0x08, 0x00);
         cc1101_write_reg(0x06, tx_idx);
-
         cc1101_strobe(CC1101_SFTX);
         cc1101_write_burst(0x3F, tx_buf, tx_idx);
         cc1101_strobe(CC1101_STX);
-
         int timeout = 1000;
-        while(gpio_get_level(GPIO_NUM_3) && --timeout > 0) {
-            esp_rom_delay_us(10);
-        }
-
-        if (sub < 2) {
-            vTaskDelay(pdMS_TO_TICKS(20 + (esp_random() % 15)));
-        }
+        while(gpio_get_level(GPIO_NUM_3) && --timeout > 0) esp_rom_delay_us(10);
+        if (sub < 2) vTaskDelay(pdMS_TO_TICKS(20 + (esp_random() % 15)));
     }
-
     cc1101_strobe(CC1101_SIDLE);
     cc1101_write_reg(0x02, 0x0D);
     cc1101_write_reg(0x08, 0x32);
     cc1101_strobe(CC1101_SRX);
-    
     is_transmitting = false;
 }
 

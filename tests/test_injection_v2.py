@@ -85,11 +85,17 @@ try:
         while time.time() - start < 3:
             if ser.in_waiting > 0:
                 resp = ser.read(ser.in_waiting)
+                print(f"Raw response: {resp.hex()}")
                 # Look for Type 1 Packet (ERP1)
-                if b'\x55\x00\x06\x07\x01' in resp:
+                if b'\x55\x00\x08' in resp: # Header for 8 bytes data
                     print("!!! ERFOLG !!! Decoder hat das virtuelle Paket erkannt!")
-                    print(f"Empfangen: {resp.hex()}")
                     break
+                # Look for Diag Packet 0x34
+                if b'\x55\x00\x04\x00\x34' in resp:
+                    idx = resp.find(b'\x55\x00\x04\x00\x34')
+                    data = resp[idx+6:idx+10]
+                    cnt, state = struct.unpack("<HH", data)
+                    print(f"Diag: Symbol Count={cnt}, Decoder State={state}")
             time.sleep(0.1)
         else:
             print("Kein ERP1 Paket empfangen. Decoder-Logik prüfen.")
