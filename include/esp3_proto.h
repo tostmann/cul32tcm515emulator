@@ -12,7 +12,9 @@
 #define ESP3_TYPE_COMMON_COMMAND 0x05
 
 // Response Codes
-#define RET_OK 0x00
+#define RET_OK            0x00
+#define RET_ERROR         0x01
+#define RET_NOT_SUPPORTED 0x02
 
 typedef struct {
     uint16_t data_len;
