@@ -223,6 +223,9 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
     // Payload
     for (int i = 0; i < len; i++) { for (int j = 7; j >= 0; j--) push_m(&s, (data[i] >> j) & 1); }
     
+    // Add 2 bytes of trailing '0' chips to ensure the last bit is fully transmitted
+    push_c(&s, 0x00, 8); push_c(&s, 0x00, 8);
+    
     int byte_len = (s.pos + 7) / 8;
     is_transmitting = true; gpio_intr_disable(PIN_GDO2);
     cc1101_strobe(CC1101_SIDLE);

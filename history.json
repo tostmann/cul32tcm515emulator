@@ -1278,5 +1278,33 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "    // Payload\n    for (int i = 0; i < len; i++) { for (int j = 7; j >= 0; j--) push_m(&s, (data[i] >> j) & 1); }\n    \n    // Add 2 bytes of trailing '0' chips to ensure the last bit is fully transmitted\n    push_c(&s, 0x00, 8); push_c(&s, 0x00, 8);\n    \n    int byte_len = (s.pos + 7) / 8;",
+            "path": "src/radio_hal.c",
+            "original_text": "    // Payload\n    for (int i = 0; i < len; i++) { for (int j = 7; j >= 0; j--) push_m(&s, (data[i] >> j) & 1); }\n    \n    int byte_len = (s.pos + 7) / 8;"
+          }
+        }
+      }
+    ]
   }
 ]
