@@ -217,10 +217,10 @@ void radio_rmt_rx_init(void) {
     rmt_rx_channel_config_t rx_chan_config = {
         .clk_src = RMT_CLK_SRC_DEFAULT,
         .resolution_hz = RMT_RESOLUTION_HZ,
-        .mem_block_symbols = MAX_RMT_SYMBOLS,
+        .mem_block_symbols = 64, // Internal FIFO size
         .gpio_num = PIN_GDO0,
         .flags.invert_in = false,
-        .flags.with_dma = false
+        .flags.with_dma = true // Use DMA to handle 1024 symbols
     };
     ESP_ERROR_CHECK(rmt_new_rx_channel(&rx_chan_config, &rx_channel));
     rmt_rx_event_callbacks_t cbs = { .on_recv_done = rmt_rx_done_callback };
