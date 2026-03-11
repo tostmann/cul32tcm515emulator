@@ -191,8 +191,9 @@ static void rmt_to_manchester_decode(const rmt_symbol_word_t *symbols, size_t nu
 static void rf_rx_task_impl(void *pvParameters) {
     rmt_receive_config_t rec_config = {
         .signal_range_min_ns = 1000,
-        .signal_range_max_ns = 40000,
+        .signal_range_max_ns = 50000,
     };
+    rmt_enable(rx_channel);
     while (1) {
         if (xSemaphoreTake(carrier_sense_sem, portMAX_DELAY) == pdTRUE) {
             if (is_transmitting) {
@@ -200,28 +201,26 @@ static void rf_rx_task_impl(void *pvParameters) {
                 continue;
             }
             
-            rmt_enable(rx_channel);
+            memset(rmt_rx_buffer, 0, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t));
             if (rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t), &rec_config) == ESP_OK) {
-                if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(40)) == pdTRUE) {
+                if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(50)) == pdTRUE) {
                     size_t rx_symbols_count = 0;
                     for(int i=0; i<MAX_RMT_SYMBOLS; i++) {
                         if(rmt_rx_buffer[i].duration0 == 0) break;
                         rx_symbols_count++;
                     }
-                    if (rx_symbols_count > 10) {
+                    if (rx_symbols_count > 20) {
                         rmt_to_manchester_decode(rmt_rx_buffer, rx_symbols_count);
                     }
                 }
             }
-            rmt_disable(rx_channel);
             
-            // Debounce / Wait for carrier to clear
-            int wait_tout = 50;
+            int wait_tout = 100;
             while (gpio_get_level(PIN_GDO2) == 1 && wait_tout > 0) {
                 vTaskDelay(pdMS_TO_TICKS(1));
                 wait_tout--;
             }
-            vTaskDelay(pdMS_TO_TICKS(10));
+            vTaskDelay(pdMS_TO_TICKS(5));
             xSemaphoreTake(carrier_sense_sem, 0); 
             gpio_intr_enable(PIN_GDO2);
         }

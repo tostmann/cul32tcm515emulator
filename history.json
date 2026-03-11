@@ -1896,5 +1896,139 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "$HOME/.platformio/penv/bin/pio run -t upload --upload-port /dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:90:B0-if00"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n\n... [OUTPUT TRUNCATED. Total size: 7381 bytes. Showing last 1500 bytes. Full output saved in 'last_execution.log'. Use 'grep' or 'read_file last_execution.log' to analyze!]\nWrote 3072 bytes (103 compressed) at 0x00008000 in 0.0 seconds (873.5 kbit/s).\nHash of data verified.\nCompressed 165280 bytes to 87441...\n\nWriting at 0x00010000 [\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]   0.0% 0/87441 bytes... \n\nWriting at 0x00019a92 [\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  18.7% 16384/87441 bytes... \n\nWriting at 0x00020de1 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  37.5% 32768/87441 bytes... \n\nWriting at 0x0002796e [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  56.2% 49152/87441 bytes... \n\nWriting at 0x0002e482 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  74.9% 65536/87441 bytes... \n\nWriting at 0x00035577 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591]  93.7% 81920/87441 bytes... \n\nWriting at 0x000385a0 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588] 100.0% 87441/87441 bytes... \nWrote 165280 bytes (87441 compressed) at 0x00010000 in 1.0 seconds (1391.5 kbit/s).\nHash of data verified.\n\nHard resetting via RTS pin...\n========================= [SUCCESS] Took 19.21 seconds =========================\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "python3 diff_test_enocean.py > test_results_12.log 2>&1 & sleep 15; kill $!"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 1\nOutput:\n/bin/sh: 1: kill: No such process\n\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "cat test_results_12.log"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n[TCM515] Listening...\n[EMULATOR] Listening...\n\n--- Test 1: TCM515 Transmits -> Emulator Receives ---\n[HOST -> TCM515] Sending ESP3: 55000b070180a5010203040102030400b901ffffffff00008b\n[TCM515] Received: 5500010002650000\n\n--- Test 2: Emulator Transmits -> TCM515 Receives ---\n[HOST -> EMULATOR] Sending ESP3: 55000b070180a5010203040506070800c901ffffffff0000b1\n[EMULATOR] Received: 5500010002650000\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "static void rf_rx_task_impl(void *pvParameters) {\n    rmt_receive_config_t rec_config = {\n        .signal_range_min_ns = 1000,\n        .signal_range_max_ns = 50000,\n    };\n    rmt_enable(rx_channel);\n    while (1) {\n        if (xSemaphoreTake(carrier_sense_sem, portMAX_DELAY) == pdTRUE) {\n            if (is_transmitting) {\n                vTaskDelay(pdMS_TO_TICKS(1));\n                gpio_intr_enable(PIN_GDO2);\n                continue;\n            }\n            \n            memset(rmt_rx_buffer, 0, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t));\n            if (rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t), &rec_config) == ESP_OK) {\n                if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(50)) == pdTRUE) {\n                    size_t rx_symbols_count = 0;\n                    for(int i=0; i<MAX_RMT_SYMBOLS; i++) {\n                        if(rmt_rx_buffer[i].duration0 == 0) break;\n                        rx_symbols_count++;\n                    }\n                    if (rx_symbols_count > 20) {\n                        rmt_to_manchester_decode(rmt_rx_buffer, rx_symbols_count);\n                    }\n                }\n            }\n            \n            int wait_tout = 100;\n            while (gpio_get_level(PIN_GDO2) == 1 && wait_tout > 0) {\n                vTaskDelay(pdMS_TO_TICKS(1));\n                wait_tout--;\n            }\n            vTaskDelay(pdMS_TO_TICKS(5));\n            xSemaphoreTake(carrier_sense_sem, 0); \n            gpio_intr_enable(PIN_GDO2);\n        }\n    }\n}\n\nvoid radio_rmt_rx_init(void) {\n    if (rmt_done_sem == NULL) carrier_sense_sem = xSemaphoreCreateBinary();\n    if (rmt_done_sem == NULL) rmt_done_sem = xSemaphoreCreateBinary();\n    \n    if (rmt_rx_buffer == NULL) {\n        rmt_rx_buffer = (rmt_symbol_word_t *)heap_caps_calloc(\n            MAX_RMT_SYMBOLS, \n            sizeof(rmt_symbol_word_t), \n            MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL\n        );\n    }\n    \n    if (rmt_rx_buffer == NULL || rmt_done_sem == NULL || carrier_sense_sem == NULL) {\n        return; \n    }\n\n    rmt_rx_channel_config_t rx_chan_config = {\n        .clk_src = RMT_CLK_SRC_DEFAULT,\n        .resolution_hz = RMT_RESOLUTION_HZ,\n        .mem_block_symbols = 48, \n        .gpio_num = PIN_GDO0,\n        .flags.invert_in = false,\n        .flags.with_dma = true\n    };\n    ESP_ERROR_CHECK(rmt_new_rx_channel(&rx_chan_config, &rx_channel));\n    rmt_rx_event_callbacks_t cbs = { .on_recv_done = rmt_rx_done_callback };\n    ESP_ERROR_CHECK(rmt_rx_register_event_callbacks(rx_channel, &cbs, NULL));\n    \n    xTaskCreate(rf_rx_task_impl, \"rf_rx_task\", 8192, NULL, 5, &rf_task_handle);\n    \n    gpio_config_t io_conf = {\n        .pin_bit_mask = (1ULL << PIN_GDO2),\n        .mode = GPIO_MODE_INPUT,\n        .pull_up_en = 0,\n        .pull_down_en = 1,\n        .intr_type = GPIO_INTR_POSEDGE\n    };\n    gpio_config(&io_conf);\n    gpio_isr_handler_add(PIN_GDO2, gdo2_cs_isr_handler, NULL);\n}\n\nvoid radio_hal_init(void) {\n    if (spi_mutex == NULL) {\n        spi_mutex = xSemaphoreCreateMutex();\n    }\n    if (spi_mutex == NULL) {\n        return; \n    }\n    \n    spi_init();\n    gpio_config_t io_led = { .pin_bit_mask = (1ULL << PIN_LED), .mode = GPIO_MODE_OUTPUT, .pull_up_en = 1 };\n    gpio_config(&io_led);\n    gpio_set_level(PIN_LED, 1);\n    \n    cc1101_strobe(CC1101_SRES);\n    vTaskDelay(pdMS_TO_TICKS(10));\n    for (int i = 0; i < sizeof(erp1_config)/sizeof(cc1101_cfg_t); i++) {\n        cc1101_write_reg(erp1_config[i].addr, erp1_config[i].val);\n    }\n    cc1101_write_burst(0x3E, patable_ook, 2);\n    \n    esp_err_t err = gpio_install_isr_service(0);\n    if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {\n    }\n    \n    radio_rmt_rx_init();\n    \n    cc1101_strobe(CC1101_SRX);\n    ESP_LOGI(TAG, \"CC1101 Initialized\");\n}",
+            "path": "src/radio_hal.c",
+            "original_text": "static void rf_rx_task_impl(void *pvParameters) {\n    rmt_receive_config_t rec_config = {\n        .signal_range_min_ns = 1000,\n        .signal_range_max_ns = 40000,\n    };\n    while (1) {\n        if (xSemaphoreTake(carrier_sense_sem, portMAX_DELAY) == pdTRUE) {\n            if (is_transmitting) {\n                gpio_intr_enable(PIN_GDO2);\n                continue;\n            }\n            \n            rmt_enable(rx_channel);\n            if (rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t), &rec_config) == ESP_OK) {\n                if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(40)) == pdTRUE) {\n                    size_t rx_symbols_count = 0;\n                    for(int i=0; i<MAX_RMT_SYMBOLS; i++) {\n                        if(rmt_rx_buffer[i].duration0 == 0) break;\n                        rx_symbols_count++;\n                    }\n                    if (rx_symbols_count > 10) {\n                        rmt_to_manchester_decode(rmt_rx_buffer, rx_symbols_count);\n                    }\n                }\n            }\n            rmt_disable(rx_channel);\n            \n            // Debounce / Wait for carrier to clear\n            int wait_tout = 50;\n            while (gpio_get_level(PIN_GDO2) == 1 && wait_tout > 0) {\n                vTaskDelay(pdMS_TO_TICKS(1));\n                wait_tout--;\n            }\n            vTaskDelay(pdMS_TO_TICKS(10));\n            xSemaphoreTake(carrier_sense_sem, 0); \n            gpio_intr_enable(PIN_GDO2);\n        }\n    }\n}\n\nvoid radio_rmt_rx_init(void) {\n    rmt_done_sem = xSemaphoreCreateBinary();\n    carrier_sense_sem = xSemaphoreCreateBinary();\n    \n    if (rmt_rx_buffer == NULL) {\n        rmt_rx_buffer = (rmt_symbol_word_t *)heap_caps_calloc(\n            MAX_RMT_SYMBOLS, \n            sizeof(rmt_symbol_word_t), \n            MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL\n        );\n    }\n    \n    if (rmt_rx_buffer == NULL || rmt_done_sem == NULL || carrier_sense_sem == NULL) {\n        return; \n    }\n\n    rmt_rx_channel_config_t rx_chan_config = {\n        .clk_src = RMT_CLK_SRC_DEFAULT,\n        .resolution_hz = RMT_RESOLUTION_HZ,\n        .mem_block_symbols = 48, \n        .gpio_num = PIN_GDO0,\n        .flags.invert_in = false,\n        .flags.with_dma = true\n    };\n    ESP_ERROR_CHECK(rmt_new_rx_channel(&rx_chan_config, &rx_channel));\n    rmt_rx_event_callbacks_t cbs = { .on_recv_done = rmt_rx_done_callback };\n    ESP_ERROR_CHECK(rmt_rx_register_event_callbacks(rx_channel, &cbs, NULL));\n    \n    xTaskCreate(rf_rx_task_impl, \"rf_rx_task\", 4096, NULL, 5, &rf_task_handle);\n    \n    gpio_config_t io_conf = {\n        .pin_bit_mask = (1ULL << PIN_GDO2),\n        .mode = GPIO_MODE_INPUT,\n        .pull_up_en = 0,\n        .pull_down_en = 1,\n        .intr_type = GPIO_INTR_POSEDGE\n    };\n    gpio_config(&io_conf);\n    gpio_isr_handler_add(PIN_GDO2, gdo2_cs_isr_handler, NULL);\n}\n\nvoid radio_hal_init(void) {\n    if (spi_mutex == NULL) {\n        spi_mutex = xSemaphoreCreateMutex();\n    }\n    if (spi_mutex == NULL) {\n        return; \n    }\n    \n    spi_init();\n    gpio_config_t io_led = { .pin_bit_mask = (1ULL << PIN_LED), .mode = GPIO_MODE_OUTPUT, .pull_up_en = 1 };\n    gpio_config(&io_led);\n    gpio_set_level(PIN_LED, 1);\n    \n    cc1101_strobe(CC1101_SRES);\n    vTaskDelay(pdMS_TO_TICKS(10));\n    for (int i = 0; i < sizeof(erp1_config)/sizeof(cc1101_cfg_t); i++) {\n        cc1101_write_reg(erp1_config[i].addr, erp1_config[i].val);\n    }\n    cc1101_write_burst(0x3E, patable_ook, 2);\n    \n    esp_err_t err = gpio_install_isr_service(0);\n    if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {\n        // Handle error\n    }\n    \n    radio_rmt_rx_init();\n    \n    cc1101_strobe(CC1101_SRX);\n    ESP_LOGI(TAG, \"CC1101 Initialized in Async RX Mode with RMT\");\n}"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Error: 'original_text' not found. Use exact match."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "static void rf_rx_task_impl(void *pvParameters) {\n    rmt_receive_config_t rec_config = {\n        .signal_range_min_ns = 1000,\n        .signal_range_max_ns = 50000,\n    };\n    rmt_enable(rx_channel);\n    while (1) {\n        if (xSemaphoreTake(carrier_sense_sem, portMAX_DELAY) == pdTRUE) {\n            if (is_transmitting) {\n                gpio_intr_enable(PIN_GDO2);\n                continue;\n            }\n            \n            memset(rmt_rx_buffer, 0, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t));\n            if (rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t), &rec_config) == ESP_OK) {\n                if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(50)) == pdTRUE) {\n                    size_t rx_symbols_count = 0;\n                    for(int i=0; i<MAX_RMT_SYMBOLS; i++) {\n                        if(rmt_rx_buffer[i].duration0 == 0) break;\n                        rx_symbols_count++;\n                    }\n                    if (rx_symbols_count > 20) {\n                        rmt_to_manchester_decode(rmt_rx_buffer, rx_symbols_count);\n                    }\n                }\n            }\n            \n            int wait_tout = 100;\n            while (gpio_get_level(PIN_GDO2) == 1 && wait_tout > 0) {\n                vTaskDelay(pdMS_TO_TICKS(1));\n                wait_tout--;\n            }\n            vTaskDelay(pdMS_TO_TICKS(5));\n            xSemaphoreTake(carrier_sense_sem, 0); \n            gpio_intr_enable(PIN_GDO2);\n        }\n    }\n}",
+            "path": "src/radio_hal.c",
+            "original_text": "static void rf_rx_task_impl(void *pvParameters) {\n    rmt_receive_config_t rec_config = {\n        .signal_range_min_ns = 1000,\n        .signal_range_max_ns = 40000,\n    };\n    while (1) {\n        if (xSemaphoreTake(carrier_sense_sem, portMAX_DELAY) == pdTRUE) {\n            if (is_transmitting) {\n                gpio_intr_enable(PIN_GDO2);\n                continue;\n            }\n            \n            rmt_enable(rx_channel);\n            if (rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t), &rec_config) == ESP_OK) {\n                if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(40)) == pdTRUE) {\n                    size_t rx_symbols_count = 0;\n                    for(int i=0; i<MAX_RMT_SYMBOLS; i++) {\n                        if(rmt_rx_buffer[i].duration0 == 0) break;\n                        rx_symbols_count++;\n                    }\n                    if (rx_symbols_count > 10) {\n                        rmt_to_manchester_decode(rmt_rx_buffer, rx_symbols_count);\n                    }\n                }\n            }\n            rmt_disable(rx_channel);\n            \n            // Debounce / Wait for carrier to clear\n            int wait_tout = 50;\n            while (gpio_get_level(PIN_GDO2) == 1 && wait_tout > 0) {\n                vTaskDelay(pdMS_TO_TICKS(1));\n                wait_tout--;\n            }\n            vTaskDelay(pdMS_TO_TICKS(10));\n            xSemaphoreTake(carrier_sense_sem, 0); \n            gpio_intr_enable(PIN_GDO2);\n        }\n    }\n}"
+          }
+        }
+      }
+    ]
   }
 ]
