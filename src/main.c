@@ -35,11 +35,13 @@ void app_main(void) {
     // Initialize ESP3 parser
     esp3_init();
     
-    // Initialize Radio HAL (SPI, GPIO, CC1101, RMT RX Task)
-    radio_hal_init();
-
     // Start USB RX Task
     xTaskCreate(usb_rx_task, "usb_rx", 8192, NULL, 5, NULL);
+    
+    // Initialize Radio HAL (SPI, GPIO, CC1101, RMT RX Task)
+    // Delay slightly to give USB a chance
+    vTaskDelay(pdMS_TO_TICKS(100));
+    radio_hal_init();
     
     // Main loop does nothing
     while (1) {
