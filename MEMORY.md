@@ -6,14 +6,13 @@ Entwicklung einer Firmware für den ESP32-C6, die ein EnOcean TCM515 (ESP3-Proto
 ### Aktueller Stand
 Die **Hardware-Schwäche (falsches 433-MHz-Modul) ist als definitive Wurzelursache** für die RF-Probleme bestätigt. Dies führt zu einer massiven Signal-Dämpfung von >60 dB.
 *   **Sender**: Die neue **LUT-basierte Sende-Logik ist implementiert**, wird aber aufgrund der Dämpfung vom realen TCM515 nicht empfangen.
-*   **Empfänger**: Der Emulator empfängt Signale des TCM515 mit einem **starken RSSI von -56 dBm**. Der **PLL-Decoder scheitert jedoch** daran, aus diesem starken Signal ein gültiges Datenpaket zu rekonstruieren. Der Fokus liegt nun auf der **Fehlersuche und Kalibrierung des Decoders**.
+*   **Empfänger**: Der Emulator empfängt Signale des TCM515 mit einem **sehr starken RSSI von bis zu -50 dBm**. Der **PLL-Decoder scheitert jedoch** daran, aus diesem starken Signal ein gültiges Datenpaket zu rekonstruieren. Der Fokus liegt nun auf der **Fehlersuche und Kalibrierung des Decoders**.
 
 ### Nächste Schritte
 *   **Hardware-Austausch (BLOCKER)**: Beschaffung und Austausch des CC1101-Moduls durch ein verifiziertes, korrekt für 868 MHz bestücktes Modul. **Dies ist die einzige und absolut höchste Priorität.**
-*   **Fehlersuche & Kalibrierung (PLL-Decoder) (Höchste Prio)**: Analysieren, warum der Decoder trotz starkem Signal (-56 dBm) vom realen TCM515 keine Pakete ausgibt.
+*   **Fehlersuche & Kalibrierung (PLL-Decoder) (Höchste Prio)**: Analysieren, warum der Decoder trotz extrem starkem Signal (-50 dBm) vom realen TCM515 keine Pakete ausgibt. Fokus auf die Anpassung der Pulsweiten-Toleranzen (`MIN_1T`, `MAX_2T` etc.), um Pulsverbreiterung bei starken Signalen zu kompensieren.
 *   **Implementierung einer Software-Paket-Injektion**: Um den RX-Datenpfad (Decoder -> ESP3 -> Host) ohne funktionierendes RF-Frontend deterministisch testen zu können.
 *   **End-to-End Validierung des Empfangs (nach HW-Fix)**: Verifizieren, dass der PLL-Decoder mit einem funktionierenden RF-Frontend vollständige ERP1-Pakete korrekt dekodiert und die Checksummen-Prüfung besteht.
-*   **Timing-Feinabstimmung (PLL-Decoder)**: Anpassen der Pulsweiten-Toleranzen (`MIN_1T`, `MAX_2T` etc.), um die Empfangssicherheit weiter zu maximieren.
 *   **Code-Refactoring**: Aufräumen des Codes, insbesondere der neuen Decoder-Logik (`erp1_decoder.c`), und Hinzufügen von Kommentaren.
 *   **Feinabstimmung**: Kalibrierung der RSSI-Werte und des LBT-Schwellwerts für den Praxiseinsatz.
 
@@ -39,7 +38,7 @@ Die **Hardware-Schwäche (falsches 433-MHz-Modul) ist als definitive Wurzelursac
             *   **Clock-Recovery**: Nutzt eine **3/4-Sampling-Regel** (Abtastung bei 6 µs im 8 µs Bit-Fenster), um gegen Jitter und Duty-Cycle-Verzerrungen (Sättigung) immun zu sein.
             *   **Multi-Block-fähig**: Der Zustand des Decoders (`erp1_decoder_t`) bleibt über mehrere RMT-DMA-Blöcke hinweg erhalten.
     *   **Gating-Logik (Gehärtet)**: Der Carrier Sense (CS) Pin (GDO2) löst einen GPIO-Interrupt aus, der die Auswertung startet.
-7.  **Diagnose-Funktionen (Neu)**:
+7.  **Diagnose-Funktionen (Final)**:
     *   Ein dedizierter Task sendet Echtzeit-Diagnosedaten über das ESP3-Protokoll an den Host.
     *   **Paket-Typ 0x33**: Sendet die Anzahl der empfangenen RMT-Symbole und den Decoder-Status.
     *   **Paket-Typ 0x34**: Sendet den aktuellen RSSI-Wert sowie die GDO0- und GDO2-Pegel.
@@ -53,7 +52,7 @@ Die **Hardware-Schwäche (falsches 433-MHz-Modul) ist als definitive Wurzelursac
 
 ### Abgeschlossene Aufgaben (Development Log)
 *   **DONE**: **RF-Sendestrategie auf Packet Mode und LUT-Kodierung umgestellt**: Der Transmitter wurde fundamental überarbeitet. Er nutzt nun den hardware-getimten **Packet Mode** des CC1101. Die Manchester-Kodierung erfolgt hocheffizient und präzise über eine **Look-Up Table (LUT)**, ergänzt durch eine verlängerte Preamble zur Verbesserung der Empfangsstabilität.
-*   **DONE**: **Hardware-Fehlanpassung als Wurzelursache verifiziert**: Systematische Tests (Distanzänderung, TX-Validierung) bestätigen, dass die extrem niedrige Empfindlichkeit und Sendeleistung (>60 dB Dämpfung) auf eine falsche Bestückung des CC1101-Moduls (433-MHz-Frontend) zurückzuführen ist.
+*   **DONE**: **Hardware-Fehlanpassung als Wurzelursache verifiziert**: Systematische Tests (Distanzänderung, TX-Validierung) bestätigen, dass die extrem niedrige Sendeleistung (>60 dB Dämpfung) auf eine falsche Bestückung des CC1101-Moduls (433-MHz-Frontend) zurückzuführen ist.
 *   **DONE**: **Kritischer Frequenz-Fehler (869.0 vs 868.3 MHz) identifiziert und behoben.**
 *   **DONE**: **CC1101-Register (AGC, BW) gegen Sättigung gehärtet**: Die RX-Bandbreite wurde auf 406 kHz erhöht und die AGC-Parameter wurden angepasst, um LNA-Clipping bei starken Signalen zu verhindern.
 *   **DONE**: **Produktionsreifer PLL-basierter Manchester-Decoder implementiert**: Der RMT-Empfänger wurde auf eine robuste State-Machine mit Clock-Recovery (3/4-Sampling) umgestellt.
