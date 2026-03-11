@@ -594,5 +594,218 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "$HOME/.platformio/penv/bin/pio run -t upload --upload-port /dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:90:B0-if00"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n\n... [OUTPUT TRUNCATED. Total size: 7483 bytes. Showing last 1500 bytes. Full output saved in 'last_execution.log'. Use 'grep' or 'read_file last_execution.log' to analyze!]\nWrote 3072 bytes (103 compressed) at 0x00008000 in 0.0 seconds (872.7 kbit/s).\nHash of data verified.\nCompressed 172528 bytes to 91945...\n\nWriting at 0x00010000 [\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]   0.0% 0/91945 bytes... \n\nWriting at 0x000198dc [\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  17.8% 16384/91945 bytes... \n\nWriting at 0x00020e68 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  35.6% 32768/91945 bytes... \n\nWriting at 0x00027937 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  53.5% 49152/91945 bytes... \n\nWriting at 0x0002e229 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  71.3% 65536/91945 bytes... \n\nWriting at 0x0003554a [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591]  89.1% 81920/91945 bytes... \n\nWriting at 0x0003a1f0 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588] 100.0% 91945/91945 bytes... \nWrote 172528 bytes (91945 compressed) at 0x00010000 in 1.0 seconds (1363.8 kbit/s).\nHash of data verified.\n\nHard resetting via RTS pin...\n========================= [SUCCESS] Took 19.90 seconds =========================\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "write_file",
+          "args": {
+            "content": "import serial\nimport time\nimport struct\n\n# EnOcean ESP3 CRC8 Tabelle\nCRC8_TABLE = [\n    0x00, 0x07, 0x0E, 0x09, 0x1C, 0x1B, 0x12, 0x15, 0x38, 0x3F, 0x36, 0x31, 0x24, 0x23, 0x2A, 0x2D,\n    0x70, 0x77, 0x7E, 0x79, 0x6C, 0x6B, 0x62, 0x65, 0x48, 0x4F, 0x46, 0x41, 0x54, 0x53, 0x5A, 0x5D,\n    0xE0, 0xE7, 0xEE, 0xE9, 0xFC, 0xFB, 0xF2, 0xF5, 0xD8, 0xDF, 0xD6, 0xD1, 0xC4, 0xC3, 0xCA, 0xCD,\n    0x90, 0x97, 0x9E, 0x99, 0x8C, 0x8B, 0x82, 0x85, 0xA8, 0xAF, 0xA6, 0xA1, 0xB4, 0xB3, 0xBA, 0xBD,\n    0xC7, 0xC0, 0xC9, 0xCE, 0xDB, 0xDC, 0xD5, 0xD2, 0xFF, 0xF8, 0xF1, 0xF6, 0xE3, 0xE4, 0xED, 0xEA,\n    0xB7, 0xB0, 0xB9, 0xBE, 0xAB, 0xAC, 0xA5, 0xA2, 0x8F, 0x88, 0x81, 0x86, 0x93, 0x94, 0x9D, 0x9A,\n    0x27, 0x20, 0x29, 0x2E, 0x3B, 0x3C, 0x35, 0x32, 0x1F, 0x18, 0x11, 0x16, 0x03, 0x04, 0x0D, 0x0A,\n    0x57, 0x50, 0x59, 0x5E, 0x4B, 0x4C, 0x45, 0x42, 0x6F, 0x68, 0x61, 0x66, 0x73, 0x74, 0x7D, 0x7A,\n    0x89, 0x8E, 0x87, 0x80, 0x95, 0x92, 0x9B, 0x9C, 0xB1, 0xB6, 0xBF, 0xB8, 0xAD, 0xAA, 0xA3, 0xA4,\n    0xF9, 0xFE, 0xF7, 0xF0, 0xE5, 0xE2, 0xEB, 0xEC, 0xC1, 0xC6, 0xCF, 0xC8, 0xDD, 0xDA, 0xD3, 0xD4,\n    0x69, 0x6E, 0x67, 0x60, 0x75, 0x72, 0x7B, 0x7C, 0x51, 0x56, 0x5F, 0x58, 0x4D, 0x4A, 0x43, 0x44,\n    0x19, 0x1E, 0x17, 0x10, 0x05, 0x02, 0x0B, 0x0C, 0x21, 0x26, 0x2F, 0x28, 0x3D, 0x3A, 0x33, 0x34,\n    0x4E, 0x49, 0x40, 0x47, 0x52, 0x55, 0x5C, 0x5B, 0x76, 0x71, 0x78, 0x7F, 0x6A, 0x6D, 0x64, 0x63,\n    0x3E, 0x39, 0x30, 0x37, 0x22, 0x25, 0x2C, 0x2B, 0x06, 0x01, 0x08, 0x0F, 0x1A, 0x1D, 0x14, 0x13,\n    0xAE, 0xA9, 0xA0, 0xA7, 0xB2, 0xB5, 0xBC, 0xBB, 0x96, 0x91, 0x98, 0x9F, 0x8A, 0x8D, 0x84, 0x83,\n    0xDE, 0xD9, 0xD0, 0xD7, 0xC2, 0xC5, 0xCC, 0xCB, 0xE6, 0xE1, 0xE8, 0xEF, 0xFA, 0xFD, 0xF4, 0xF3\n]\n\ndef calc_crc8(data):\n    crc = 0\n    for byte in data:\n        crc = CRC8_TABLE[crc ^ byte]\n    return crc\n\ndef build_esp3_packet(packet_type, data, opt_data=b''):\n    header = struct.pack(\">HBB\", len(data), len(opt_data), packet_type)\n    crc8h = calc_crc8(header)\n    payload = data + opt_data\n    crc8d = calc_crc8(payload)\n    return b'\\x55' + header + bytes([crc8h]) + payload + bytes([crc8d])\n\nEMU_ID = \"/dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:90:B0-if00\"\n\ntry:\n    with serial.Serial(EMU_ID, 57600, timeout=2) as ser:\n        # RPS Telegram\n        data = bytes.fromhex(\"F600FFFFFFFF30\")\n        opt = bytes.fromhex(\"03FFFFFFFF0000\")\n        esp3_frame = build_esp3_packet(0x01, data, opt)\n        \n        print(f\"Sende ERP1 Paket: {esp3_frame.hex()}\")\n        ser.write(esp3_frame)\n        \n        start = time.time()\n        while time.time() - start < 3:\n            if ser.in_waiting > 0:\n                resp = ser.read(ser.in_waiting)\n                print(f\"Empfangen: {resp.hex()}\")\n            time.sleep(0.1)\nexcept Exception as e:\n    print(f\"Error: {e}\")\n",
+            "path": "test_loopback.py"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "write_file",
+          "response": {
+            "result": "Wrote to test_loopback.py"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "python3 test_loopback.py"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\nSende ERP1 Paket: 55000707017af600ffffffff3003ffffffff00001d\nEmpfangen: 55000707017af600ffffffff3001ffffffff30005d5500010002650000\nEmpfangen: 550004003332c69900014a\nEmpfangen: 550004003332c79a0101f4\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "write_file",
+          "args": {
+            "content": "import serial\nimport time\nimport struct\n\nCRC8_TABLE = [\n    0x00, 0x07, 0x0E, 0x09, 0x1C, 0x1B, 0x12, 0x15, 0x38, 0x3F, 0x36, 0x31, 0x24, 0x23, 0x2A, 0x2D,\n    0x70, 0x77, 0x7E, 0x79, 0x6C, 0x6B, 0x62, 0x65, 0x48, 0x4F, 0x46, 0x41, 0x54, 0x53, 0x5A, 0x5D,\n    0xE0, 0xE7, 0xEE, 0xE9, 0xFC, 0xFB, 0xF2, 0xF5, 0xD8, 0xDF, 0xD6, 0xD1, 0xC4, 0xC3, 0xCA, 0xCD,\n    0x90, 0x97, 0x9E, 0x99, 0x8C, 0x8B, 0x82, 0x85, 0xA8, 0xAF, 0xA6, 0xA1, 0xB4, 0xB3, 0xBA, 0xBD,\n    0xC7, 0xC0, 0xC9, 0xCE, 0xDB, 0xDC, 0xD5, 0xD2, 0xFF, 0xF8, 0xF1, 0xF6, 0xE3, 0xE4, 0xED, 0xEA,\n    0xB7, 0xB0, 0xB9, 0xBE, 0xAB, 0xAC, 0xA5, 0xA2, 0x8F, 0x88, 0x81, 0x86, 0x93, 0x94, 0x9D, 0x9A,\n    0x27, 0x20, 0x29, 0x2E, 0x3B, 0x3C, 0x35, 0x32, 0x1F, 0x18, 0x11, 0x16, 0x03, 0x04, 0x0D, 0x0A,\n    0x57, 0x50, 0x59, 0x5E, 0x4B, 0x4C, 0x45, 0x42, 0x6F, 0x68, 0x61, 0x66, 0x73, 0x74, 0x7D, 0x7A,\n    0x89, 0x8E, 0x87, 0x80, 0x95, 0x92, 0x9B, 0x9C, 0xB1, 0xB6, 0xBF, 0xB8, 0xAD, 0xAA, 0xA3, 0xA4,\n    0xF9, 0xFE, 0xF7, 0xF0, 0xE5, 0xE2, 0xEB, 0xEC, 0xC1, 0xC6, 0xCF, 0xC8, 0xDD, 0xDA, 0xD3, 0xD4,\n    0x69, 0x6E, 0x67, 0x60, 0x75, 0x72, 0x7B, 0x7C, 0x51, 0x56, 0x5F, 0x58, 0x4D, 0x4A, 0x43, 0x44,\n    0x19, 0x1E, 0x17, 0x10, 0x05, 0x02, 0x0B, 0x0C, 0x21, 0x26, 0x2F, 0x28, 0x3D, 0x3A, 0x33, 0x34,\n    0x4E, 0x49, 0x40, 0x47, 0x52, 0x55, 0x5C, 0x5B, 0x76, 0x71, 0x78, 0x7F, 0x6A, 0x6D, 0x64, 0x63,\n    0x3E, 0x39, 0x30, 0x37, 0x22, 0x25, 0x2C, 0x2B, 0x06, 0x01, 0x08, 0x0F, 0x1A, 0x1D, 0x14, 0x13,\n    0xAE, 0xA9, 0xA0, 0xA7, 0xB2, 0xB5, 0xBC, 0xBB, 0x96, 0x91, 0x98, 0x9F, 0x8A, 0x8D, 0x84, 0x83,\n    0xDE, 0xD9, 0xD0, 0xD7, 0xC2, 0xC5, 0xCC, 0xCB, 0xE6, 0xE1, 0xE8, 0xEF, 0xFA, 0xFD, 0xF4, 0xF3\n]\n\ndef calc_crc8(data):\n    crc = 0\n    for byte in data:\n        crc = CRC8_TABLE[crc ^ byte]\n    return crc\n\ndef build_esp3_packet(packet_type, data, opt_data=b''):\n    header = struct.pack(\">HBB\", len(data), len(opt_data), packet_type)\n    crc8h = calc_crc8(header)\n    payload = data + opt_data\n    crc8d = calc_crc8(payload)\n    return b'\\x55' + header + bytes([crc8h]) + payload + bytes([crc8d])\n\ndef p(level, dur_us):\n    # Decoder resolution in firmware is 8MHz (1 tick = 0.125us)\n    # But inject function expects duration in 'ticks' (based on erp1_decode_pulse logic)\n    # Wait, the expert said duration in hex_pulses. Let's look at the C code.\n    # val = duration | (0x8000 if level else 0)\n    # erp1_decode_pulse(dec, level, duration)\n    # In my C code, duration is compared to TICK_1T (32) which is 4us.\n    # So 1us = 8 ticks.\n    ticks = int(dur_us * 8)\n    val = (ticks & 0x7FFF) | (0x8000 if level else 0)\n    return f\"{val:04X}\"\n\n# Manchester Bit (125kbps): 8us total.\n# Logisch 1 -> High (4us), Low (4us)\n# Logisch 0 -> Low (4us), High (4us)\ndef m1(): return p(1, 4) + p(0, 4)\ndef m0(): return p(0, 4) + p(1, 4)\n\n# Build a virtual packet:\n# Preamble: 10x '1'\npulses = \"\"\nfor _ in range(10): pulses += m1()\n# SOF: '0' -> physikalisch: Low (4us), High (4us). \n# Wait, EnOcean SOF is a logische 0. But in the stream it looks like:\n# ... 1(H4,L4) SOF(L4,H4) ... -> The two L4 meet and form an 8us LOW.\npulses += m0()\n\n# Payload: 0xF6 0x00 0xF6 (Simplified)\ndata_bytes = [0xF6, 0x00, 0xF6]\nfor b in data_bytes:\n    for i in range(7, -1, -1):\n        if (b >> i) & 1: pulses += m1()\n        else: pulses += m0()\n\n# End of packet\npulses += p(0, 30) # 30us silence\n\nEMU_ID = \"/dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:90:B0-if00\"\n\ntry:\n    with serial.Serial(EMU_ID, 57600, timeout=2) as ser:\n        cmd_data = b'\\x7F' + pulses.encode('ascii')\n        esp3_frame = build_esp3_packet(0x05, cmd_data)\n        print(f\"Sende Pulse Injection ({len(pulses)} chars)\")\n        ser.write(esp3_frame)\n        \n        start = time.time()\n        while time.time() - start < 3:\n            if ser.in_waiting > 0:\n                resp = ser.read(ser.in_waiting)\n                print(f\"Empfangen: {resp.hex()}\")\n            time.sleep(0.1)\nexcept Exception as e:\n    print(f\"Error: {e}\")\n",
+            "path": "test_injection.py"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "write_file",
+          "response": {
+            "result": "Wrote to test_injection.py"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "python3 test_injection.py"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\nSende Pulse Injection (284 chars)\nEmpfangen: 4a550004003332c398000068550004003332c79a0101f4550004003332c89a010126550004003332c69900004d550004003332c69900014a550004003332c69900014a550004003332c599000170550004003332c498010118550004003332c89a010126550004003332c599000170550004003332c79a0100f3550004003332c79a0100f3550004003332c69900014a550004003332c79a0100f3550004003332c599000170550004003332c599010062550004003332c49800010d550004003332c297000039550004003332c49800010d550004003332c498010118550004003332c89a010126550004003332c599000077550004003332c69900014a550004003332c599000170\nEmpfangen: 5500010002650000\nEmpfangen: 550004003332c69901015f\nEmpfangen: 550004003332c599010165\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "write_file",
+          "args": {
+            "content": "import serial\nimport time\nimport struct\n\nCRC8_TABLE = [\n    0x00, 0x07, 0x0E, 0x09, 0x1C, 0x1B, 0x12, 0x15, 0x38, 0x3F, 0x36, 0x31, 0x24, 0x23, 0x2A, 0x2D,\n    0x70, 0x77, 0x7E, 0x79, 0x6C, 0x6B, 0x62, 0x65, 0x48, 0x4F, 0x46, 0x41, 0x54, 0x53, 0x5A, 0x5D,\n    0xE0, 0xE7, 0xEE, 0xE9, 0xFC, 0xFB, 0xF2, 0xF5, 0xD8, 0xDF, 0xD6, 0xD1, 0xC4, 0xC3, 0xCA, 0xCD,\n    0x90, 0x97, 0x9E, 0x99, 0x8C, 0x8B, 0x82, 0x85, 0xA8, 0xAF, 0xA6, 0xA1, 0xB4, 0xB3, 0xBA, 0xBD,\n    0xC7, 0xC0, 0xC9, 0xCE, 0xDB, 0xDC, 0xD5, 0xD2, 0xFF, 0xF8, 0xF1, 0xF6, 0xE3, 0xE4, 0xED, 0xEA,\n    0xB7, 0xB0, 0xB9, 0xBE, 0xAB, 0xAC, 0xA5, 0xA2, 0x8F, 0x88, 0x81, 0x86, 0x93, 0x94, 0x9D, 0x9A,\n    0x27, 0x20, 0x29, 0x2E, 0x3B, 0x3C, 0x35, 0x32, 0x1F, 0x18, 0x11, 0x16, 0x03, 0x04, 0x0D, 0x0A,\n    0x57, 0x50, 0x59, 0x5E, 0x4B, 0x4C, 0x45, 0x42, 0x6F, 0x68, 0x61, 0x66, 0x73, 0x74, 0x7D, 0x7A,\n    0x89, 0x8E, 0x87, 0x80, 0x95, 0x92, 0x9B, 0x9C, 0xB1, 0xB6, 0xBF, 0xB8, 0xAD, 0xAA, 0xA3, 0xA4,\n    0xF9, 0xFE, 0xF7, 0xF0, 0xE5, 0xE2, 0xEB, 0xEC, 0xC1, 0xC6, 0xCF, 0xC8, 0xDD, 0xDA, 0xD3, 0xD4,\n    0x69, 0x6E, 0x67, 0x60, 0x75, 0x72, 0x7B, 0x7C, 0x51, 0x56, 0x5F, 0x58, 0x4D, 0x4A, 0x43, 0x44,\n    0x19, 0x1E, 0x17, 0x10, 0x05, 0x02, 0x0B, 0x0C, 0x21, 0x26, 0x2F, 0x28, 0x3D, 0x3A, 0x33, 0x34,\n    0x4E, 0x49, 0x40, 0x47, 0x52, 0x55, 0x5C, 0x5B, 0x76, 0x71, 0x78, 0x7F, 0x6A, 0x6D, 0x64, 0x63,\n    0x3E, 0x39, 0x30, 0x37, 0x22, 0x25, 0x2C, 0x2B, 0x06, 0x01, 0x08, 0x0F, 0x1A, 0x1D, 0x14, 0x13,\n    0xAE, 0xA9, 0xA0, 0xA7, 0xB2, 0xB5, 0xBC, 0xBB, 0x96, 0x91, 0x98, 0x9F, 0x8A, 0x8D, 0x84, 0x83,\n    0xDE, 0xD9, 0xD0, 0xD7, 0xC2, 0xC5, 0xCC, 0xCB, 0xE6, 0xE1, 0xE8, 0xEF, 0xFA, 0xFD, 0xF4, 0xF3\n]\n\ndef calc_crc8(data):\n    crc = 0\n    for byte in data:\n        crc = CRC8_TABLE[crc ^ byte]\n    return crc\n\ndef build_esp3_packet(packet_type, data, opt_data=b''):\n    header = struct.pack(\">HBB\", len(data), len(opt_data), packet_type)\n    crc8h = calc_crc8(header)\n    payload = data + opt_data\n    crc8d = calc_crc8(payload)\n    return b'\\x55' + header + bytes([crc8h]) + payload + bytes([crc8d])\n\n# Generation logic\nraw_pulses = [] # List of (level, duration_us)\n\ndef add_m1(): raw_pulses.extend([(1, 4), (0, 4)])\ndef add_m0(): raw_pulses.extend([(0, 4), (1, 4)])\n\n# 1. Preamble (10x logisch 1)\nfor _ in range(10): add_m1()\n# 2. SOF (logisch 0)\nadd_m0()\n\n# 3. Payload: 0xF6 0x00 0x00 0x00 0x00 0xF6 (Valid RPS packet)\n# Data: F6 00 00 00 00, Checksum: F6\npayload = [0xF6, 0x00, 0x00, 0x00, 0x00, 0xF6]\nfor b in payload:\n    for i in range(7, -1, -1):\n        if (b >> i) & 1: add_m1()\n        else: add_m0()\n\n# Pulse Merger\nmerged = []\nif raw_pulses:\n    curr_l, curr_d = raw_pulses[0]\n    for next_l, next_d in raw_pulses[1:]:\n        if next_l == curr_l:\n            curr_d += next_d\n        else:\n            merged.append((curr_l, curr_d))\n            curr_l, curr_d = next_l, next_d\n    merged.append((curr_l, curr_d))\n\n# To Hex\nhex_pulses = \"\"\nfor l, d in merged:\n    ticks = int(d * 8)\n    val = (ticks & 0x7FFF) | (0x8000 if l else 0)\n    hex_pulses += f\"{val:04X}\"\n\nEMU_ID = \"/dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:90:B0-if00\"\n\ntry:\n    with serial.Serial(EMU_ID, 57600, timeout=2) as ser:\n        cmd_data = b'\\x7F' + hex_pulses.encode('ascii')\n        esp3_frame = build_esp3_packet(0x05, cmd_data)\n        print(f\"Sende Pulse Injection (Merged: {len(merged)} pulses)\")\n        ser.write(esp3_frame)\n        \n        start = time.time()\n        while time.time() - start < 3:\n            if ser.in_waiting > 0:\n                resp = ser.read(ser.in_waiting)\n                # Look for Type 1 Packet (ERP1)\n                if b'\\x55\\x00\\x06\\x07\\x01' in resp:\n                    print(\"!!! ERFOLG !!! Decoder hat das virtuelle Paket erkannt!\")\n                    print(f\"Empfangen: {resp.hex()}\")\n                    break\n            time.sleep(0.1)\n        else:\n            print(\"Kein ERP1 Paket empfangen. Decoder-Logik pr\u00fcfen.\")\nexcept Exception as e:\n    print(f\"Error: {e}\")\n",
+            "path": "test_injection_v2.py"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "write_file",
+          "response": {
+            "result": "Wrote to test_injection_v2.py"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "python3 test_injection_v2.py"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\nSende Pulse Injection (Merged: 109 pulses)\nKein ERP1 Paket empfangen. Decoder-Logik pr\u00fcfen.\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "# 3. Payload: RPS Packet (7 Bytes)\n# F6 00 FF FF FF FF 30, Checksum: 22\npayload = [0xF6, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x30, 0x22]\nfor b in payload:\n    for i in range(7, -1, -1):\n        if (b >> i) & 1: add_m1()\n        else: add_m0()",
+            "path": "test_injection_v2.py",
+            "original_text": "# 3. Payload: 0xF6 0x00 0x00 0x00 0x00 0xF6 (Valid RPS packet)\n# Data: F6 00 00 00 00, Checksum: F6\npayload = [0xF6, 0x00, 0x00, 0x00, 0x00, 0xF6]\nfor b in payload:\n    for i in range(7, -1, -1):\n        if (b >> i) & 1: add_m1()\n        else: add_m0()"
+          }
+        }
+      }
+    ]
   }
 ]
