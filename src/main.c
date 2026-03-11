@@ -36,7 +36,7 @@ void app_main(void) {
     esp3_init();
     
     // Initialize Radio HAL (SPI, GPIO, CC1101, RMT RX Task)
-    radio_hal_init();
+    // radio_hal_init();
 
     // Start USB RX Task
     xTaskCreate(usb_rx_task, "usb_rx", 4096, NULL, 5, NULL);
