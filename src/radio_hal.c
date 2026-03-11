@@ -204,6 +204,11 @@ void radio_hal_init(void) {
     cc1101_strobe(CC1101_SIDLE);
     cc1101_write_reg(0x08, 0x32); // Asynchronous
     cc1101_write_reg(0x02, 0x0D); // GDO0 = Serial Out
+    
+    // Carrier Sense Threshold (GDO2)
+    cc1101_write_reg(0x1E, 0x00); // MAGN_TARGET = 33dB, MAX_LNA_GAIN = 0, MAX_DVGA_GAIN = 0
+    cc1101_write_reg(0x1F, 0x40); // AGC_FREEZE = 0, WAIT_TIME = 0, CS_REL_THR = 6dB, CS_ABS_THR = 0dB
+    
     cc1101_strobe(CC1101_SRX);
 }
 

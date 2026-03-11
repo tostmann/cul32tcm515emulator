@@ -1306,5 +1306,111 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "$HOME/.platformio/penv/bin/pio run -t upload --upload-port /dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:90:B0-if00"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n\n... [OUTPUT TRUNCATED. Total size: 7381 bytes. Showing last 1500 bytes. Full output saved in 'last_execution.log'. Use 'grep' or 'read_file last_execution.log' to analyze!]\nWrote 3072 bytes (103 compressed) at 0x00008000 in 0.0 seconds (941.3 kbit/s).\nHash of data verified.\nCompressed 171296 bytes to 91224...\n\nWriting at 0x00010000 [\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]   0.0% 0/91224 bytes... \n\nWriting at 0x0001999a [\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  18.0% 16384/91224 bytes... \n\nWriting at 0x00020e9c [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  35.9% 32768/91224 bytes... \n\nWriting at 0x000279b1 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  53.9% 49152/91224 bytes... \n\nWriting at 0x0002e22e [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  71.8% 65536/91224 bytes... \n\nWriting at 0x00035553 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591]  89.8% 81920/91224 bytes... \n\nWriting at 0x00039d20 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588] 100.0% 91224/91224 bytes... \nWrote 171296 bytes (91224 compressed) at 0x00010000 in 1.0 seconds (1389.8 kbit/s).\nHash of data verified.\n\nHard resetting via RTS pin...\n========================= [SUCCESS] Took 18.97 seconds =========================\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "python3 diff_test_enocean.py > test_results_20.log 2>&1 & sleep 15; kill $!"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 1\nOutput:\n/bin/sh: 1: kill: No such process\n\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "cat test_results_20.log"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n[TCM515] Listening...\n[EMULATOR] Listening...\n\n--- Test 1: TCM515 Transmits -> Emulator Receives ---\n[HOST -> TCM515] Sending ESP3: 55000b070180a5010203040102030400b901ffffffff00008b\n[TCM515] Received: 55000100026500005500010004770838\n\n--- Test 2: Emulator Transmits -> TCM515 Receives ---\n[HOST -> EMULATOR] Sending ESP3: 55000b070180a5010203040506070800c901ffffffff0000b1\n[EMULATOR] Received: 5500010002650000\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "    // Async RX mode\n    cc1101_strobe(CC1101_SIDLE);\n    cc1101_write_reg(0x08, 0x32); // Asynchronous\n    cc1101_write_reg(0x02, 0x0D); // GDO0 = Serial Out\n    \n    // Carrier Sense Threshold (GDO2)\n    cc1101_write_reg(0x1E, 0x00); // MAGN_TARGET = 33dB, MAX_LNA_GAIN = 0, MAX_DVGA_GAIN = 0\n    cc1101_write_reg(0x1F, 0x40); // AGC_FREEZE = 0, WAIT_TIME = 0, CS_REL_THR = 6dB, CS_ABS_THR = 0dB\n    \n    cc1101_strobe(CC1101_SRX);\n}",
+            "path": "src/radio_hal.c",
+            "original_text": "    // Async RX mode\n    cc1101_strobe(CC1101_SIDLE);\n    cc1101_write_reg(0x08, 0x32); // Asynchronous\n    cc1101_write_reg(0x02, 0x0D); // GDO0 = Serial Out\n    cc1101_strobe(CC1101_SRX);\n}"
+          }
+        }
+      }
+    ]
   }
 ]
