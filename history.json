@@ -1854,5 +1854,138 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "$HOME/.platformio/penv/bin/pio run -t upload --upload-port /dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:90:B0-if00"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n\n... [OUTPUT TRUNCATED. Total size: 7381 bytes. Showing last 1500 bytes. Full output saved in 'last_execution.log'. Use 'grep' or 'read_file last_execution.log' to analyze!]\nWrote 3072 bytes (103 compressed) at 0x00008000 in 0.0 seconds (878.2 kbit/s).\nHash of data verified.\nCompressed 171344 bytes to 91257...\n\nWriting at 0x00010000 [\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]   0.0% 0/91257 bytes... \n\nWriting at 0x0001999a [\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  18.0% 16384/91257 bytes... \n\nWriting at 0x00020e8c [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  35.9% 32768/91257 bytes... \n\nWriting at 0x000279a0 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  53.9% 49152/91257 bytes... \n\nWriting at 0x0002e227 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  71.8% 65536/91257 bytes... \n\nWriting at 0x00035538 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591]  89.8% 81920/91257 bytes... \n\nWriting at 0x00039d50 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588] 100.0% 91257/91257 bytes... \nWrote 171344 bytes (91257 compressed) at 0x00010000 in 1.0 seconds (1388.8 kbit/s).\nHash of data verified.\n\nHard resetting via RTS pin...\n========================= [SUCCESS] Took 19.26 seconds =========================\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "python3 diff_test_enocean.py > test_results_17.log 2>&1 & sleep 15; kill $!"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 1\nOutput:\n/bin/sh: 1: kill: No such process\n\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "cat test_results_17.log"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n[TCM515] Listening...\n[EMULATOR] Listening...\n\n--- Test 1: TCM515 Transmits -> Emulator Receives ---\n[HOST -> TCM515] Sending ESP3: 55000b070180a5010203040102030400b901ffffffff00008b\n[TCM515] Received: 55000100026500005500010004770838\n\n--- Test 2: Emulator Transmits -> TCM515 Receives ---\n[HOST -> EMULATOR] Sending ESP3: 55000b070180a5010203040506070800c901ffffffff0000b1\n[EMULATOR] Received: 5500010002650000\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "ask_pro_model",
+          "args": {
+            "question": "Give me the PERFECT, COMPLETE CC1101 register set for sending and receiving EnOcean ERP1 (868.3 MHz, 125kbps Manchester).\nAssume 26MHz Crystal.\nI want to use:\n- Asynchronous Mode for RX (to use ESP32 RMT).\n- Packet Mode (Fixed Length) for TX (to avoid bit-banging).\nProvide the exact values for MDMCFG4/3/2, PKTCTRL0, FREND0 and FREQ2/1/0.\nAlso, verify if I should send any dummy bits to 'warm up' the CC1101 OOK modulator before the preamble.",
+            "context_data": "src/radio_hal.c\ninclude/cc1101_regs.h\n\nCurrent state:\n- TCM515 doesn't receive the packet from Emulator.\n- Emulator doesn't receive the packet from TCM515.\n- Both use CC1101 at 868.299 MHz, 250kbps OOK.\n- Emulator uses RMT RX for decoding.\n- Emulator uses CC1101 Packet Mode (Fixed Length) for TX.\n\nThe CC1101 has a 'Manchester' setting in MDMCFG2. Should I use it?\nThe expert said NO, use raw 250kbps.\nBut why does the TCM515 not see my signal?\nCould it be the 'SYNC' setting in CC1101?\nIf I use Packet Mode with fixed length, the CC1101 might still try to send a preamble/sync if not configured to 0.\nMDMCFG2 = 0x30 (No Sync/Preamble). This should be correct.\nPKTCTRL0 = 0x00 (Fixed length).\nPKTLEN = length.\n\nIs there any other register like MCSM0, MCSM1, or AGCCTRL that is critical for OOK?\nWhat about the PA Table?\nWhat about the Frequency? Is 868.3 MHz correct or is there an offset?\nTCM515 datasheet says: 868.300 MHz.\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "ask_pro_model",
+          "response": {
+            "result": "Experten-Analyse (gemini-pro-latest):\nAls Senior Expert Advisor analysiere ich dein Setup. Dass die Kommunikation in **beide Richtungen** fehlschl\u00e4gt, ist ein klassisches Symptom bei der Implementierung von OOK (On-Off-Keying) mit dem CC1101 auf 250 kbps, speziell wenn man versucht, Hardware-Features zu umgehen.\n\nHier ist die tiefe Fehleranalyse und die exakte, umsetzbare L\u00f6sung.\n\n### Warum dein aktuelles Setup fehlschl\u00e4gt (Die Analyse)\n\n1.  **Der PATABLE-Fehler bei OOK (Kritischster Punkt):**\n    Bei FSK/GFSK nutzt der CC1101 nur den ersten Eintrag der PA-Tabelle (`PATABLE[0]`). Bei ASK/OOK \u00e4ndert sich die Hardware-Logik fundamental: Eine logische `0` verwendet **immer** `PATABLE[0]`, und eine logische `1` verwendet den Index, der im Register `FREND0` (Bits 2:0) definiert ist. Wenn du die PA-Tabelle wie bei FSK initialisiert hast, sendest du bei OOK durchgehend mit voller oder null Leistung, aber modulierst nicht.\n2.  **Die Bandbreite (MDMCFG4):**\n    F\u00fcr 250 kbps rohes OOK brauchst du eine signifikant h\u00f6here Empfangsbandbreite als f\u00fcr FSK. OOK ist extrem anf\u00e4llig f\u00fcr Frequenzdrift. Wenn die Bandbreite zu gering ist (< 300 kHz), \"verschluckt\" der Filter die steilen Flanken deines Manchester-Signals.\n3.  **Die AGC-Einschwingzeit (TCM515 sieht dich nicht):**\n    Wenn du im CC1101 den Hardware-Preamble ausschaltest (`MDMCFG2 = 0x30`) und sofort deine reinen Daten via FIFO pusht, beginnt der TX-Verst\u00e4rker abrupt. Der TCM515 Empf\u00e4nger braucht aber eine perfekte \"Ramp-up\" Phase (konstantes 101010-Muster), um seine eigene Automatic Gain Control (AGC) einzupegeln.\n\n---\n\n### DIE L\u00d6SUNG: Das perfekte Register-Set (26 MHz Quarz)\n\nDu musst zwischen RX (Async via RMT) und TX (Packet Mode) umschalten. Wenn du das tust, musst du zwingend \u00fcber den `SIDLE` State gehen.\n\n#### 1. Frequenz- und Basis-Register\n**868.300 MHz exakt** (Berechnung: `(868.3 * 65536) / 26` = 2188436 = `0x2165D4`):\n*   `FREQ2 = 0x21`\n*   `FREQ1 = 0x65`\n*   `FREQ0 = 0xD4`\n\n#### 2. Modem & Datenrate (250 kbps OOK)\nF\u00fcr 250 kbps und eine gro\u00dfz\u00fcgige Filter-Bandbreite von ~541 kHz:\n*   `MDMCFG4 = 0x2D` *(CHANBW = 541 kHz, DRATE_E = 13)*\n*   `MDMCFG3 = 0x3B` *(DRATE_M = 59)*\n*   `MDMCFG2 = 0x30` *(ASK/OOK, 000: No Preamble/Sync word)*\n\n#### 3. OOK Spezifische Register (TX PA & RX AGC)\nHier liegt der Schl\u00fcssel zum Erfolg:\n*   `FREND0 = 0x11` *(Setzt den PA_POWER Index f\u00fcr logisch '1' auf Index 1)*\n*   `AGCCTRL2 = 0x0B` *(H\u00f6chste LNA Gain, wichtig f\u00fcr schnelle OOK Anpassung)*\n*   `AGCCTRL1 = 0x00`\n*   `AGCCTRL0 = 0x92` *(Medium Filter Length, wichtig bei 250k OOK)*\n*   `MCSM0 = 0x18` *(Auto-Calibrate beim Wechsel von IDLE nach RX/TX - zwingend erforderlich!)*\n\n#### 4. Die PATABLE (Zwingend f\u00fcr OOK!)\nDu **musst** exakt zwei Bytes in die CC1101 PA-Tabelle schreiben:\n```c\nuint8_t paTable[2] = {0x00, 0x8E}; // 0x00 f\u00fcr logisch 0 (aus), 0x8E f\u00fcr logisch 1 (+10dBm)\ncc1101_write_burst(CC1101_PATABLE, paTable, 2);\n```\n\n#### 5. Modus-Umschaltung (RX vs. TX)\n\nDa du f\u00fcr RX den ESP32 RMT (Async) und f\u00fcr TX den CC1101 FIFO (Packet) nutzen willst, musst du dynamisch umschalten.\n\n**F\u00fcr RX (Empfang TCM515 -> ESP32):**\n```c\ncc1101_strobe(CC1101_SIDLE);\ncc1101_write_reg(CC1101_PKTCTRL0, 0x32); // Asynchronous serial mode\ncc1101_write_reg(CC1101_IOCFG0, 0x0D);   // GDO0 = Serial Data Output\ncc1101_strobe(CC1101_SRX);\n```\n\n**F\u00fcr TX (Senden ESP32 -> TCM515):**\n```c\ncc1101_strobe(CC1101_SIDLE);\ncc1101_write_reg(CC1101_PKTCTRL0, 0x00); // Fixed length, Packet mode via FIFO\n// IOCFG0 muss hier nicht zwingend ge\u00e4ndert werden, es sei denn du willst ein TX-Done Signal\n```\n\n---\n\n### Deine Frage zu den \"Dummy Bits\" (Warm-up)\n\n**JA. Das ist absolut entscheidend.**\nDa du den Hardware-Preamble deaktiviert hast (`MDMCFG2 = 0x30`), musst du den \"Warm-up\" in Software simulieren. Der TCM515 erwartet einen sauberen EnOcean Preamble, aber der CC1101 OOK-Modulator braucht selbst ein paar Bits, um die Amplitude stabil zu schwingen.\n\n**Umsetzung im TX-Payload (vor dem Senden in den FIFO):**\nF\u00fcge **zwei Bytes `0xAA`** (`10101010` bin\u00e4r) vor deinem eigentlich in Software generierten Manchester-Frame ein.\n\nDein Array, das du in den FIFO pusht, sollte so aussehen:\n1.  `0xAA` (Dummy Warm-up)\n2.  `0xAA` (Dummy Warm-up)\n3.  EnOcean Preamble (in Manchester encodiert)\n4.  EnOcean Sync Word (in Manchester encodiert)\n5.  EnOcean Daten (in Manchester encodiert)\n6.  EnOcean CRC (in Manchester encodiert)\n\n*Wichtig:* Die Gesamtl\u00e4nge (inklusive der 2 `0xAA` Bytes) schreibst du in das CC1101 Register `PKTLEN`.\n\n### Letzter Check (Endianness)\nDer CC1101 schiebt im Packet-Mode das **MSB (Most Significant Bit)** eines jeden Bytes zuerst aus dem FIFO in die Luft.\nStelle sicher, dass deine Software-Manchester-Routine das MSB-first Format beibeh\u00e4lt, andernfalls sieht der TCM515 nur \"M\u00fcll\", obwohl die Funkstrecke physisch steht."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "static const uint8_t patable_ook[] = {0x00, 0x8E}; \n\n#endif // CC1101_REGS_H",
+            "path": "include/cc1101_regs.h",
+            "original_text": "static const uint8_t patable_ook[] = {0x00, 0x50}; \n\n#endif // CC1101_REGS_H"
+          }
+        }
+      }
+    ]
   }
 ]
