@@ -3,5 +3,5 @@
   "pro_model": "gemini-pro-latest",
   "summary_model": "gemini-2.5-pro",
   "force_model": "",
-  "max_turns": 40
+  "max_turns": 35
 }
