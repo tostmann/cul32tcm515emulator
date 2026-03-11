@@ -2,6 +2,7 @@
 #include "cc1101_regs.h"
 #include "esp3_proto.h"
 #include "enocean_security.h"
+#include "enocean_nvs.h"
 #include "driver/spi_master.h"
 #include "driver/gpio.h"
 #include "driver/rmt_rx.h"
