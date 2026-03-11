@@ -62,11 +62,6 @@ static SemaphoreHandle_t carrier_sense_sem = NULL;
 static void erp1_decoder_reset(erp1_decoder_t *dec);
 static void erp1_decode_pulse(erp1_decoder_t *dec, int level, int duration, bool noise_reset);
 
-// Dummy implementation for device lookup
-enocean_sec_device_t* get_device_by_id(uint32_t sender_id) {
-    return NULL; // To be implemented with NVS storage
-}
-
 static void erp1_decoder_reset(erp1_decoder_t *dec) {
     dec->state = ERP1_STATE_SYNC;
     dec->half = 0;
@@ -84,7 +79,47 @@ static void handle_complete_telegram(const uint8_t *data, uint16_t length) {
     for (int i = 0; i < length - 1; i++) checksum += data[i];
     if (checksum != data[length - 1]) return;
 
-    // Send as ESP3 ERP1 Packet
+    uint8_t r_org = data[0];
+    uint32_t sender_id = (data[length-5] << 24) | (data[length-4] << 16) | 
+                         (data[length-3] << 8)  | data[length-2];
+
+    if (r_org == 0x30 || r_org == 0x31) {
+        enocean_sec_device_t dev;
+        if (enocean_nvs_get_device(sender_id, &dev) == ESP_OK) {
+            // Found secure device!
+            // Assume SLF with 3-byte RLC and 4-byte MAC for now
+            // [R-ORG] [Data...] [RLC(3)] [MAC(4)] [SenderID(4)] [Status] [CRC]
+            // Data starts at data[1]. 
+            // RLC is at data[length - 5 - 4 - 3] = data[length - 12]
+            // MAC is at data[length - 9]
+            uint32_t rlc = (data[length-12] << 16) | (data[length-11] << 8) | data[length-10];
+            const uint8_t *mac = &data[length-9];
+            uint16_t payload_len = length - 1 - 3 - 4 - 4 - 1 - 1; // R-ORG, RLC, MAC, ID, Status, CRC
+            uint8_t *payload = malloc(payload_len);
+            if (payload) {
+                memcpy(payload, &data[1], payload_len);
+                if (enocean_sec_verify_mac(&dev, payload, payload_len, rlc, mac, 4)) {
+                    if (r_org == 0x31) {
+                        enocean_sec_decrypt_ctr(&dev, payload, payload_len, rlc);
+                    }
+                    // Update RLC
+                    dev.rlc = rlc;
+                    enocean_nvs_save_device(&dev);
+                    
+                    // Send decrypted/verified packet to host as pseudo R-ORG (e.g. original R-ORG if known)
+                    // For now, send as is but marked as verified
+                    uint8_t opt[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x40, 0x01 }; // Bit 0 of RSSI/Status as verified flag
+                    esp3_send_packet(ESP3_TYPE_RADIO_ERP1, data, length, opt, 7);
+                } else {
+                    ESP_LOGW(TAG, "Security MAC verification failed for %08lX", sender_id);
+                }
+                free(payload);
+            }
+            return;
+        }
+    }
+
+    // Default: Send as ESP3 ERP1 Packet
     uint8_t opt[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x40, 0x00 };
     esp3_send_packet(ESP3_TYPE_RADIO_ERP1, data, length, opt, 7);
 }
