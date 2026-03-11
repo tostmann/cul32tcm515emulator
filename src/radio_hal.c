@@ -36,9 +36,9 @@ static bool IRAM_ATTR rmt_rx_done_callback(rmt_channel_handle_t channel, const r
     return high_task_wakeup == pdTRUE;
 }
 
-static void IRAM_ATTR gdo0_data_isr_handler(void* arg) {
+static void IRAM_ATTR gdo2_cs_isr_handler(void* arg) {
     BaseType_t high_task_wakeup = pdFALSE;
-    gpio_intr_disable(PIN_GDO0);
+    gpio_intr_disable(PIN_GDO2);
     vTaskNotifyGiveFromISR(rf_task_handle, &high_task_wakeup);
     if (high_task_wakeup) portYIELD_FROM_ISR();
 }
