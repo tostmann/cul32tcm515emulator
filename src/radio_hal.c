@@ -189,14 +189,14 @@ static void push_m(bit_s *s, int b) { if (b) push_c(s, 0x02, 2); else push_c(s, 
 void radio_transmit(const uint8_t *data, uint8_t len) {
     if (len > 31) return; 
     uint8_t chip_buf[128]; memset(chip_buf, 0, 128); bit_s s = { .buf = chip_buf, .pos = 0 };
-    for (int i = 0; i < 8; i++) push_m(&s, 1); // Preamble (8x '1')
+    for (int i = 0; i < 24; i++) push_m(&s, 1); // Preamble (24x '1')
     push_m(&s, 0); // SOF ('0')
     for (int i = 0; i < len; i++) { for (int j = 7; j >= 0; j--) push_m(&s, (data[i] >> j) & 1); }
     int byte_len = (s.pos + 7) / 8;
     is_transmitting = true; gpio_intr_disable(PIN_GDO2);
     cc1101_strobe(CC1101_SIDLE);
     cc1101_write_reg(0x10, 0x2D); cc1101_write_reg(0x11, 0x3B); cc1101_write_reg(0x08, 0x00); cc1101_write_reg(0x06, byte_len); cc1101_write_reg(0x12, 0x30); 
-    for(int i = 0; i < 5; i++) { if (cc1101_read_status(0x34) < 75) break; vTaskDelay(pdMS_TO_TICKS(5)); }
+    for(int i = 0; i < 10; i++) { if (cc1101_read_status(0x34) < 140) break; vTaskDelay(pdMS_TO_TICKS(5)); }
     for(int sub = 0; sub < 3; sub++) {
         cc1101_strobe(CC1101_SIDLE); cc1101_strobe(CC1101_SFTX); cc1101_write_burst(0x3F, chip_buf, byte_len); cc1101_strobe(CC1101_STX);
         int t = 50; while((cc1101_read_status(CC1101_MARCSTATE) & 0x1F) != 0x01 && t-- > 0) vTaskDelay(1);
