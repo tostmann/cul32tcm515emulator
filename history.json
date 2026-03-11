@@ -1427,5 +1427,270 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "write_file",
+          "args": {
+            "content": "#include \"radio_hal.h\"\n#include \"cc1101_regs.h\"\n#include \"esp3_proto.h\"\n#include \"driver/spi_master.h\"\n#include \"driver/gpio.h\"\n#include \"driver/rmt_rx.h\"\n#include \"esp_log.h\"\n#include \"esp_random.h\"\n#include \"esp_rom_sys.h\"\n#include \"freertos/FreeRTOS.h\"\n#include \"freertos/task.h\"\n#include \"freertos/semphr.h\"\n#include \"esp_heap_caps.h\"\n#include <string.h>\n\nstatic const char *TAG = \"RADIO_HAL\";\nstatic spi_device_handle_t spi_handle;\nstatic SemaphoreHandle_t spi_mutex = NULL;\nSemaphoreHandle_t rf_rx_semaphore = NULL;\nvolatile bool is_transmitting = false;\n\n#define RMT_RESOLUTION_HZ   1000000 \n#define MAX_RMT_SYMBOLS     1024\n\nstatic rmt_channel_handle_t rx_channel = NULL;\nstatic TaskHandle_t rf_task_handle = NULL;\nstatic SemaphoreHandle_t rmt_done_sem = NULL;\nstatic rmt_symbol_word_t *rmt_rx_buffer = NULL;\nstatic SemaphoreHandle_t carrier_sense_sem = NULL;\n\nstatic bool IRAM_ATTR rmt_rx_done_callback(rmt_channel_handle_t channel, const rmt_rx_done_event_data_t *edata, void *user_ctx) {\n    BaseType_t high_task_wakeup = pdFALSE;\n    xSemaphoreGiveFromISR(rmt_done_sem, &high_task_wakeup);\n    return high_task_wakeup == pdTRUE;\n}\n\nstatic void IRAM_ATTR gdo2_cs_isr_handler(void* arg) {\n    BaseType_t high_task_wakeup = pdFALSE;\n    gpio_intr_disable(PIN_GDO2);\n    xSemaphoreGiveFromISR(carrier_sense_sem, &high_task_wakeup);\n    if (high_task_wakeup) portYIELD_FROM_ISR();\n}\n\nstatic void spi_init(void) {\n    spi_bus_config_t buscfg = {\n        .miso_io_num = PIN_MISO,\n        .mosi_io_num = PIN_MOSI,\n        .sclk_io_num = PIN_SCK,\n        .quadwp_io_num = -1,\n        .quadhd_io_num = -1,\n        .max_transfer_sz = 256\n    };\n    spi_device_interface_config_t devcfg = {\n        .clock_speed_hz = 5000000,\n        .mode = 0,\n        .spics_io_num = PIN_SS,\n        .queue_size = 7,\n    };\n    spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_DISABLED);\n    spi_bus_add_device(SPI2_HOST, &devcfg, &spi_handle);\n}\n\nvoid cc1101_strobe(uint8_t cmd) {\n    xSemaphoreTake(spi_mutex, portMAX_DELAY);\n    spi_transaction_t t = { .length = 8, .tx_data = {cmd}, .flags = SPI_TRANS_USE_TXDATA };\n    spi_device_polling_transmit(spi_handle, &t);\n    xSemaphoreGive(spi_mutex);\n}\n\nvoid cc1101_write_reg(uint8_t addr, uint8_t value) {\n    xSemaphoreTake(spi_mutex, portMAX_DELAY);\n    uint8_t tx_data[2] = { addr, value };\n    spi_transaction_t t = { .length = 16, .tx_buffer = tx_data };\n    spi_device_polling_transmit(spi_handle, &t);\n    xSemaphoreGive(spi_mutex);\n}\n\nuint8_t cc1101_read_reg(uint8_t addr) {\n    xSemaphoreTake(spi_mutex, portMAX_DELAY);\n    uint8_t tx_data[2] = { (uint8_t)(addr | 0x80), 0x00 };\n    uint8_t rx_data[2] = { 0 };\n    spi_transaction_t t = { .length = 16, .tx_buffer = tx_data, .rx_buffer = rx_data };\n    spi_device_polling_transmit(spi_handle, &t);\n    xSemaphoreGive(spi_mutex);\n    return rx_data[1];\n}\n\nuint8_t cc1101_read_status(uint8_t addr) {\n    xSemaphoreTake(spi_mutex, portMAX_DELAY);\n    uint8_t tx_data[2] = { (uint8_t)(addr | 0xC0), 0x00 };\n    uint8_t rx_data[2] = { 0 };\n    spi_transaction_t t = { .length = 16, .tx_buffer = tx_data, .rx_buffer = rx_data };\n    spi_device_polling_transmit(spi_handle, &t);\n    xSemaphoreGive(spi_mutex);\n    return rx_data[1];\n}\n\nvoid cc1101_write_burst(uint8_t addr, const uint8_t *data, uint8_t len) {\n    xSemaphoreTake(spi_mutex, portMAX_DELAY);\n    uint8_t buf[129];\n    buf[0] = addr | 0x40;\n    memcpy(&buf[1], data, len);\n    spi_transaction_t t = { .length = (len + 1) * 8, .tx_buffer = buf };\n    spi_device_polling_transmit(spi_handle, &t);\n    xSemaphoreGive(spi_mutex);\n}\n\nvoid cc1101_read_burst(uint8_t addr, uint8_t *data, uint8_t len) {\n    xSemaphoreTake(spi_mutex, portMAX_DELAY);\n    uint8_t tx_buf[129] = { (uint8_t)(addr | 0xC0) };\n    uint8_t rx_buf[129] = { 0 };\n    spi_transaction_t t = { .length = (len + 1) * 8, .tx_buffer = tx_buf, .rx_buffer = rx_buf };\n    spi_device_polling_transmit(spi_handle, &t);\n    memcpy(data, &rx_buf[1], len);\n    xSemaphoreGive(spi_mutex);\n}\n\nstatic void rmt_to_manchester_decode(const rmt_symbol_word_t *symbols, size_t num_symbols) {\n    uint32_t sync_shift_reg = 0;\n    bool sync_found = false;\n    uint8_t payload[64];\n    int payload_len = 0;\n    uint8_t current_byte = 0;\n    int bit_count = 0;\n    int chip_state = 0; \n    uint8_t first_chip = 0;\n\n    for (size_t i = 0; i < num_symbols; i++) {\n        uint32_t durs[2] = {symbols[i].duration0, symbols[i].duration1};\n        uint8_t levs[2]  = {symbols[i].level0, symbols[i].level1};\n        for (int p = 0; p < 2; p++) {\n            if (durs[p] == 0) continue;\n            int count = (durs[p] + 2) / 4;\n            if (count > 4) count = 4;\n            for (int c = 0; c < count; c++) {\n                sync_shift_reg = (sync_shift_reg << 1) | levs[p];\n                if (!sync_found) {\n                    if ((sync_shift_reg & 0xFFFF) == 0xA55A) {\n                        sync_found = true;\n                        chip_state = 0;\n                        bit_count = 0;\n                        payload_len = 0;\n                    }\n                } else {\n                    if (chip_state == 0) {\n                        first_chip = levs[p];\n                        chip_state = 1;\n                    } else {\n                        uint8_t second_chip = levs[p];\n                        int bit = -1;\n                        if (first_chip == 1 && second_chip == 0) bit = 1;\n                        else if (first_chip == 0 && second_chip == 1) bit = 0;\n                        if (bit != -1) {\n                            current_byte = (current_byte << 1) | bit;\n                            bit_count++;\n                            if (bit_count == 8) {\n                                if (payload_len < sizeof(payload)) payload[payload_len++] = current_byte;\n                                bit_count = 0;\n                            }\n                        } else {\n                            sync_found = false;\n                            goto packet_ready;\n                        }\n                        chip_state = 0;\n                    }\n                }\n            }\n        }\n    }\npacket_ready:\n    if (payload_len > 0) {\n        uint8_t opt[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x40, 0x00 };\n        esp3_send_packet(ESP3_TYPE_RADIO_ERP1, payload, payload_len, opt, 7);\n    }\n}\n\nstatic void rf_rx_task_impl(void *pvParameters) {\n    rmt_receive_config_t rec_config = { .signal_range_min_ns = 1000, .signal_range_max_ns = 60000 };\n    rmt_enable(rx_channel);\n    while (1) {\n        if (xSemaphoreTake(carrier_sense_sem, portMAX_DELAY) == pdTRUE) {\n            if (is_transmitting) {\n                gpio_intr_enable(PIN_GDO2);\n                continue;\n            }\n            memset(rmt_rx_buffer, 0, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t));\n            if (rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t), &rec_config) == ESP_OK) {\n                if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(50)) == pdTRUE) {\n                    size_t cnt = 0;\n                    for(int i=0; i<MAX_RMT_SYMBOLS; i++) {\n                        if(rmt_rx_buffer[i].duration0 == 0) break;\n                        cnt++;\n                    }\n                    if (cnt > 20) rmt_to_manchester_decode(rmt_rx_buffer, cnt);\n                }\n            }\n            int tout = 100;\n            while (gpio_get_level(PIN_GDO2) == 1 && tout > 0) { vTaskDelay(pdMS_TO_TICKS(1)); tout--; }\n            vTaskDelay(pdMS_TO_TICKS(5));\n            xSemaphoreTake(carrier_sense_sem, 0); \n            gpio_intr_enable(PIN_GDO2);\n        }\n    }\n}\n\nvoid radio_rmt_rx_init(void) {\n    if (!carrier_sense_sem) carrier_sense_sem = xSemaphoreCreateBinary();\n    if (!rmt_done_sem) rmt_done_sem = xSemaphoreCreateBinary();\n    if (!rmt_rx_buffer) rmt_rx_buffer = (rmt_symbol_word_t *)heap_caps_calloc(MAX_RMT_SYMBOLS, sizeof(rmt_symbol_word_t), MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);\n    \n    rmt_rx_channel_config_t rx_chan_config = {\n        .clk_src = RMT_CLK_SRC_DEFAULT, .resolution_hz = RMT_RESOLUTION_HZ, .mem_block_symbols = 48, \n        .gpio_num = PIN_GDO0, .flags.with_dma = true\n    };\n    rmt_new_rx_channel(&rx_chan_config, &rx_channel);\n    rmt_rx_event_callbacks_t cbs = { .on_recv_done = rmt_rx_done_callback };\n    rmt_rx_register_event_callbacks(rx_channel, &cbs, NULL);\n    xTaskCreate(rf_rx_task_impl, \"rf_rx\", 4096, NULL, 5, &rf_task_handle);\n    \n    gpio_config_t io_conf = { .pin_bit_mask = (1ULL << PIN_GDO2), .mode = GPIO_MODE_INPUT, .pull_down_en = 1, .intr_type = GPIO_INTR_POSEDGE };\n    gpio_config(&io_conf);\n    gpio_isr_handler_add(PIN_GDO2, gdo2_cs_isr_handler, NULL);\n}\n\nvoid radio_hal_init(void) {\n    if (!spi_mutex) spi_mutex = xSemaphoreCreateMutex();\n    spi_init();\n    gpio_config_t io_led = { .pin_bit_mask = (1ULL << PIN_LED), .mode = GPIO_MODE_OUTPUT };\n    gpio_config(&io_led);\n    gpio_set_level(PIN_LED, 1);\n    \n    cc1101_strobe(CC1101_SRES);\n    vTaskDelay(pdMS_TO_TICKS(10));\n    for (int i = 0; i < sizeof(erp1_config)/sizeof(cc1101_cfg_t); i++) cc1101_write_reg(erp1_config[i].addr, erp1_config[i].val);\n    \n    cc1101_write_reg(0x0D, 0x21); cc1101_write_reg(0x0E, 0x65); cc1101_write_reg(0x0F, 0x6A); \n    cc1101_write_reg(0x10, 0x2D); cc1101_write_reg(0x11, 0x3B); cc1101_write_reg(0x12, 0x30); \n    cc1101_write_burst(0x3E, patable_ook, 2);\n    \n    gpio_install_isr_service(0);\n    radio_rmt_rx_init();\n    cc1101_strobe(CC1101_SRX);\n}\n\nstatic bool check_lbt(void) {\n    return cc1101_read_status(0x34) < 75;\n}\n\nstatic uint16_t encode_manchester_byte(uint8_t b) {\n    uint16_t res = 0;\n    for (int i = 7; i >= 0; i--) {\n        if ((b >> i) & 1) res = (res << 2) | 0x02;\n        else res = (res << 2) | 0x01;\n    }\n    return res;\n}\n\nvoid radio_transmit(const uint8_t *data, uint8_t len) {\n    if (len > 31) return; \n    uint8_t buf[128]; uint8_t idx = 0;\n    buf[idx++] = 0xAA; buf[idx++] = 0xAA;\n    buf[idx++] = 0xA5; buf[idx++] = 0x5A;\n    for (uint8_t i = 0; i < len; i++) {\n        uint16_t enc = encode_manchester_byte(data[i]);\n        buf[idx++] = (enc >> 8); buf[idx++] = (enc & 0xFF);\n    }\n    is_transmitting = true;\n    gpio_intr_disable(PIN_GDO2);\n    cc1101_strobe(CC1101_SIDLE);\n    cc1101_write_reg(0x10, 0x2D); cc1101_write_reg(0x11, 0x3B); \n    cc1101_write_reg(0x08, 0x00); cc1101_write_reg(0x06, idx); cc1101_write_reg(0x12, 0x30); \n    for(int i = 0; i < 5; i++) { if(check_lbt()) break; vTaskDelay(pdMS_TO_TICKS(2 + (esp_random() % 5))); }\n    for(int sub = 0; sub < 3; sub++) {\n        cc1101_strobe(CC1101_SIDLE); cc1101_strobe(CC1101_SFTX);\n        cc1101_write_burst(0x3F, buf, idx); cc1101_strobe(CC1101_STX);\n        int tout = 50; \n        while((cc1101_read_status(CC1101_MARCSTATE) & 0x1F) != 0x01 && tout > 0) { vTaskDelay(pdMS_TO_TICKS(1)); tout--; }\n        if (sub < 2) vTaskDelay(pdMS_TO_TICKS(10 + (esp_random() % 16)));\n    }\n    cc1101_write_reg(0x10, 0x2D); cc1101_write_reg(0x08, 0x32); cc1101_write_reg(0x12, 0x30); \n    cc1101_strobe(CC1101_SFRX); cc1101_strobe(CC1101_SRX);\n    gpio_intr_enable(PIN_GDO2);\n    is_transmitting = false;\n}\n",
+            "path": "src/radio_hal.c"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "write_file",
+          "response": {
+            "result": "Wrote to src/radio_hal.c"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "$HOME/.platformio/penv/bin/pio run -t upload --upload-port /dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:90:B0-if00"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n\n... [OUTPUT TRUNCATED. Total size: 7429 bytes. Showing last 1500 bytes. Full output saved in 'last_execution.log'. Use 'grep' or 'read_file last_execution.log' to analyze!]\nWrote 3072 bytes (103 compressed) at 0x00008000 in 0.0 seconds (878.1 kbit/s).\nHash of data verified.\nCompressed 171632 bytes to 91417...\n\nWriting at 0x00010000 [\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]   0.0% 0/91417 bytes... \n\nWriting at 0x0001997b [\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  17.9% 16384/91417 bytes... \n\nWriting at 0x00020e65 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  35.8% 32768/91417 bytes... \n\nWriting at 0x0002794b [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  53.8% 49152/91417 bytes... \n\nWriting at 0x0002e20b [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  71.7% 65536/91417 bytes... \n\nWriting at 0x0003552a [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591]  89.6% 81920/91417 bytes... \n\nWriting at 0x00039e70 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588] 100.0% 91417/91417 bytes... \nWrote 171632 bytes (91417 compressed) at 0x00010000 in 1.0 seconds (1386.6 kbit/s).\nHash of data verified.\n\nHard resetting via RTS pin...\n========================= [SUCCESS] Took 19.59 seconds =========================\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "python3 diff_test_enocean.py > test_results_14.log 2>&1 & sleep 15; kill $!"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 1\nOutput:\n/bin/sh: 1: kill: No such process\n\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "cat test_results_14.log"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n[TCM515] Listening...\n[EMULATOR] Listening...\n\n--- Test 1: TCM515 Transmits -> Emulator Receives ---\n[HOST -> TCM515] Sending ESP3: 55000b070180a5010203040102030400b901ffffffff00008b\n[TCM515] Received: 55000100026500005500010004770838\n\n--- Test 2: Emulator Transmits -> TCM515 Receives ---\n[HOST -> EMULATOR] Sending ESP3: 55000b070180a5010203040506070800c901ffffffff0000b1\n[EMULATOR] Received: 5500010002650000\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "ask_pro_model",
+          "args": {
+            "question": "Provide the exact ERP1 (868.3 MHz) physical telegram structure.\n1. What is the preamble length and bit pattern?\n2. What is the sync bit/byte?\n3. What is the first byte of the data payload (is it the RORG)?\n4. Does the TCM515 require a specific inter-telegram gap or post-amble?\n5. Verify if 0xA55A (chips) is the correct sync word for TCM515.\n6. Give a concrete example of a 4BS telegram (RORG 0xA5) including all bits from preamble to checksum.",
+            "context_data": "EnOcean ERP1 (868.3 MHz) uses 125kbps Manchester.\nI am sending:\n- Preamble: 0xAAAA (chips)\n- Sync Word: 0xA55A (chips)\n- Manchester encoded payload.\n\nIs the Sync Word 0xA55A (chips) correct to trigger a TCM515 receiver?\nWhat is the first data byte (pre-manchester) of a standard ERP1 telegram?\nIs there a 'Start of Frame' byte like 0x80?\nDoes the TCM515 expect a specific number of preamble bits?\nProvide the exact byte sequence of a 'Radio 4BS' telegram as it appears on the air (after Manchester).\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "ask_pro_model",
+          "response": {
+            "result": "Experten-Analyse (gemini-pro-latest):\nAls Senior Expert Advisor im Bereich der drahtlosen Kommunikationstechnik (speziell EnOcean und ISO/IEC 14543-3-10) analysiere ich Ihr Vorhaben. \n\nIhre Annahme, das Sync-Wort `0xA55A` (Chips) zu senden, ist **der fundamentale Fehler**, warum der TCM515 Empf\u00e4nger Ihr Telegramm nicht erkennt. Sie vermischen hier vermutlich Konzepte aus anderen Funkstandards, Transceiver-Hardware-Registern (wie dem CC1101) oder dem seriellen ESP3-Protokoll mit dem reinen physikalischen EnOcean RF-Layer (ERP1).\n\nHier ist die tiefgr\u00fcndige Analyse und die genaue Definition des physikalischen ERP1-Layers (868,3 MHz, 125 kbps ASK, Manchester).\n\n### Grundlegende ERP1 Manchester-Regel (ISO/IEC 14543-3-10)\nEnOcean sendet **MSB first**. \nDie Chip-Rate betr\u00e4gt 250 kchips/s (was zu einer Datenrate von 125 kbps f\u00fchrt).\n*   **Datenbit '1'** = Chip-Sequenz `10` (High f\u00fcr 4 \u00b5s, Low f\u00fcr 4 \u00b5s)\n*   **Datenbit '0'** = Chip-Sequenz `01` (Low f\u00fcr 4 \u00b5s, High f\u00fcr 4 \u00b5s)\n\n---\n\n### Antworten auf Ihre spezifischen Fragen\n\n#### 1. What is the preamble length and bit pattern?\nDie Preambel besteht standardm\u00e4\u00dfig aus mindestens 4 logischen Datenbits `'1'`. \n*   **Datenbits:** `1 1 1 1`\n*   **Chips (Air-Format):** `10 10 10 10` (`0xAA`)\n*   *Anmerkung:* Wenn Sie `0xAAAA` als Chips senden, entspricht das 8 Datenbits `'1'`. Das ist v\u00f6llig in Ordnung und hilft dem TCM515 sogar bei der Clock-Recovery (AGC-Einschwingzeit). Behalten Sie `0xAAAA` bei.\n\n#### 2. What is the sync bit/byte?\nEs gibt auf dem Funk-Layer **kein Sync-Byte** und keine Sync-Verletzung (Manchester-Violation). EnOcean nutzt stattdessen ein einzelnes **Startbit (Start of Frame - SOF)**.\n*   Das Startbit ist exakt ein logisches Datenbit `'0'`.\n*   **Chip (Air-Format):** `01`\nDer TCM515 erkennt den Frame-Start am Flankenwechsel, der den Stream von Preambel-Einsen unterbricht: `...10 10 10 01...`\n\n#### 3. What is the first byte of the data payload (is it the RORG)?\nJa, **unmittelbar** nach dem 1-Bit Startbit beginnt ohne weitere Header oder Length-Bytes das erste Datenbyte, welches das **RORG-Byte** (Radio Organisation) ist (z.B. `0xA5` f\u00fcr 4BS). \n\n#### 4. Does the TCM515 require a specific inter-telegram gap or post-amble?\n**Nein.** Nach dem letzten Chip des Checksum-Bytes wird das RF-Signal (der Tr\u00e4ger) einfach abgeschaltet (DC Low). Es gibt keine Postambel. Der TCM515 wei\u00df anhand des RORG-Bytes genau, wie lang das Telegramm ist (bei RORG `0xA5` erwartet er exakt 11 Bytes: 1 RORG + 4 Data + 4 ID + 1 Status + 1 Checksum) und wertet den Frame am Ende \u00fcber die Checksumme aus.\n\n#### 5. Verify if 0xA55A (chips) is the correct sync word for TCM515.\n**Absolut falsch.** \nWenn Sie `0xA55A` als Chip-Sequenz senden (`1010 0101 0101 1010`), senden Sie Manchester-dekodiert die Datenbits `11000011` (`0xC3`). Der TCM515 sucht nach dem Startbit (`0`), gefolgt von einem g\u00fcltigen RORG. Ein eingeschobenes `0xC3` zerst\u00f6rt das Framing und das Byte-Alignment komplett. \n*Entfernen Sie dieses \"Sync-Wort\" restlos aus Ihrem Code.*\n\n---\n\n### 6. Konkretes Beispiel eines 4BS Telegramms (Air-Format)\n\nWir konstruieren ein ERP1 Telegramm.\n**Payload:**\n*   RORG: `0xA5` (4BS)\n*   Data: `0x00 0x00 0x00 0x08` (Beispiel-Sensordaten)\n*   Sender-ID: `0x01 0x02 0x03 0x04`\n*   Status: `0x00`\n*   **Checksumme:** Summe aller Bytes Modulo 256. \n    `(0xA5 + 0x00 + 0x00 + 0x00 + 0x08 + 0x01 + 0x02 + 0x03 + 0x04 + 0x00) & 0xFF = 0xBD`\n\n**Bit- und Chip-Generierung (Der Stream, der auf die Antenne muss):**\n\n| Element | Daten (Hex) | Daten-Bits (MSB first) | Chip-Sequenz auf Sendepuffer (OOK / ASK) |\n| :--- | :--- | :--- | :--- |\n| **Preamble** | - | `1 1 1 1 1 1 1 1` (8x) | `1010 1010 1010 1010` (`0xAA 0xAA`) |\n| **Startbit** | - | `0` | `01` |\n| **RORG** | `0xA5` | `1 0 1 0 0 1 0 1` | `10 01 10 01 01 10 01 10` |\n| **Data 3** | `0x00` | `0 0 0 0 0 0 0 0` | `01 01 01 01 01 01 01 01` |\n| **Data 2** | `0x00` | `0 0 0 0 0 0 0 0` | `01 01 01 01 01 01 01 01` |\n| **Data 1** | `0x00` | `0 0 0 0 0 0 0 0` | `01 01 01 01 01 01 01 01` |\n| **Data 0** | `0x08` | `0 0 0 0 1 0 0 0` | `01 01 01 01 10 01 01 01` |\n| **ID 3** | `0x01` | `0 0 0 0 0 0 0 1` | `01 01 01 01 01 01 01 10` |\n| **ID 2** | `0x02` | `0 0 0 0 0 0 1 0` | `01 01 01 01 01 01 10 01` |\n| **ID 1** | `0x03` | `0 0 0 0 0 0 1 1` | `01 01 01 01 01 01 10 10` |\n| **ID 0** | `0x04` | `0 0 0 0 0 1 0 0` | `01 01 01 01 01 10 01 01` |\n| **Status** | `0x00` | `0 0 0 0 0 0 0 0` | `01 01 01 01 01 01 01 01` |\n| **Checksum**| `0xBD` | `1 0 1 1 1 1 0 1` | `10 01 10 10 10 10 01 10` |\n\n#### Das \"1-Bit-Shift-Problem\" bei der Chip-Konstruktion\nWeil das Startbit genau **1 Datenbit** (bzw. 2 Chips) lang ist, verschiebt sich das Byte-Alignment f\u00fcr Ihre Chip-Generierung um 2 Bit im Array, wenn Sie den Array hart aufbauen!\n\nDer tats\u00e4chliche kontinuierliche Chip-Datenstrom, der aus dem Transceiver flie\u00dfen muss (hexadezimal dargestellt), sieht f\u00fcr die ersten Bytes (`Preambel + Start + RORG 0xA5`) so aus:\n\n*Stream:* `10101010` `10101010` `01` `10011001` `01100110` ...\nGruppiert in Sendebytes (so wie ein SPI-Transceiver es br\u00e4uchte):\n1. `10101010` = `0xAA` (Preamble)\n2. `10101010` = `0xAA` (Preamble)\n3. `01100110` = `0x66` (Startbit + erste 3 Bits vom RORG)\n4. `01011001` = `0x59` (N\u00e4chste Bits vom RORG)\n5. `10...` (Letztes Bit RORG + erstes Bit Data3)\n\n### Expert Advice (Action Items f\u00fcr Ihr Setup)\n1. **Vergessen Sie ESP3 UART-Pakete auf der Luftschnittstelle:** Die `0x55` Header oder `0xA55A` haben im Funksignal **nichts** zu suchen.\n2. Generieren Sie einen reinen Daten-Bitstream im Speicher Ihres Mikrocontrollers:\n   `[Preambel-Bits (z.B. 8x '1')] + ['0'] + [Nutzdaten-Bytes inkl. RORG] + [Checksumme]`.\n3. Lassen Sie im allerletzten Schritt eine einfache Funktion \u00fcber diesen Array laufen, die jedes Datenbit in 2 Chips \u00fcbersetzt (`1`->`10`, `0`->`01`). Senden Sie genau dieses resultierende Chip-Array unmodifiziert via OOK mit 250 kbaud auf 868,3 MHz.\n4. Falls Sie einen Hardware-Transceiver wie den **TI CC1101** im Packet/Synchronous-Mode nutzen: Dieser erfordert oftmals ein k\u00fcnstliches Sync-Wort. Konfigurieren Sie den CC1101 am besten auf den *Asynchronous Transparent Mode (OOK)*, und \"bit-bangen\" Sie den Stream wie oben beschrieben per GPIO. Der Packet-Mode vieler Standard-ICs kommt mit dem 1-Bit-Shift des EnOcean Startbits oft nicht hardwareseitig zurecht."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "write_file",
+          "args": {
+            "content": "#include \"radio_hal.h\"\n#include \"cc1101_regs.h\"\n#include \"esp3_proto.h\"\n#include \"driver/spi_master.h\"\n#include \"driver/gpio.h\"\n#include \"driver/rmt_rx.h\"\n#include \"esp_log.h\"\n#include \"esp_random.h\"\n#include \"esp_rom_sys.h\"\n#include \"freertos/FreeRTOS.h\"\n#include \"freertos/task.h\"\n#include \"freertos/semphr.h\"\n#include \"esp_heap_caps.h\"\n#include <string.h>\n\nstatic const char *TAG = \"RADIO_HAL\";\nstatic spi_device_handle_t spi_handle;\nstatic SemaphoreHandle_t spi_mutex = NULL;\nvolatile bool is_transmitting = false;\n\n#define RMT_RESOLUTION_HZ   1000000 \n#define MAX_RMT_SYMBOLS     1024\n\nstatic rmt_channel_handle_t rx_channel = NULL;\nstatic TaskHandle_t rf_task_handle = NULL;\nstatic SemaphoreHandle_t rmt_done_sem = NULL;\nstatic rmt_symbol_word_t *rmt_rx_buffer = NULL;\nstatic SemaphoreHandle_t carrier_sense_sem = NULL;\n\nstatic bool IRAM_ATTR rmt_rx_done_callback(rmt_channel_handle_t channel, const rmt_rx_done_event_data_t *edata, void *user_ctx) {\n    BaseType_t high_task_wakeup = pdFALSE;\n    xSemaphoreGiveFromISR(rmt_done_sem, &high_task_wakeup);\n    return high_task_wakeup == pdTRUE;\n}\n\nstatic void IRAM_ATTR gdo2_cs_isr_handler(void* arg) {\n    BaseType_t high_task_wakeup = pdFALSE;\n    gpio_intr_disable(PIN_GDO2);\n    xSemaphoreGiveFromISR(carrier_sense_sem, &high_task_wakeup);\n    if (high_task_wakeup) portYIELD_FROM_ISR();\n}\n\nstatic void spi_init(void) {\n    spi_bus_config_t buscfg = { .miso_io_num = PIN_MISO, .mosi_io_num = PIN_MOSI, .sclk_io_num = PIN_SCK, .quadwp_io_num = -1, .quadhd_io_num = -1, .max_transfer_sz = 256 };\n    spi_device_interface_config_t devcfg = { .clock_speed_hz = 5000000, .mode = 0, .spics_io_num = PIN_SS, .queue_size = 7 };\n    spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_DISABLED);\n    spi_bus_add_device(SPI2_HOST, &devcfg, &spi_handle);\n}\n\nvoid cc1101_strobe(uint8_t cmd) {\n    xSemaphoreTake(spi_mutex, portMAX_DELAY);\n    spi_transaction_t t = { .length = 8, .tx_data = {cmd}, .flags = SPI_TRANS_USE_TXDATA };\n    spi_device_polling_transmit(spi_handle, &t);\n    xSemaphoreGive(spi_mutex);\n}\n\nvoid cc1101_write_reg(uint8_t addr, uint8_t value) {\n    xSemaphoreTake(spi_mutex, portMAX_DELAY);\n    uint8_t tx_data[2] = { addr, value };\n    spi_transaction_t t = { .length = 16, .tx_buffer = tx_data };\n    spi_device_polling_transmit(spi_handle, &t);\n    xSemaphoreGive(spi_mutex);\n}\n\nuint8_t cc1101_read_reg(uint8_t addr) {\n    xSemaphoreTake(spi_mutex, portMAX_DELAY);\n    uint8_t tx_data[2] = { (uint8_t)(addr | 0x80), 0x00 };\n    uint8_t rx_data[2] = { 0 };\n    spi_transaction_t t = { .length = 16, .tx_buffer = tx_data, .rx_buffer = rx_data };\n    spi_device_polling_transmit(spi_handle, &t);\n    xSemaphoreGive(spi_mutex);\n    return rx_data[1];\n}\n\nuint8_t cc1101_read_status(uint8_t addr) {\n    xSemaphoreTake(spi_mutex, portMAX_DELAY);\n    uint8_t tx_data[2] = { (uint8_t)(addr | 0xC0), 0x00 };\n    uint8_t rx_data[2] = { 0 };\n    spi_transaction_t t = { .length = 16, .tx_buffer = tx_data, .rx_buffer = rx_data };\n    spi_device_polling_transmit(spi_handle, &t);\n    xSemaphoreGive(spi_mutex);\n    return rx_data[1];\n}\n\nvoid cc1101_write_burst(uint8_t addr, const uint8_t *data, uint8_t len) {\n    xSemaphoreTake(spi_mutex, portMAX_DELAY);\n    uint8_t buf[129]; buf[0] = addr | 0x40; memcpy(&buf[1], data, len);\n    spi_transaction_t t = { .length = (len + 1) * 8, .tx_buffer = buf };\n    spi_device_polling_transmit(spi_handle, &t);\n    xSemaphoreGive(spi_mutex);\n}\n\nstatic void rmt_to_manchester_decode(const rmt_symbol_word_t *symbols, size_t num_symbols) {\n    uint32_t sync_reg = 0;\n    bool in_frame = false;\n    uint8_t payload[64]; int payload_len = 0;\n    uint8_t cur_byte = 0; int bit_cnt = 0;\n    int chip_pair = 0; uint8_t chip1 = 0;\n\n    for (size_t i = 0; i < num_symbols; i++) {\n        uint32_t d[2] = {symbols[i].duration0, symbols[i].duration1};\n        uint8_t l[2] = {symbols[i].level0, symbols[i].level1};\n        for (int p = 0; p < 2; p++) {\n            if (d[p] == 0) continue;\n            int count = (d[p] + 2) / 4; if (count > 4) count = 4;\n            for (int c = 0; c < count; c++) {\n                sync_reg = (sync_reg << 1) | l[p];\n                if (!in_frame) {\n                    // Start of frame: transition from preamble '1' (10) to SOF '0' (01)\n                    // Preamble ends with ...1010. SOF is 01. So we look for ...101001\n                    if ((sync_reg & 0x0F) == 0x09) { // ...1001\n                        in_frame = true; chip_pair = 0; bit_cnt = 0; payload_len = 0; cur_byte = 0;\n                    }\n                } else {\n                    if (chip_pair == 0) { chip1 = l[p]; chip_pair = 1; }\n                    else {\n                        uint8_t chip2 = l[p]; int bit = -1;\n                        if (chip1 == 1 && chip2 == 0) bit = 1;\n                        else if (chip1 == 0 && chip2 == 1) bit = 0;\n                        if (bit != -1) {\n                            cur_byte = (cur_byte << 1) | bit; bit_cnt++;\n                            if (bit_cnt == 8) {\n                                if (payload_len < sizeof(payload)) payload[payload_len++] = cur_byte;\n                                bit_cnt = 0;\n                            }\n                        } else { in_frame = false; goto end; }\n                        chip_pair = 0;\n                    }\n                }\n            }\n        }\n    }\nend:\n    if (payload_len >= 7) { // Min ERP1 size\n        uint8_t opt[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x40, 0x00 };\n        esp3_send_packet(ESP3_TYPE_RADIO_ERP1, payload, payload_len, opt, 7);\n    }\n}\n\nstatic void rf_rx_task_impl(void *pvParameters) {\n    rmt_receive_config_t cfg = { .signal_range_min_ns = 1000, .signal_range_max_ns = 60000 };\n    rmt_enable(rx_channel);\n    while (1) {\n        if (xSemaphoreTake(carrier_sense_sem, portMAX_DELAY) == pdTRUE) {\n            if (is_transmitting) { gpio_intr_enable(PIN_GDO2); continue; }\n            memset(rmt_rx_buffer, 0, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t));\n            if (rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t), &cfg) == ESP_OK) {\n                if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(50)) == pdTRUE) {\n                    size_t cnt = 0; while (cnt < MAX_RMT_SYMBOLS && rmt_rx_buffer[cnt].duration0 != 0) cnt++;\n                    if (cnt > 15) rmt_to_manchester_decode(rmt_rx_buffer, cnt);\n                }\n            }\n            int t = 100; while (gpio_get_level(PIN_GDO2) == 1 && t-- > 0) vTaskDelay(1);\n            vTaskDelay(5); xSemaphoreTake(carrier_sense_sem, 0); gpio_intr_enable(PIN_GDO2);\n        }\n    }\n}\n\nvoid radio_rmt_rx_init(void) {\n    if (!carrier_sense_sem) carrier_sense_sem = xSemaphoreCreateBinary();\n    if (!rmt_done_sem) rmt_done_sem = xSemaphoreCreateBinary();\n    if (!rmt_rx_buffer) rmt_rx_buffer = heap_caps_calloc(MAX_RMT_SYMBOLS, sizeof(rmt_symbol_word_t), MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);\n    rmt_rx_channel_config_t rcfg = { .clk_src = RMT_CLK_SRC_DEFAULT, .resolution_hz = RMT_RESOLUTION_HZ, .mem_block_symbols = 48, .gpio_num = PIN_GDO0, .flags.with_dma = true };\n    rmt_new_rx_channel(&rcfg, &rx_channel);\n    rmt_rx_event_callbacks_t cbs = { .on_recv_done = rmt_rx_done_callback };\n    rmt_rx_register_event_callbacks(rx_channel, &cbs, NULL);\n    xTaskCreate(rf_rx_task_impl, \"rf_rx\", 4096, NULL, 5, &rf_task_handle);\n    gpio_config_t io = { .pin_bit_mask = (1ULL << PIN_GDO2), .mode = GPIO_MODE_INPUT, .pull_down_en = 1, .intr_type = GPIO_INTR_POSEDGE };\n    gpio_config(&io); gpio_isr_handler_add(PIN_GDO2, gdo2_cs_isr_handler, NULL);\n}\n\nvoid radio_hal_init(void) {\n    if (!spi_mutex) spi_mutex = xSemaphoreCreateMutex();\n    spi_init();\n    gpio_config_t io_led = { .pin_bit_mask = (1ULL << PIN_LED), .mode = GPIO_MODE_OUTPUT };\n    gpio_config(&io_led); gpio_set_level(PIN_LED, 1);\n    cc1101_strobe(CC1101_SRES); vTaskDelay(10);\n    for (int i = 0; i < sizeof(erp1_config)/sizeof(cc1101_cfg_t); i++) cc1101_write_reg(erp1_config[i].addr, erp1_config[i].val);\n    cc1101_write_reg(0x0D, 0x21); cc1101_write_reg(0x0E, 0x65); cc1101_write_reg(0x0F, 0x6A); \n    cc1101_write_reg(0x10, 0x2D); cc1101_write_reg(0x11, 0x3B); cc1101_write_reg(0x12, 0x30); \n    cc1101_write_burst(0x3E, patable_ook, 2);\n    gpio_install_isr_service(0); radio_rmt_rx_init(); cc1101_strobe(CC1101_SRX);\n}\n\ntypedef struct { uint8_t *buf; int pos; } bit_s;\nstatic void push_c(bit_s *s, uint8_t c, int n) { for (int i = n - 1; i >= 0; i--) { if ((c >> i) & 1) s->buf[s->pos / 8] |= (1 << (7 - (s->pos % 8))); else s->buf[s->pos / 8] &= ~(1 << (7 - (s->pos % 8))); s->pos++; } }\nstatic void push_m(bit_s *s, int b) { if (b) push_c(s, 0x02, 2); else push_c(s, 0x01, 2); }\n\nvoid radio_transmit(const uint8_t *data, uint8_t len) {\n    if (len > 31) return; \n    uint8_t chip_buf[128]; memset(chip_buf, 0, 128); bit_s s = { .buf = chip_buf, .pos = 0 };\n    for (int i = 0; i < 8; i++) push_m(&s, 1); // Preamble (8x '1')\n    push_m(&s, 0); // SOF ('0')\n    for (int i = 0; i < len; i++) { for (int j = 7; j >= 0; j--) push_m(&s, (data[i] >> j) & 1); }\n    int byte_len = (s.pos + 7) / 8;\n    is_transmitting = true; gpio_intr_disable(PIN_GDO2);\n    cc1101_strobe(CC1101_SIDLE);\n    cc1101_write_reg(0x10, 0x2D); cc1101_write_reg(0x11, 0x3B); cc1101_write_reg(0x08, 0x00); cc1101_write_reg(0x06, byte_len); cc1101_write_reg(0x12, 0x30); \n    for(int i = 0; i < 5; i++) { if (cc1101_read_status(0x34) < 75) break; vTaskDelay(pdMS_TO_TICKS(5)); }\n    for(int sub = 0; sub < 3; sub++) {\n        cc1101_strobe(CC1101_SIDLE); cc1101_strobe(CC1101_SFTX); cc1101_write_burst(0x3F, chip_buf, byte_len); cc1101_strobe(CC1101_STX);\n        int t = 50; while((cc1101_read_status(CC1101_MARCSTATE) & 0x1F) != 0x01 && t-- > 0) vTaskDelay(1);\n        if (sub < 2) vTaskDelay(pdMS_TO_TICKS(15));\n    }\n    cc1101_write_reg(0x10, 0x2D); cc1101_write_reg(0x08, 0x32); cc1101_write_reg(0x12, 0x30); cc1101_strobe(CC1101_SFRX); cc1101_strobe(CC1101_SRX);\n    gpio_intr_enable(PIN_GDO2); is_transmitting = false;\n}\n",
+            "path": "src/radio_hal.c"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "write_file",
+          "response": {
+            "result": "Wrote to src/radio_hal.c"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "$HOME/.platformio/penv/bin/pio run -t upload --upload-port /dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:90:B0-if00"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n\n... [OUTPUT TRUNCATED. Total size: 7381 bytes. Showing last 1500 bytes. Full output saved in 'last_execution.log'. Use 'grep' or 'read_file last_execution.log' to analyze!]\nWrote 3072 bytes (103 compressed) at 0x00008000 in 0.0 seconds (877.7 kbit/s).\nHash of data verified.\nCompressed 171280 bytes to 91230...\n\nWriting at 0x00010000 [\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]   0.0% 0/91230 bytes... \n\nWriting at 0x0001998c [\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  18.0% 16384/91230 bytes... \n\nWriting at 0x00020e7e [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  35.9% 32768/91230 bytes... \n\nWriting at 0x0002798a [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  53.9% 49152/91230 bytes... \n\nWriting at 0x0002e21a [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  71.8% 65536/91230 bytes... \n\nWriting at 0x00035542 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591]  89.8% 81920/91230 bytes... \n\nWriting at 0x00039d10 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588] 100.0% 91230/91230 bytes... \nWrote 171280 bytes (91230 compressed) at 0x00010000 in 1.0 seconds (1383.8 kbit/s).\nHash of data verified.\n\nHard resetting via RTS pin...\n========================= [SUCCESS] Took 19.41 seconds =========================\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "python3 diff_test_enocean.py > test_results_15.log 2>&1 & sleep 15; kill $!"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 1\nOutput:\n/bin/sh: 1: kill: No such process\n\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "cat test_results_15.log"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n[TCM515] Listening...\n[EMULATOR] Listening...\n\n--- Test 1: TCM515 Transmits -> Emulator Receives ---\n[HOST -> TCM515] Sending ESP3: 55000b070180a5010203040102030400b901ffffffff00008b\n[TCM515] Received: 5500010002650000\n\n--- Test 2: Emulator Transmits -> TCM515 Receives ---\n[HOST -> EMULATOR] Sending ESP3: 55000b070180a5010203040506070800c901ffffffff0000b1\n[EMULATOR] Received: 5500010002650000\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "static const uint8_t patable_ook[] = {0x00, 0x50}; \n\n#endif // CC1101_REGS_H",
+            "path": "include/cc1101_regs.h",
+            "original_text": "static const uint8_t patable_ook[] = {0x00, 0xC0}; \n\n#endif // CC1101_REGS_H"
+          }
+        }
+      }
+    ]
   }
 ]

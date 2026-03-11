@@ -51,6 +51,6 @@ static const cc1101_cfg_t erp1_config[] = {
 };
 
 /* PATABLE for OOK: Index 0 is 'off', Index 1 is 'on' (+10dBm z.B.) */
-static const uint8_t patable_ook[] = {0x00, 0xC0}; 
+static const uint8_t patable_ook[] = {0x00, 0x50}; 
 
 #endif // CC1101_REGS_H
