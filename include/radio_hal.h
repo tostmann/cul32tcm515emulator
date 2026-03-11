@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
 
 // --- PIN DEFINITIONS (ESP32-C6) ---
 #define PIN_GDO0   2
@@ -19,6 +21,7 @@ extern "C" {
 #endif
 
 void radio_hal_init(void);
+void radio_transmit(const uint8_t *data, uint8_t len);
 
 // SPI Primitives
 void cc1101_strobe(uint8_t cmd);
@@ -30,8 +33,7 @@ uint8_t cc1101_read_status(uint8_t addr);
 void cc1101_write_burst(uint8_t addr, const uint8_t *data, uint8_t len);
 void cc1101_read_burst(uint8_t addr, uint8_t *data, uint8_t len);
 
-// Interrupts
-void radio_hal_enable_rx_isr(void (*isr_callback)(void*), void* arg);
+extern SemaphoreHandle_t rf_rx_semaphore;
 
 #ifdef __cplusplus
 }

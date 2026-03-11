@@ -1,0 +1,12 @@
+{
+  "project": "TCM-Emu-Gemini",
+  "version": "1.0.0",
+  "target": "esp32-c6-mini",
+  "files": [
+    {
+      "path": "factory.bin",
+      "type": "factory",
+      "offset": "0x0"
+    }
+  ]
+}

@@ -6,7 +6,7 @@
     "idf_path":           "/root/.platformio/packages/framework-espidf",
     "build_dir":          "/opt/ai_builder_data/users/763684262/projects/TCM-Emu-Gemini/.pio/build/esp32-c6-mini",
     "config_file":        "/opt/ai_builder_data/users/763684262/projects/TCM-Emu-Gemini/sdkconfig.esp32-c6-mini",
-    "config_defaults":    "",
+    "config_defaults":    "/opt/ai_builder_data/users/763684262/projects/TCM-Emu-Gemini/sdkconfig.defaults",
     "bootloader_elf":     "/opt/ai_builder_data/users/763684262/projects/TCM-Emu-Gemini/.pio/build/esp32-c6-mini/bootloader/bootloader.elf",
     "app_elf":            "TCM-Emu-Gemini.elf",
     "app_bin":            "TCM-Emu-Gemini.bin",
@@ -1495,7 +1495,7 @@
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "/opt/ai_builder_data/users/763684262/projects/TCM-Emu-Gemini/.pio/build/esp32-c6-mini/esp-idf/src/libsrc.a",
-            "sources": [ "/opt/ai_builder_data/users/763684262/projects/TCM-Emu-Gemini/src/main.c", "/opt/ai_builder_data/users/763684262/projects/TCM-Emu-Gemini/src/radio_hal.c" ],
+            "sources": [ "/opt/ai_builder_data/users/763684262/projects/TCM-Emu-Gemini/src/main.c", "/opt/ai_builder_data/users/763684262/projects/TCM-Emu-Gemini/src/radio_hal.c", "/opt/ai_builder_data/users/763684262/projects/TCM-Emu-Gemini/src/esp3_proto.c" ],
             "include_dirs": [ ".", "../include" ]
         },
         "tcp_transport": {

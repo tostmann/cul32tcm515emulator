@@ -3,11 +3,22 @@
 #include "driver/spi_master.h"
 #include "driver/gpio.h"
 #include "esp_log.h"
+#include "esp_random.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
 static const char *TAG = "RADIO_HAL";
 static spi_device_handle_t spi_handle;
+SemaphoreHandle_t rf_rx_semaphore = NULL;
+volatile bool is_transmitting = false;
+
+static void IRAM_ATTR cc1101_gdo0_isr(void* arg) {
+    if (!is_transmitting && rf_rx_semaphore != NULL) {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        xSemaphoreGiveFromISR(rf_rx_semaphore, &xHigherPriorityTaskWoken);
+        if (xHigherPriorityTaskWoken) portYIELD_FROM_ISR();
+    }
+}
 
 static void spi_init(void) {
     spi_bus_config_t buscfg = {
@@ -20,8 +31,8 @@ static void spi_init(void) {
     };
 
     spi_device_interface_config_t devcfg = {
-        .clock_speed_hz = 5000000, // 5 MHz
-        .mode = 0,                 // SPI mode 0
+        .clock_speed_hz = 5000000,
+        .mode = 0,
         .spics_io_num = PIN_SS,
         .queue_size = 3,
         .flags = 0
@@ -40,14 +51,14 @@ static void gpio_init(void) {
         .intr_type = GPIO_INTR_DISABLE
     };
     gpio_config(&io_out);
-    gpio_set_level(PIN_LED, 1); // Turn off
+    gpio_set_level(PIN_LED, 1);
 
     gpio_config_t io_in = {
         .pin_bit_mask = (1ULL << PIN_GDO0) | (1ULL << PIN_GDO2) | (1ULL << PIN_SWITCH),
         .mode = GPIO_MODE_INPUT,
         .pull_up_en = 1,
         .pull_down_en = 0,
-        .intr_type = GPIO_INTR_DISABLE 
+        .intr_type = GPIO_INTR_NEGEDGE // For GDO0
     };
     gpio_config(&io_in);
 }
@@ -102,7 +113,6 @@ void cc1101_write_burst(uint8_t addr, const uint8_t *data, uint8_t len) {
         .flags = SPI_TRANS_USE_TXDATA
     };
     spi_device_polling_transmit(spi_handle, &t);
-
     spi_transaction_t t_data = {
         .length = len * 8,
         .tx_buffer = data
@@ -118,7 +128,6 @@ void cc1101_read_burst(uint8_t addr, uint8_t *data, uint8_t len) {
         .flags = SPI_TRANS_USE_TXDATA
     };
     spi_device_polling_transmit(spi_handle, &t);
-
     spi_transaction_t t_data = {
         .length = len * 8,
         .rx_buffer = data
@@ -127,6 +136,7 @@ void cc1101_read_burst(uint8_t addr, uint8_t *data, uint8_t len) {
 }
 
 void radio_hal_init(void) {
+    rf_rx_semaphore = xSemaphoreCreateBinary();
     gpio_init();
     spi_init();
 
@@ -140,15 +150,42 @@ void radio_hal_init(void) {
     for (int i = 0; i < sizeof(erp1_config)/sizeof(cc1101_cfg_t); i++) {
         cc1101_write_reg(erp1_config[i].addr, erp1_config[i].val);
     }
-    
     cc1101_write_burst(0x3E, patable_ook, 2);
+
+    gpio_install_isr_service(0);
+    gpio_isr_handler_add(PIN_GDO0, cc1101_gdo0_isr, NULL);
 
     cc1101_strobe(CC1101_SRX);
     ESP_LOGI(TAG, "CC1101 Initialized and in RX Mode");
 }
 
-void radio_hal_enable_rx_isr(void (*isr_callback)(void*), void* arg) {
-    gpio_install_isr_service(0);
-    gpio_set_intr_type(PIN_GDO0, GPIO_INTR_NEGEDGE); 
-    gpio_isr_handler_add(PIN_GDO0, isr_callback, arg);
+static bool check_lbt(void) {
+    uint8_t rssi_dec = cc1101_read_status(0x34); // RSSI
+    if (rssi_dec >= 75) return false; 
+    return true;
+}
+
+void radio_transmit(const uint8_t *data, uint8_t len) {
+    is_transmitting = true;
+    for(int i=0; i<5; i++) {
+        if(check_lbt()) break;
+        vTaskDelay(pdMS_TO_TICKS(2 + (esp_random() % 5)));
+    }
+    for(int sub = 0; sub < 3; sub++) {
+        cc1101_strobe(CC1101_SIDLE);
+        cc1101_strobe(CC1101_SFTX);
+        cc1101_write_burst(0x3F, data, len);
+        cc1101_strobe(CC1101_STX);
+        int timeout = 50; 
+        while((cc1101_read_status(CC1101_MARCSTATE) & 0x1F) != 0x01 && timeout > 0) {
+            vTaskDelay(pdMS_TO_TICKS(1));
+            timeout--;
+        }
+        if (sub < 2) {
+            vTaskDelay(pdMS_TO_TICKS(10 + (esp_random() % 16)));
+        }
+    }
+    cc1101_strobe(CC1101_SFRX);
+    cc1101_strobe(CC1101_SRX);
+    is_transmitting = false;
 }

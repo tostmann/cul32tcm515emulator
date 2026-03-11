@@ -2203,7 +2203,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "TCM-Emu-Gemini.elf::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-TCM-Emu-Gemini.elf-7f3e00d578be6f9308ea.json",
+					"jsonFile" : "target-TCM-Emu-Gemini.elf-12e4af180a9ebd64b200.json",
 					"name" : "TCM-Emu-Gemini.elf",
 					"projectIndex" : 0
 				},
@@ -2777,7 +2777,7 @@
 				{
 					"directoryIndex" : 119,
 					"id" : "__idf_src::@2478b13de56d3028f688",
-					"jsonFile" : "target-__idf_src-bea539273afcb04b154a.json",
+					"jsonFile" : "target-__idf_src-5f64cfbabcd48b83b3a7.json",
 					"name" : "__idf_src",
 					"projectIndex" : 1
 				},

@@ -43,7 +43,6 @@
 			"/root/.platformio/packages/framework-espidf/components/newlib/CMakeLists.txt",
 			"/root/.platformio/packages/framework-espidf/components/pthread/CMakeLists.txt",
 			"/root/.platformio/packages/framework-espidf/components/cxx/CMakeLists.txt",
-			"/root/.platformio/packages/framework-espidf/components/esp_driver_uart/CMakeLists.txt",
 			"/root/.platformio/packages/framework-espidf/components/esp_phy/CMakeLists.txt",
 			"/root/.platformio/packages/framework-espidf/components/esp_driver_usb_serial_jtag/CMakeLists.txt",
 			"/root/.platformio/packages/framework-espidf/components/esp_vfs_console/CMakeLists.txt",
@@ -1096,7 +1095,25 @@
 			{
 				"command" : 5,
 				"file" : 22,
-				"line" : 30,
+				"line" : 68,
+				"parent" : 183
+			},
+			{
+				"command" : 5,
+				"file" : 22,
+				"line" : 71,
+				"parent" : 183
+			},
+			{
+				"command" : 5,
+				"file" : 22,
+				"line" : 93,
+				"parent" : 183
+			},
+			{
+				"command" : 5,
+				"file" : 22,
+				"line" : 94,
 				"parent" : 183
 			},
 			{
@@ -1105,26 +1122,14 @@
 			{
 				"command" : 5,
 				"file" : 23,
-				"line" : 68,
-				"parent" : 185
+				"line" : 27,
+				"parent" : 188
 			},
 			{
 				"command" : 5,
 				"file" : 23,
-				"line" : 71,
-				"parent" : 185
-			},
-			{
-				"command" : 5,
-				"file" : 23,
-				"line" : 93,
-				"parent" : 185
-			},
-			{
-				"command" : 5,
-				"file" : 23,
-				"line" : 94,
-				"parent" : 185
+				"line" : 33,
+				"parent" : 188
 			},
 			{
 				"file" : 24
@@ -1132,14 +1137,8 @@
 			{
 				"command" : 5,
 				"file" : 24,
-				"line" : 27,
-				"parent" : 190
-			},
-			{
-				"command" : 5,
-				"file" : 24,
-				"line" : 33,
-				"parent" : 190
+				"line" : 21,
+				"parent" : 191
 			},
 			{
 				"file" : 25
@@ -1147,23 +1146,14 @@
 			{
 				"command" : 5,
 				"file" : 25,
-				"line" : 21,
+				"line" : 29,
 				"parent" : 193
 			},
 			{
-				"file" : 26
-			},
-			{
 				"command" : 5,
-				"file" : 26,
-				"line" : 29,
-				"parent" : 195
-			},
-			{
-				"command" : 5,
-				"file" : 26,
+				"file" : 25,
 				"line" : 32,
-				"parent" : 195
+				"parent" : 193
 			},
 			{
 				"command" : 6,
@@ -1179,9 +1169,9 @@
 			},
 			{
 				"command" : 6,
-				"file" : 27,
+				"file" : 26,
 				"line" : 201,
-				"parent" : 199
+				"parent" : 197
 			},
 			{
 				"command" : 5,
@@ -1674,7 +1664,7 @@
 					"path" : "/root/.platformio/packages/framework-espidf/components/esp_driver_mcpwm/include"
 				},
 				{
-					"backtrace" : 201,
+					"backtrace" : 199,
 					"path" : "/root/.platformio/packages/framework-espidf/components/esp_driver_ana_cmpr/include"
 				},
 				{
@@ -1686,7 +1676,7 @@
 					"path" : "/root/.platformio/packages/framework-espidf/components/sdmmc/include"
 				},
 				{
-					"backtrace" : 202,
+					"backtrace" : 200,
 					"path" : "/root/.platformio/packages/framework-espidf/components/esp_driver_sdmmc/include"
 				},
 				{
@@ -1698,11 +1688,11 @@
 					"path" : "/root/.platformio/packages/framework-espidf/components/esp_driver_sdio/include"
 				},
 				{
-					"backtrace" : 203,
+					"backtrace" : 201,
 					"path" : "/root/.platformio/packages/framework-espidf/components/esp_driver_dac/include"
 				},
 				{
-					"backtrace" : 204,
+					"backtrace" : 202,
 					"path" : "/root/.platformio/packages/framework-espidf/components/esp_driver_bitscrambler/include"
 				},
 				{
@@ -1778,7 +1768,7 @@
 					"path" : "/root/.platformio/packages/framework-espidf/components/esp_adc/deprecated/include"
 				},
 				{
-					"backtrace" : 205,
+					"backtrace" : 203,
 					"path" : "/root/.platformio/packages/framework-espidf/components/esp_driver_isp/include"
 				},
 				{
@@ -1790,11 +1780,11 @@
 					"path" : "/root/.platformio/packages/framework-espidf/components/esp_driver_cam/interface"
 				},
 				{
-					"backtrace" : 206,
+					"backtrace" : 204,
 					"path" : "/root/.platformio/packages/framework-espidf/components/esp_driver_jpeg/include"
 				},
 				{
-					"backtrace" : 207,
+					"backtrace" : 205,
 					"path" : "/root/.platformio/packages/framework-espidf/components/esp_driver_ppa/include"
 				},
 				{
@@ -1866,7 +1856,7 @@
 					"path" : "/root/.platformio/packages/framework-espidf/components/esp_local_ctrl/include"
 				},
 				{
-					"backtrace" : 208,
+					"backtrace" : 206,
 					"path" : "/root/.platformio/packages/framework-espidf/components/esp_tee/include"
 				},
 				{
@@ -1894,11 +1884,11 @@
 					"path" : "/root/.platformio/packages/framework-espidf/components/fatfs/vfs"
 				},
 				{
-					"backtrace" : 209,
+					"backtrace" : 207,
 					"path" : "/root/.platformio/packages/framework-espidf/components/idf_test/include"
 				},
 				{
-					"backtrace" : 209,
+					"backtrace" : 207,
 					"path" : "/root/.platformio/packages/framework-espidf/components/idf_test/include/esp32c6"
 				},
 				{
@@ -1948,11 +1938,11 @@
 	"dependencies" : 
 	[
 		{
-			"backtrace" : 198,
+			"backtrace" : 196,
 			"id" : "_project_elf_src::@6890427a1f51a3e7e1df"
 		},
 		{
-			"backtrace" : 200,
+			"backtrace" : 198,
 			"id" : "__ldgen_output_sections.ld::@6890427a1f51a3e7e1df"
 		},
 		{
@@ -5486,12 +5476,22 @@
 			},
 			{
 				"backtrace" : 184,
-				"fragment" : "-u uart_vfs_include_dev_init",
+				"fragment" : "-u include_esp_phy_override",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 185,
+				"fragment" : "-lphy",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 186,
-				"fragment" : "-u include_esp_phy_override",
+				"fragment" : "-lbtbb",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 187,
+				"fragment" : "esp-idf/esp_phy/libesp_phy.a",
 				"role" : "libraries"
 			},
 			{
@@ -5500,62 +5500,47 @@
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 188,
+				"backtrace" : 187,
 				"fragment" : "-lbtbb",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 189,
+				"backtrace" : 187,
 				"fragment" : "esp-idf/esp_phy/libesp_phy.a",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 189,
+				"backtrace" : 187,
 				"fragment" : "-lphy",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 189,
+				"backtrace" : 187,
 				"fragment" : "-lbtbb",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 189,
-				"fragment" : "esp-idf/esp_phy/libesp_phy.a",
-				"role" : "libraries"
-			},
-			{
-				"backtrace" : 189,
-				"fragment" : "-lphy",
-				"role" : "libraries"
-			},
-			{
-				"backtrace" : 189,
-				"fragment" : "-lbtbb",
-				"role" : "libraries"
-			},
-			{
-				"backtrace" : 191,
 				"fragment" : "-u usb_serial_jtag_vfs_include_dev_init",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 192,
+				"backtrace" : 190,
 				"fragment" : "-u usb_serial_jtag_connection_monitor_include",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 194,
+				"backtrace" : 192,
 				"fragment" : "-u esp_vfs_include_console_register",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 196,
+				"backtrace" : 194,
 				"fragment" : "-u vfs_include_syscalls_impl",
 				"role" : "libraries"
 			},
 			{
-				"backtrace" : 197,
+				"backtrace" : 195,
 				"fragment" : "-u esp_vfs_include_nullfs_register",
 				"role" : "libraries"
 			}
