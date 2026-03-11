@@ -229,11 +229,17 @@ void radio_rmt_rx_init(void) {
     rmt_done_sem = xSemaphoreCreateBinary();
     carrier_sense_sem = xSemaphoreCreateBinary();
     
-    rmt_rx_buffer = (rmt_symbol_word_t *)heap_caps_calloc(
-        MAX_RMT_SYMBOLS, 
-        sizeof(rmt_symbol_word_t), 
-        MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL
-    );
+    if (rmt_rx_buffer == NULL) {
+        rmt_rx_buffer = (rmt_symbol_word_t *)heap_caps_calloc(
+            MAX_RMT_SYMBOLS, 
+            sizeof(rmt_symbol_word_t), 
+            MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL
+        );
+    }
+    
+    if (rmt_rx_buffer == NULL || rmt_done_sem == NULL || carrier_sense_sem == NULL) {
+        return; 
+    }
 
     rmt_rx_channel_config_t rx_chan_config = {
         .clk_src = RMT_CLK_SRC_DEFAULT,
