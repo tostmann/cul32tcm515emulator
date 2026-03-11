@@ -18,7 +18,7 @@ volatile bool is_transmitting = false;
 
 // RMT Configuration
 #define RMT_RESOLUTION_HZ   4000000 // 4 MHz -> 0.25 µs
-#define MAX_RMT_SYMBOLS     512
+#define MAX_RMT_SYMBOLS     1024
 #define THRESHOLD_SHORT_MIN 8   // 2.0 µs
 #define THRESHOLD_SHORT_MAX 23  // 5.75 µs
 #define THRESHOLD_LONG_MIN  24  // 6.0 µs

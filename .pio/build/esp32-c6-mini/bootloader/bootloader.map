@@ -51,7 +51,7 @@ Archive member included to satisfy reference by file (symbol)
 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
                               .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o) (esp_efuse_utility_clear_program_registers)
 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_bootloader_format/libesp_bootloader_format.a(esp_bootloader_desc.c.o)
-                              .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o) (esp_bootloader_get_description)
+                              (esp_bootloader_desc)
 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(cpu_region_protect.c.o)
                               .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_mem.c.o) (esp_cpu_configure_region_protection)
 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o)
@@ -62,14 +62,10 @@ Archive member included to satisfy reference by file (symbol)
                               .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o) (get_act_hp_dbias)
 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
                               .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o) (esp_rom_install_channel_putc)
-.pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_uart.c.o)
-                              .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o) (esp_rom_output_switch_buffer)
 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
                               .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o) (esp_rom_regi2c_write)
 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
                               .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o) (wdt_hal_init)
-.pio/build/esp32-c6-mini/bootloader/esp-idf/log/liblog.a(log_timestamp.c.o)
-                              .pio/build/esp32-c6-mini/bootloader/esp-idf/main/libmain.a(bootloader_start.c.o) (esp_log_timestamp)
 .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
                               .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o) (rv_utils_dbgr_is_attached)
 .pio/build/esp32-c6-mini/bootloader/esp-idf/soc/libsoc.a(uart_periph.c.o)
@@ -114,15 +110,13 @@ Discarded input sections
  .data          0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
  .bss           0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
  .text.bootloader_common_get_partition_description
-                0x00000000       0x9e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
+                0x00000000       0x6c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
  .text.bootloader_atexit
                 0x00000000        0x8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
  .text.bootloader_sha256_hex_to_str
                 0x00000000       0x50 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
- .rodata.bootloader_sha256_flash_contents.str1.4
-                0x00000000       0x2d .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
  .text.bootloader_sha256_flash_contents
-                0x00000000      0x100 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
+                0x00000000       0xde .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
  .text          0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
  .data          0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
  .bss           0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
@@ -131,16 +125,14 @@ Discarded input sections
  .bss           0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
  .text.esp_image_bootloader_offset_get
                 0x00000000        0xa .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
- .rodata.esp_image_bootloader_offset_set.str1.4
-                0x00000000       0x44 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
  .text.esp_image_bootloader_offset_set
-                0x00000000       0x3c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
+                0x00000000        0xa .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
  .text.bootloader_load_image_no_verify
                 0x00000000        0xe .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
  .text.esp_image_verify
                 0x00000000        0x8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
  .text.esp_image_get_metadata
-                0x00000000       0xbe .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
+                0x00000000       0xbc .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
  .text.esp_image_verify_bootloader_data
                 0x00000000       0x26 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
  .text.esp_image_verify_bootloader
@@ -181,14 +173,10 @@ Discarded input sections
                 0x00000000       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
  .text.esp_get_flash_encryption_mode
                 0x00000000       0x8e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
- .rodata.esp_flash_encryption_set_release_mode.str1.4
-                0x00000000       0xb6 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
  .text.esp_flash_encryption_set_release_mode
-                0x00000000      0x124 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
- .rodata.esp_flash_encryption_cfg_verify_release_mode.str1.4
-                0x00000000      0x3c7 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
+                0x00000000       0xc0 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
  .text.esp_flash_encryption_cfg_verify_release_mode
-                0x00000000      0x334 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
+                0x00000000      0x16c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
  .text          0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random_esp32c6.c.o)
  .data          0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random_esp32c6.c.o)
  .bss           0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random_esp32c6.c.o)
@@ -986,10 +974,8 @@ Discarded input sections
                 0x00000000       0x50 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
  .text.esp_efuse_write_field_blob
                 0x00000000       0x74 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
- .rodata.esp_efuse_write_field_cnt.str1.4
-                0x00000000       0x4e .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
  .text.esp_efuse_write_field_cnt
-                0x00000000       0xae .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
+                0x00000000       0x8a .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
  .text.esp_efuse_write_field_bit
                 0x00000000       0x5a .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
  .text.esp_efuse_get_field_size
@@ -1003,23 +989,17 @@ Discarded input sections
  .text.esp_efuse_write_block
                 0x00000000       0x44 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
  .rodata.esp_efuse_batch_write_begin.str1.4
-                0x00000000       0x51 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
+                0x00000000       0x1a .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
  .text.esp_efuse_batch_write_begin
-                0x00000000       0x72 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
- .rodata.esp_efuse_batch_write_cancel.str1.4
-                0x00000000       0x5f .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
+                0x00000000       0x50 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
  .text.esp_efuse_batch_write_cancel
-                0x00000000       0x72 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
- .rodata.esp_efuse_batch_write_commit.str1.4
-                0x00000000       0x37 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
+                0x00000000       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
  .text.esp_efuse_batch_write_commit
-                0x00000000       0x8e .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
+                0x00000000       0x48 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
  .text.esp_efuse_check_errors
                 0x00000000        0x8 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
- .rodata.esp_efuse_destroy_block.str1.4
-                0x00000000      0x120 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
  .text.esp_efuse_destroy_block
-                0x00000000      0x13c .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
+                0x00000000       0xb2 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
  .rodata.__func__.0
                 0x00000000       0x1c .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
  .rodata.__func__.1
@@ -1028,14 +1008,14 @@ Discarded input sections
                 0x00000000       0x19 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
  .sbss.s_batch_writing_mode
                 0x00000000        0x4 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
- .debug_info    0x00000000     0x1295 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
- .debug_abbrev  0x00000000      0x3f5 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
- .debug_loc     0x00000000      0xab2 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
+ .debug_info    0x00000000     0x10c8 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
+ .debug_abbrev  0x00000000      0x3e5 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
+ .debug_loc     0x00000000      0xa57 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
  .debug_aranges
                 0x00000000       0x98 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
- .debug_ranges  0x00000000       0xe0 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
- .debug_line    0x00000000     0x13d2 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
- .debug_str     0x00000000      0x99d .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
+ .debug_ranges  0x00000000      0x100 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
+ .debug_line    0x00000000     0x10da .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
+ .debug_str     0x00000000      0x97c .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
  .comment       0x00000000       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
  .note.GNU-stack
                 0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
@@ -1050,19 +1030,17 @@ Discarded input sections
  .text.write_reg
                 0x00000000       0x7a .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .rodata.esp_efuse_utility_process.str1.4
-                0x00000000       0x5d .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
+                0x00000000       0x19 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .text.esp_efuse_utility_process
-                0x00000000      0x174 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
+                0x00000000      0x14e .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .text.esp_efuse_utility_reset
                 0x00000000       0x50 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .text.esp_efuse_utility_burn_efuses
                 0x00000000       0x2e .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .text.esp_efuse_utility_erase_virt_blocks
                 0x00000000        0x2 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
- .rodata.esp_efuse_utility_update_virt_blocks.str1.4
-                0x00000000       0x27 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .text.esp_efuse_utility_update_virt_blocks
-                0x00000000       0x2a .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
+                0x00000000        0x2 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .rodata.esp_efuse_utility_debug_dump_single_block.str1.4
                 0x00000000       0x12 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .text.esp_efuse_utility_debug_dump_single_block
@@ -1085,20 +1063,16 @@ Discarded input sections
                 0x00000000       0x31 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .text.esp_efuse_utility_write_cnt
                 0x00000000       0xd4 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
- .rodata.esp_efuse_utility_write_reg.str1.4
-                0x00000000       0x53 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .text.esp_efuse_utility_write_reg
-                0x00000000       0x64 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
+                0x00000000       0x3c .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .text.esp_efuse_utility_write_blob
                 0x00000000       0x92 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .rodata.esp_efuse_utility_get_read_register_address.str1.4
                 0x00000000       0x16 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .text.esp_efuse_utility_get_read_register_address
                 0x00000000       0x3e .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
- .rodata.esp_efuse_utility_is_correct_written_data.str1.4
-                0x00000000       0xba .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .text.esp_efuse_utility_is_correct_written_data
-                0x00000000       0xd6 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
+                0x00000000       0x66 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .rodata.__func__.0
                 0x00000000       0x2c .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .rodata.__func__.1
@@ -1111,18 +1085,18 @@ Discarded input sections
                 0x00000000       0x1a .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .sbss.s_burn_counter
                 0x00000000        0x4 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
- .debug_info    0x00000000     0x1456 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
- .debug_abbrev  0x00000000      0x458 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
- .debug_loc     0x00000000     0x1331 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
+ .debug_info    0x00000000     0x137a .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
+ .debug_abbrev  0x00000000      0x47a .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
+ .debug_loc     0x00000000     0x12f6 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .debug_aranges
                 0x00000000       0xa8 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
- .debug_ranges  0x00000000      0x2d0 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
- .debug_line    0x00000000     0x18e0 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
- .debug_str     0x00000000      0xb00 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
+ .debug_ranges  0x00000000      0x2a8 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
+ .debug_line    0x00000000     0x16b3 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
+ .debug_str     0x00000000      0xaee .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .comment       0x00000000       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .note.GNU-stack
                 0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
- .debug_frame   0x00000000      0x2bc .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
+ .debug_frame   0x00000000      0x2ac .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .riscv.attributes
                 0x00000000       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .text          0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
@@ -1166,14 +1140,10 @@ Discarded input sections
                 0x00000000       0x2a .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
  .text.esp_efuse_count_unused_key_blocks
                 0x00000000       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
- .rodata.esp_efuse_write_key.str1.4
-                0x00000000       0x65 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
  .text.esp_efuse_write_key
-                0x00000000      0x114 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
- .rodata.esp_efuse_write_keys.str1.4
-                0x00000000       0xd2 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
+                0x00000000       0xf0 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
  .text.esp_efuse_write_keys
-                0x00000000      0x156 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
+                0x00000000       0xbe .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
  .rodata.esp_efuse_get_digest_revoke.str1.4
                 0x00000000       0x42 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
  .text.esp_efuse_get_digest_revoke
@@ -1204,18 +1174,18 @@ Discarded input sections
                 0x00000000       0x24 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
  .rodata.s_table
                 0x00000000       0x78 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
- .debug_info    0x00000000     0x1691 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
- .debug_abbrev  0x00000000      0x3e2 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
- .debug_loc     0x00000000      0xde5 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
+ .debug_info    0x00000000     0x1592 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
+ .debug_abbrev  0x00000000      0x3c8 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
+ .debug_loc     0x00000000      0xddb .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
  .debug_aranges
                 0x00000000       0xe0 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
- .debug_ranges  0x00000000      0x208 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
- .debug_line    0x00000000     0x1577 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
- .debug_str     0x00000000     0x110e .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
+ .debug_ranges  0x00000000      0x1f0 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
+ .debug_line    0x00000000     0x13a7 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
+ .debug_str     0x00000000     0x10ed .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
  .comment       0x00000000       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
  .note.GNU-stack
                 0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
- .debug_frame   0x00000000      0x330 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
+ .debug_frame   0x00000000      0x318 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
  .riscv.attributes
                 0x00000000       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
  .text          0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
@@ -1225,39 +1195,37 @@ Discarded input sections
                 0x00000000       0x18 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .text.esp_efuse_utility_check_errors
                 0x00000000        0x4 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
- .rodata.esp_efuse_utility_burn_chip_opt.str1.4
-                0x00000000      0x1b0 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .text.esp_efuse_utility_burn_chip_opt
-                0x00000000      0x2ba .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
+                0x00000000      0x1ae .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .text.esp_efuse_utility_burn_chip
                 0x00000000        0xc .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
- .rodata.esp_efuse_utility_apply_new_coding_scheme.str1.4
-                0x00000000       0x3f .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .text.esp_efuse_utility_apply_new_coding_scheme
-                0x00000000       0xb4 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
+                0x00000000       0x92 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .rodata.range_write_addr_blocks
                 0x00000000       0x58 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .bss.write_mass_blocks
                 0x00000000      0x160 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .rodata.range_read_addr_blocks
                 0x00000000       0x58 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
- .debug_info    0x00000000      0x9b0 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
- .debug_abbrev  0x00000000      0x2c8 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
- .debug_loc     0x00000000      0x38c .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
+ .debug_info    0x00000000      0x7f4 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
+ .debug_abbrev  0x00000000      0x2a5 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
+ .debug_loc     0x00000000      0x3ad .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .debug_aranges
                 0x00000000       0x40 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
- .debug_ranges  0x00000000      0x118 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
- .debug_line    0x00000000      0xd52 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
- .debug_str     0x00000000      0x854 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
+ .debug_ranges  0x00000000      0x130 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
+ .debug_line    0x00000000      0xaa0 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
+ .debug_str     0x00000000      0x833 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .comment       0x00000000       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .note.GNU-stack
                 0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
- .debug_frame   0x00000000       0xdc .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
+ .debug_frame   0x00000000       0xd8 .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .riscv.attributes
                 0x00000000       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
  .text          0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_bootloader_format/libesp_bootloader_format.a(esp_bootloader_desc.c.o)
  .data          0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_bootloader_format/libesp_bootloader_format.a(esp_bootloader_desc.c.o)
  .bss           0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_bootloader_format/libesp_bootloader_format.a(esp_bootloader_desc.c.o)
+ .text.esp_bootloader_get_description
+                0x00000000        0xa .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_bootloader_format/libesp_bootloader_format.a(esp_bootloader_desc.c.o)
  .text          0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(cpu_region_protect.c.o)
  .data          0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(cpu_region_protect.c.o)
  .bss           0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(cpu_region_protect.c.o)
@@ -1358,9 +1326,6 @@ Discarded input sections
  .bss           0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
  .text.esp_rom_output_to_channels
                 0x00000000       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
- .text          0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_uart.c.o)
- .data          0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_uart.c.o)
- .bss           0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_uart.c.o)
  .text          0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
  .data          0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
  .bss           0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
@@ -1373,9 +1338,6 @@ Discarded input sections
  .bss           0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
  .text.wdt_hal_deinit
                 0x00000000       0x84 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
- .text          0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/log/liblog.a(log_timestamp.c.o)
- .data          0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/log/liblog.a(log_timestamp.c.o)
- .bss           0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/log/liblog.a(log_timestamp.c.o)
  .text          0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
  .data          0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
  .bss           0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
@@ -1991,7 +1953,7 @@ LOAD /root/.platformio/packages/toolchain-riscv32-esp/bin/../lib/gcc/riscv32-esp
                 0x40000078                        PROVIDE (esp_rom_output_tx_wait_idle = uart_tx_wait_idle)
                 [!provide]                        PROVIDE (esp_rom_output_rx_one_char = uart_rx_one_char)
                 [!provide]                        PROVIDE (esp_rom_output_rx_string = UartRxString)
-                0x40000084                        PROVIDE (esp_rom_output_set_as_console = uart_tx_switch)
+                [!provide]                        PROVIDE (esp_rom_output_set_as_console = uart_tx_switch)
                 0x40000080                        PROVIDE (esp_rom_output_putc = ets_write_char_uart)
                 0x4000074c                        PROVIDE (esp_rom_md5_init = MD5Init)
                 0x40000750                        PROVIDE (esp_rom_md5_update = MD5Update)
@@ -2003,7 +1965,7 @@ LOAD /root/.platformio/packages/toolchain-riscv32-esp/bin/../lib/gcc/riscv32-esp
                 0x40000040                        PROVIDE (esp_rom_delay_us = ets_delay_us)
                 0x40000018                        PROVIDE (esp_rom_get_reset_reason = rtc_get_reset_reason)
                 [!provide]                        PROVIDE (esp_rom_route_intr_matrix = intr_matrix_set)
-                0x40000044                        PROVIDE (esp_rom_get_cpu_ticks_per_us = ets_get_cpu_frequency)
+                [!provide]                        PROVIDE (esp_rom_get_cpu_ticks_per_us = ets_get_cpu_frequency)
                 0x40000048                        PROVIDE (esp_rom_set_cpu_ticks_per_us = ets_update_cpu_frequency)
                 [!provide]                        PROVIDE (esp_rom_spiflash_attach = spi_flash_attach)
                 [!provide]                        PROVIDE (esp_rom_spiflash_clear_bp = esp_rom_spiflash_unlock)
@@ -2288,7 +2250,7 @@ LOAD /root/.platformio/packages/toolchain-riscv32-esp/bin/../lib/gcc/riscv32-esp
                 0x00000001                        ASSERT ((bootloader_iram_loader_seg_start == 0x4086e610), bootloader_iram_loader_seg_start inconsistent with SRAM_DRAM_END)
 
 .iram_loader.text
-                0x4086e610     0x31ae
+                0x4086e610     0x2752
                 0x4086e610                        . = ALIGN (0x10)
                 0x4086e610                        _loader_text_start = ABSOLUTE (.)
  *(.stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
@@ -2307,190 +2269,182 @@ LOAD /root/.platformio/packages/toolchain-riscv32-esp/bin/../lib/gcc/riscv32-esp
                 0x4086e9d4                bootloader_flash_read_sfdp
  .iram1.4       0x4086ea14       0x34 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
                 0x4086ea14                bootloader_read_flash_id
- .iram1.6       0x4086ea48       0xbe .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
+ .iram1.6       0x4086ea48       0x84 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
                 0x4086ea48                bootloader_flash_xmc_startup
- .iram1.0       0x4086eb06       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
-                0x4086eb06                bootloader_flash_cs_timing_config
- .iram1.2       0x4086eb26       0x56 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
-                0x4086eb26                bootloader_configure_spi_pins
- .iram1.0       0x4086eb7c       0x5a .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
- .iram1.2       0x4086ebd6       0x6e .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
-                0x4086ebd6                rtc_get_xtal
-                0x4086ebd6                rtc_clk_xtal_freq_get
- .iram1.0       0x4086ec44       0x1c .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_uart.c.o)
-                0x4086ec44                esp_rom_output_switch_buffer
- .iram1.0       0x4086ec60       0xec .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
- .iram1.3       0x4086ed4c       0x50 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
-                0x4086ed4c                regi2c_write_impl
-                0x4086ed4c                esp_rom_regi2c_write
- .iram1.4       0x4086ed9c       0xdc .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
-                0x4086ed9c                esp_rom_regi2c_write_mask
-                0x4086ed9c                regi2c_write_mask_impl
- .iram1.0       0x4086ee78       0x1e .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
-                0x4086ee78                efuse_hal_chip_revision
- .iram1.1       0x4086ee96       0x1e .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
-                0x4086ee96                efuse_hal_blk_version
- .iram1.2       0x4086eeb4        0xe .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
-                0x4086eeb4                efuse_hal_get_disable_wafer_version_major
- .iram1.4       0x4086eec2       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
-                0x4086eec2                efuse_hal_get_disable_blk_version_major
- .iram1.5       0x4086eed2       0x1e .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
-                0x4086eed2                efuse_hal_flash_encryption_enabled
- .iram1.0       0x4086eef0       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
-                0x4086eef0                efuse_hal_get_major_chip_version
- .iram1.1       0x4086ef00       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
-                0x4086ef00                efuse_hal_get_minor_chip_version
- .iram1.2       0x4086ef10       0x28 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(lp_timer_hal.c.o)
-                0x4086ef10                lp_timer_hal_get_cycle_count
+ .iram1.0       0x4086eacc       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
+                0x4086eacc                bootloader_flash_cs_timing_config
+ .iram1.2       0x4086eaec       0x56 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
+                0x4086eaec                bootloader_configure_spi_pins
+ .iram1.0       0x4086eb42       0x5a .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+ .iram1.2       0x4086eb9c       0x4a .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+                0x4086eb9c                rtc_get_xtal
+                0x4086eb9c                rtc_clk_xtal_freq_get
+ .iram1.0       0x4086ebe6       0xec .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
+ .iram1.3       0x4086ecd2       0x50 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
+                0x4086ecd2                regi2c_write_impl
+                0x4086ecd2                esp_rom_regi2c_write
+ .iram1.4       0x4086ed22       0xdc .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
+                0x4086ed22                esp_rom_regi2c_write_mask
+                0x4086ed22                regi2c_write_mask_impl
+ .iram1.0       0x4086edfe       0x1e .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+                0x4086edfe                efuse_hal_chip_revision
+ .iram1.1       0x4086ee1c       0x1e .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+                0x4086ee1c                efuse_hal_blk_version
+ .iram1.2       0x4086ee3a        0xe .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+                0x4086ee3a                efuse_hal_get_disable_wafer_version_major
+ .iram1.4       0x4086ee48       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+                0x4086ee48                efuse_hal_get_disable_blk_version_major
+ .iram1.5       0x4086ee58       0x1e .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+                0x4086ee58                efuse_hal_flash_encryption_enabled
+ .iram1.0       0x4086ee76       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+                0x4086ee76                efuse_hal_get_major_chip_version
+ .iram1.1       0x4086ee86       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+                0x4086ee86                efuse_hal_get_minor_chip_version
+ .iram1.2       0x4086ee96       0x28 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(lp_timer_hal.c.o)
+                0x4086ee96                lp_timer_hal_get_cycle_count
  *liblog.a:(.literal .text .literal.* .text.*)
- .text.esp_log_early_timestamp
-                0x4086ef38       0x26 .pio/build/esp32-c6-mini/bootloader/esp-idf/log/liblog.a(log_timestamp.c.o)
-                0x4086ef38                esp_log_timestamp
-                0x4086ef38                esp_log_early_timestamp
  *libgcc.a:(.literal .text .literal.* .text.*)
  *libclang_rt.builtins.a:(.literal .text .literal.* .text.*)
  *libbootloader_support.a:bootloader_clock_loader.*(.literal .text .literal.* .text.*)
  *libbootloader_support.a:bootloader_common_loader.*(.literal .text .literal.* .text.*)
  .text.bootloader_common_check_chip_revision_validity
-                0x4086ef5e       0xc2 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
-                0x4086ef5e                bootloader_common_check_chip_revision_validity
+                0x4086eebe       0x5e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
+                0x4086eebe                bootloader_common_check_chip_revision_validity
  .text.bootloader_common_ota_select_crc
-                0x4086f020        0xe .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
-                0x4086f020                bootloader_common_ota_select_crc
+                0x4086ef1c        0xe .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
+                0x4086ef1c                bootloader_common_ota_select_crc
  .text.bootloader_common_ota_select_invalid
-                0x4086f02e       0x16 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
-                0x4086f02e                bootloader_common_ota_select_invalid
+                0x4086ef2a       0x16 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
+                0x4086ef2a                bootloader_common_ota_select_invalid
  .text.bootloader_common_ota_select_valid
-                0x4086f044       0x2a .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
-                0x4086f044                bootloader_common_ota_select_valid
+                0x4086ef40       0x2a .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
+                0x4086ef40                bootloader_common_ota_select_valid
  .text.bootloader_common_check_efuse_blk_validity
-                0x4086f06e       0xb4 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
-                0x4086f06e                bootloader_common_check_efuse_blk_validity
+                0x4086ef6a       0x40 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
+                0x4086ef6a                bootloader_common_check_efuse_blk_validity
  .text.bootloader_common_check_chip_validity
-                0x4086f122       0x64 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
-                0x4086f122                bootloader_common_check_chip_validity
+                0x4086efaa       0x36 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
+                0x4086efaa                bootloader_common_check_chip_validity
  .text.bootloader_common_select_otadata
-                0x4086f186       0x3e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
-                0x4086f186                bootloader_common_select_otadata
+                0x4086efe0       0x3e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
+                0x4086efe0                bootloader_common_select_otadata
  .text.bootloader_common_get_active_otadata
-                0x4086f1c4       0x2e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
-                0x4086f1c4                bootloader_common_get_active_otadata
+                0x4086f01e       0x2e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
+                0x4086f01e                bootloader_common_get_active_otadata
  *libbootloader_support.a:bootloader_flash.*(.literal .text .literal.* .text.*)
  .text.spi_to_esp_err
-                0x4086f1f2       0x24 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
+                0x4086f04c       0x24 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
  .text.bootloader_mmap_get_free_pages
-                0x4086f216        0x6 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
-                0x4086f216                bootloader_mmap_get_free_pages
+                0x4086f070        0x6 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
+                0x4086f070                bootloader_mmap_get_free_pages
  .text.bootloader_mmap
-                0x4086f21c       0xc8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
-                0x4086f21c                bootloader_mmap
+                0x4086f076       0x72 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
+                0x4086f076                bootloader_mmap
  .text.bootloader_munmap
-                0x4086f2e4       0x28 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
-                0x4086f2e4                bootloader_munmap
+                0x4086f0e8       0x28 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
+                0x4086f0e8                bootloader_munmap
  .text.bootloader_flash_read
-                0x4086f30c      0x114 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
-                0x4086f30c                bootloader_flash_read
+                0x4086f110       0xee .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
+                0x4086f110                bootloader_flash_read
  .text.bootloader_flash_erase_sector
-                0x4086f420       0x12 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
-                0x4086f420                bootloader_flash_erase_sector
+                0x4086f1fe       0x12 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
+                0x4086f1fe                bootloader_flash_erase_sector
  .text.bootloader_flash_write
-                0x4086f432       0xd0 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
-                0x4086f432                bootloader_flash_write
+                0x4086f210       0x6a .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
+                0x4086f210                bootloader_flash_write
  .text.bootloader_enable_wp
-                0x4086f502        0xc .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
-                0x4086f502                bootloader_enable_wp
+                0x4086f27a        0xc .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
+                0x4086f27a                bootloader_enable_wp
  .text.bootloader_flash_get_spi_mode
-                0x4086f50e       0x3e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
-                0x4086f50e                bootloader_flash_get_spi_mode
+                0x4086f286       0x3e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
+                0x4086f286                bootloader_flash_get_spi_mode
  *libbootloader_support.a:bootloader_random.*(.literal .text .literal.* .text.*)
  .text.bootloader_fill_random
-                0x4086f54c       0x80 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random.c.o)
-                0x4086f54c                bootloader_fill_random
+                0x4086f2c4       0x7e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random.c.o)
+                0x4086f2c4                bootloader_fill_random
  *libbootloader_support.a:bootloader_random*.*(.literal.bootloader_random_disable .text.bootloader_random_disable)
  .text.bootloader_random_disable
-                0x4086f5cc      0x10c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random_esp32c6.c.o)
-                0x4086f5cc                bootloader_random_disable
+                0x4086f342      0x100 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random_esp32c6.c.o)
+                0x4086f342                bootloader_random_disable
  *libbootloader_support.a:bootloader_random*.*(.literal.bootloader_random_enable .text.bootloader_random_enable)
  .text.bootloader_random_enable
-                0x4086f6d8      0x1cc .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random_esp32c6.c.o)
-                0x4086f6d8                bootloader_random_enable
+                0x4086f442      0x1cc .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random_esp32c6.c.o)
+                0x4086f442                bootloader_random_enable
  *libbootloader_support.a:bootloader_efuse.*(.literal .text .literal.* .text.*)
  *libbootloader_support.a:bootloader_utility.*(.literal .text .literal.* .text.*)
- .text.log_invalid_app_partition
-                0x4086f8a4       0x84 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
- .text.index_to_partition
-                0x4086f928       0x46 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
  .text.try_load_partition
-                0x4086f96e       0x44 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
+                0x4086f60e       0x1a .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
+ .text.index_to_partition
+                0x4086f628       0x46 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
  .text.set_actual_ota_seq
-                0x4086f9b2       0xaa .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
+                0x4086f66e       0x62 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
  .text.load_image
-                0x4086fa5c      0x1d0 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
+                0x4086f6d0      0x1b0 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
  .text.bootloader_common_read_otadata
-                0x4086fc2c       0xa2 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
-                0x4086fc2c                bootloader_common_read_otadata
+                0x4086f880       0x60 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
+                0x4086f880                bootloader_common_read_otadata
  .text.bootloader_utility_load_partition_table
-                0x4086fcce      0x27e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
-                0x4086fcce                bootloader_utility_load_partition_table
+                0x4086f8e0       0xc0 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
+                0x4086f8e0                bootloader_utility_load_partition_table
  .text.bootloader_utility_get_selected_boot_partition
-                0x4086ff4c      0x112 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
-                0x4086ff4c                bootloader_utility_get_selected_boot_partition
+                0x4086f9a0       0xa8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
+                0x4086f9a0                bootloader_utility_get_selected_boot_partition
  .text.bootloader_reset
-                0x4087005e       0x1c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
-                0x4087005e                bootloader_reset
+                0x4086fa48       0x1c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
+                0x4086fa48                bootloader_reset
  .text.bootloader_utility_load_boot_image
-                0x4087007a      0x11c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
-                0x4087007a                bootloader_utility_load_boot_image
+                0x4086fa64       0xa4 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
+                0x4086fa64                bootloader_utility_load_boot_image
  .text.bootloader_debug_buffer
-                0x40870196        0x2 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
-                0x40870196                bootloader_debug_buffer
+                0x4086fb08        0x2 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
+                0x4086fb08                bootloader_debug_buffer
  *libbootloader_support.a:bootloader_utility_tee.*(.literal .text .literal.* .text.*)
  *libbootloader_support.a:bootloader_sha.*(.literal .text .literal.* .text.*)
  .text.bootloader_sha256_start
-                0x40870198       0x2c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
-                0x40870198                bootloader_sha256_start
+                0x4086fb0a       0x2c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
+                0x4086fb0a                bootloader_sha256_start
  .text.bootloader_sha256_data
-                0x408701c4       0x34 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
-                0x408701c4                bootloader_sha256_data
+                0x4086fb36       0x34 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
+                0x4086fb36                bootloader_sha256_data
  .text.bootloader_sha256_finish
-                0x408701f8       0x46 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
-                0x408701f8                bootloader_sha256_finish
+                0x4086fb6a       0x46 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
+                0x4086fb6a                bootloader_sha256_finish
  *libbootloader_support.a:bootloader_console_loader.*(.literal .text .literal.* .text.*)
  .text.bootloader_console_deinit
-                0x4087023e        0x2 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console_loader.c.o)
-                0x4087023e                bootloader_console_deinit
+                0x4086fbb0        0x2 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console_loader.c.o)
+                0x4086fbb0                bootloader_console_deinit
  *libbootloader_support.a:bootloader_panic.*(.literal .text .literal.* .text.*)
  .text.__assert_func
-                0x40870240       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
-                0x40870240                __assert_func
+                0x4086fbb2       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
+                0x4086fbb2                __assert_func
  .text.unlikely.abort
-                0x40870260       0x22 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
-                0x40870260                abort
+                0x4086fbd2       0x22 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
+                0x4086fbd2                abort
  *libbootloader_support.a:bootloader_soc.*(.literal .text .literal.* .text.*)
  .text.bootloader_ana_super_wdt_reset_config
-                0x40870282       0x32 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
-                0x40870282                bootloader_ana_super_wdt_reset_config
+                0x4086fbf4       0x32 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
+                0x4086fbf4                bootloader_ana_super_wdt_reset_config
  .text.bootloader_ana_clock_glitch_reset_config
-                0x408702b4        0x2 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
-                0x408702b4                bootloader_ana_clock_glitch_reset_config
+                0x4086fc26        0x2 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
+                0x4086fc26                bootloader_ana_clock_glitch_reset_config
  *libbootloader_support.a:esp_image_format.*(.literal .text .literal.* .text.*)
  .text.should_load
-                0x408702b6       0x4e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
+                0x4086fc28       0x4e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
  .text.bootloader_util_regions_overlap
-                0x40870304       0x4c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
- .text.process_segments
-                0x40870350      0x50c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
+                0x4086fc76       0x4c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
+ .text.process_segments.isra.0
+                0x4086fcc2      0x346 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
  .text.image_load
-                0x4087085c      0x406 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
+                0x40870008      0x2fe .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
  .text.bootloader_load_image
-                0x40870c62        0x8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
-                0x40870c62                bootloader_load_image
+                0x40870306        0x8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
+                0x40870306                bootloader_load_image
  *libbootloader_support.a:flash_encrypt.*(.literal .text .literal.* .text.*)
  *libbootloader_support.a:flash_encryption_secure_features.*(.literal .text .literal.* .text.*)
  *libbootloader_support.a:flash_partitions.*(.literal .text .literal.* .text.*)
  .text.esp_partition_table_verify
-                0x40870c6a      0x18a .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
-                0x40870c6a                esp_partition_table_verify
+                0x4087030e       0xd2 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
+                0x4087030e                esp_partition_table_verify
  *libbootloader_support.a:secure_boot.*(.literal .text .literal.* .text.*)
  *libbootloader_support.a:secure_boot_secure_features.*(.literal .text .literal.* .text.*)
  *libbootloader_support.a:secure_boot_signatures_bootloader.*(.literal .text .literal.* .text.*)
@@ -2499,104 +2453,104 @@ LOAD /root/.platformio/packages/toolchain-riscv32-esp/bin/../lib/gcc/riscv32-esp
  *libhal.a:wdt_hal_iram.*(.literal .text .literal.* .text.*)
  *libhal.a:mmu_hal.*(.literal .text .literal.* .text.*)
  .text.mmu_ll_check_valid_paddr_region.isra.0
-                0x40870df4       0x86 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
+                0x408703e0       0x86 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
  .text.mmu_hal_unmap_all
-                0x40870e7a       0x24 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
-                0x40870e7a                mmu_hal_unmap_all
+                0x40870466       0x24 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
+                0x40870466                mmu_hal_unmap_all
  .text.mmu_hal_init
-                0x40870e9e       0x24 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
-                0x40870e9e                mmu_hal_init
+                0x4087048a       0x24 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
+                0x4087048a                mmu_hal_init
  .text.mmu_hal_pages_to_bytes
-                0x40870ec2       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
-                0x40870ec2                mmu_hal_pages_to_bytes
+                0x408704ae       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
+                0x408704ae                mmu_hal_pages_to_bytes
  .text.mmu_hal_check_valid_ext_vaddr_region
-                0x40870ef2       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
-                0x40870ef2                mmu_hal_check_valid_ext_vaddr_region
+                0x408704de       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
+                0x408704de                mmu_hal_check_valid_ext_vaddr_region
  .text.mmu_hal_map_region
-                0x40870f12      0x10a .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
-                0x40870f12                mmu_hal_map_region
+                0x408704fe      0x10a .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
+                0x408704fe                mmu_hal_map_region
  *libhal.a:cache_hal.*(.literal .text .literal.* .text.*)
  .text.s_cache_hal_init_ctx
-                0x4087101c       0x32 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
-                0x4087101c                s_cache_hal_init_ctx
+                0x40870608       0x32 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
+                0x40870608                s_cache_hal_init_ctx
  .text.cache_hal_init
-                0x4087104e       0x48 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
-                0x4087104e                cache_hal_init
+                0x4087063a       0x48 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
+                0x4087063a                cache_hal_init
  .text.s_update_cache_state
-                0x40871096       0x34 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
-                0x40871096                s_update_cache_state
+                0x40870682       0x34 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
+                0x40870682                s_update_cache_state
  .text.cache_hal_disable
-                0x408710ca       0x2a .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
-                0x408710ca                cache_hal_disable
+                0x408706b6       0x2a .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
+                0x408706b6                cache_hal_disable
  .text.cache_hal_enable
-                0x408710f4       0x2e .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
-                0x408710f4                cache_hal_enable
+                0x408706e0       0x2e .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
+                0x408706e0                cache_hal_enable
  *libhal.a:efuse_hal.*(.literal .text .literal.* .text.*)
  *libesp_hw_support.a:rtc_clk.*(.literal .text .literal.* .text.*)
  .text.rtc_clk_bbpll_disable
-                0x40871122       0x22 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+                0x4087070e       0x22 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
  .text.rtc_clk_cpu_freq_to_8m
-                0x40871144       0x48 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+                0x40870730       0x48 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
  .text.rtc_clk_cpu_freq_to_pll_mhz
-                0x4087118c       0x84 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+                0x40870778       0x84 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
  .text.rtc_clk_32k_enable.part.0
-                0x40871210       0x54 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+                0x408707fc       0x54 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
  .text.rtc_clk_32k_enable
-                0x40871264       0x1a .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
-                0x40871264                rtc_clk_32k_enable
+                0x40870850       0x1a .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+                0x40870850                rtc_clk_32k_enable
  .text.rtc_clk_32k_enable_external
-                0x4087127e       0x1a .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
-                0x4087127e                rtc_clk_32k_enable_external
+                0x4087086a       0x1a .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+                0x4087086a                rtc_clk_32k_enable_external
  .text.rtc_clk_rc32k_enable
-                0x40871298       0x2c .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
-                0x40871298                rtc_clk_rc32k_enable
+                0x40870884       0x2c .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+                0x40870884                rtc_clk_rc32k_enable
  .text.rtc_clk_8m_enable
-                0x408712c4       0x2c .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
-                0x408712c4                rtc_clk_8m_enable
+                0x408708b0       0x2c .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+                0x408708b0                rtc_clk_8m_enable
  .text.rtc_clk_slow_src_set
-                0x408712f0       0x50 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
-                0x408712f0                rtc_clk_slow_src_set
+                0x408708dc       0x50 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+                0x408708dc                rtc_clk_slow_src_set
  .text.rtc_clk_slow_src_get
-                0x40871340       0x1e .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
-                0x40871340                rtc_clk_slow_src_get
+                0x4087092c       0x1e .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+                0x4087092c                rtc_clk_slow_src_get
  .text.rtc_clk_slow_freq_get_hz
-                0x4087135e       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
-                0x4087135e                rtc_clk_slow_freq_get_hz
+                0x4087094a       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+                0x4087094a                rtc_clk_slow_freq_get_hz
  .text.rtc_clk_fast_src_set
-                0x4087137e       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
-                0x4087137e                rtc_clk_fast_src_set
+                0x4087096a       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+                0x4087096a                rtc_clk_fast_src_set
  .text.rtc_clk_fast_src_get
-                0x408713ae        0xe .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
-                0x408713ae                rtc_clk_fast_src_get
+                0x4087099a        0xe .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+                0x4087099a                rtc_clk_fast_src_get
  .text.rtc_clk_set_cpu_switch_to_pll
-                0x408713bc        0x2 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
-                0x408713bc                rtc_clk_set_cpu_switch_to_pll
+                0x408709a8        0x2 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+                0x408709a8                rtc_clk_set_cpu_switch_to_pll
  .text.rtc_clk_cpu_freq_mhz_to_config
-                0x408713be       0x6c .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
-                0x408713be                rtc_clk_cpu_freq_mhz_to_config
+                0x408709aa       0x6c .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+                0x408709aa                rtc_clk_cpu_freq_mhz_to_config
  .text.rtc_clk_cpu_freq_set_config
-                0x4087142a      0x180 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
-                0x4087142a                rtc_clk_cpu_freq_set_config
+                0x40870a16      0x17c .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+                0x40870a16                rtc_clk_cpu_freq_set_config
  .text.rtc_clk_cpu_freq_get_config
-                0x408715aa       0xf2 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
-                0x408715aa                rtc_clk_cpu_freq_get_config
+                0x40870b92       0xd4 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+                0x40870b92                rtc_clk_cpu_freq_get_config
  .text.rtc_clk_xtal_freq_update
-                0x4087169c       0x26 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
-                0x4087169c                rtc_clk_xtal_freq_update
+                0x40870c66       0x26 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+                0x40870c66                rtc_clk_xtal_freq_update
  .text.rtc_clk_apb_freq_get
-                0x408716c2       0xf0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
-                0x408716c2                rtc_clk_apb_freq_get
+                0x40870c8c       0xca .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+                0x40870c8c                rtc_clk_apb_freq_get
  *libesp_hw_support.a:rtc_time.*(.literal .text .literal.* .text.*)
  *libesp_hw_support.a:regi2c_ctrl.*(.literal .text .literal.* .text.*)
  *libefuse.a:*.*(.literal .text .literal.* .text.*)
  *libriscv.a:rv_utils.*(.literal .text .literal.* .text.*)
  .text.rv_utils_dbgr_is_attached
-                0x408717b2        0xc .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
-                0x408717b2                rv_utils_dbgr_is_attached
+                0x40870d56        0xc .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
+                0x40870d56                rv_utils_dbgr_is_attached
  *(.fini.literal)
  *(.fini)
  *(.gnu.version)
-                0x408717be                        _loader_text_end = ABSOLUTE (.)
+                0x40870d62                        _loader_text_end = ABSOLUTE (.)
 
 .iram.text      0x4086b910        0x0
                 0x4086b910                        . = ALIGN (0x10)
@@ -2670,227 +2624,176 @@ LOAD /root/.platformio/packages/toolchain-riscv32-esp/bin/../lib/gcc/riscv32-esp
  *(.jcr)
                 0x4087578c                        _data_end = ABSOLUTE (.)
 
-.dram0.rodata   0x4087578c     0x16d8
+.dram0.rodata   0x4087578c      0x554
                 0x4087578c                        _rodata_start = ABSOLUTE (.)
  *(.rodata)
  *(.rodata.*)
- .rodata.call_start_cpu0.str1.4
-                0x4087578c     0x155e .pio/build/esp32-c6-mini/bootloader/esp-idf/main/libmain.a(bootloader_start.c.o)
-                                 0x31 (size before relaxing)
- .rodata.log_invalid_app_partition.str1.4
-                0x40876cea       0x99 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
- .rodata.try_load_partition.str1.4
-                0x40876cea       0x37 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
- .rodata.set_actual_ota_seq.str1.4
-                0x40876cea       0x6e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
  .rodata.load_image.str1.4
-                0x40876cea       0x93 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
- .rodata.bootloader_common_read_otadata.str1.4
-                0x40876cea       0x7e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
- .rodata.bootloader_utility_load_partition_table.str1.4
-                0x40876cea      0x1fc .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
- .rodata.bootloader_utility_get_selected_boot_partition.str1.4
-                0x40876cea       0xec .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
- .rodata.bootloader_utility_load_boot_image.str1.4
-                0x40876cea       0xc3 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
- *fill*         0x40876cea        0x2 
+                0x4087578c      0x3da .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
+                                 0x5f (size before relaxing)
+ *fill*         0x40875b66        0x2 
  .rodata.__func__.0
-                0x40876cec       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
- .rodata.esp_partition_table_verify.str1.4
-                0x40876cfc      0x131 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
+                0x40875b68       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
  .rodata.bootloader_util_regions_overlap.str1.4
-                0x40876cfc       0x5e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
- .rodata.process_segments.str1.4
-                0x40876cfc      0x2f2 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
+                0x40875b78       0x5e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
+ .rodata.process_segments.isra.0.str1.4
+                0x40875b78       0x53 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
  .rodata.image_load.str1.4
-                0x40876cfc      0x192 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
+                0x40875b78       0x1e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
  .rodata.__func__.0
-                0x40876cfc       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
+                0x40875b78       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
  .rodata.__func__.1
-                0x40876d1c       0x16 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
+                0x40875b98       0x16 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
  .rodata.bootloader_sha256_data.str1.4
-                0x40876d32       0x49 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
- *fill*         0x40876d32        0x2 
+                0x40875bae       0x49 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
+ *fill*         0x40875bae        0x2 
  .rodata.__func__.0
-                0x40876d34       0x19 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
- *fill*         0x40876d4d        0x3 
+                0x40875bb0       0x19 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
+ *fill*         0x40875bc9        0x3 
  .rodata.__func__.1
-                0x40876d50       0x17 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
+                0x40875bcc       0x17 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
  .rodata.bootloader_ana_super_wdt_reset_config.str1.4
-                0x40876d67       0x49 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
- *fill*         0x40876d67        0x1 
+                0x40875be3       0x49 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
+ *fill*         0x40875be3        0x1 
  .rodata.__func__.0
-                0x40876d68       0x26 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
+                0x40875be4       0x26 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
  .rodata.bootloader_init.str1.4
-                0x40876d8e       0xf8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
- *fill*         0x40876d8e        0x2 
+                0x40875c0a       0x7f .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
+ *fill*         0x40875c0a        0x2 
  .rodata.__func__.0
-                0x40876d90       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
+                0x40875c0c       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
  .rodata.__assert_func.str1.4
-                0x40876da0       0x22 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
+                0x40875c1c       0x22 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
  .rodata.abort.str1.4
-                0x40876da0       0x22 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
- .rodata.bootloader_common_check_chip_revision_validity.str1.4
-                0x40876da0       0xa3 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
- .rodata.bootloader_common_check_efuse_blk_validity.str1.4
-                0x40876da0       0x98 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
- .rodata.bootloader_common_check_chip_validity.str1.4
-                0x40876da0       0x35 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
+                0x40875c1c       0x22 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
  .rodata.bootloader_fill_random.str1.4
-                0x40876da0       0x4c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random.c.o)
+                0x40875c1c       0x4c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random.c.o)
  .rodata.__func__.0
-                0x40876da0       0x17 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random.c.o)
- .rodata.bootloader_mmap.str1.4
-                0x40876db7       0x8d .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
- .rodata.bootloader_flash_read.str1.4
-                0x40876db7       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
+                0x40875c1c       0x17 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random.c.o)
  .rodata.str1.4
-                0x40876db7       0xc8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
- .rodata.bootloader_flash_write.str1.4
-                0x40876db7       0xcc .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
- *fill*         0x40876db7        0x1 
+                0x40875c33       0x7f .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
+ *fill*         0x40875c33        0x1 
  .rodata.__func__.1
-                0x40876db8       0x1b .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
- *fill*         0x40876dd3        0x1 
+                0x40875c34       0x1b .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
+ *fill*         0x40875c4f        0x1 
  .rodata.__func__.0
-                0x40876dd4       0x28 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
- .rodata.bootloader_init_spi_flash.str1.4
-                0x40876dfc       0xe1 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
- .rodata.bootloader_read_bootloader_header.str1.4
-                0x40876dfc       0x3d .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
- .rodata.bootloader_check_bootloader_validity.str1.4
-                0x40876dfc       0x4e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
- .rodata.bootloader_enable_random.str1.4
-                0x40876dfc       0x32 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
- .rodata.bootloader_print_banner.str1.4
-                0x40876dfc       0x4d .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
- .rodata.rtc_clk_init.str1.4
-                0x40876dfc       0x39 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o)
+                0x40875c50       0x28 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
  .rodata.str1.4
-                0x40876dfc       0x43 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
- .rodata.rtc_clk_cpu_freq_get_config.str1.4
-                0x40876dfc       0x31 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
- .rodata.rtc_clk_apb_freq_get.str1.4
-                0x40876dfc       0x22 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
- .rodata.str1.4
-                0x40876dfc       0x7a .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
+                0x40875c78       0x7a .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
  .rodata.__func__.2
-                0x40876dfc       0x17 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
- *fill*         0x40876e13        0x1 
+                0x40875c78       0x17 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
+ *fill*         0x40875c8f        0x1 
  .rodata.__func__.0
-                0x40876e14       0x14 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
+                0x40875c90       0x14 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
  .rodata.uart_periph_signal
-                0x40876e28       0x3c .pio/build/esp32-c6-mini/bootloader/esp-idf/soc/libsoc.a(uart_periph.c.o)
-                0x40876e28                uart_periph_signal
+                0x40875ca4       0x3c .pio/build/esp32-c6-mini/bootloader/esp-idf/soc/libsoc.a(uart_periph.c.o)
+                0x40875ca4                uart_periph_signal
  *(.gnu.linkonce.r.*)
  *(.rodata1)
  *(.sdata2 .sdata2.* .srodata .srodata.*)
-                0x40876e64                        __XT_EXCEPTION_TABLE_ = ABSOLUTE (.)
+                0x40875ce0                        __XT_EXCEPTION_TABLE_ = ABSOLUTE (.)
  *(.xt_except_table)
  *(.gcc_except_table)
  *(.gnu.linkonce.e.*)
  *(.gnu.version_r)
  *(.eh_frame_hdr)
  *(.eh_frame)
-                0x40876e64                        . = ((. + 0x3) & 0xfffffffffffffffc)
-                0x40876e64                        __init_array_start = ABSOLUTE (.)
+                0x40875ce0                        . = ((. + 0x3) & 0xfffffffffffffffc)
+                0x40875ce0                        __init_array_start = ABSOLUTE (.)
  *crtbegin.*(.ctors)
  *(EXCLUDE_FILE(*crtend.*) .ctors)
  *(SORT_BY_NAME(.ctors.*))
  *(.ctors)
-                0x40876e64                        __init_array_end = ABSOLUTE (.)
+                0x40875ce0                        __init_array_end = ABSOLUTE (.)
  *crtbegin.*(.dtors)
  *(EXCLUDE_FILE(*crtend.*) .dtors)
  *(SORT_BY_NAME(.dtors.*))
  *(.dtors)
-                0x40876e64                        __XT_EXCEPTION_DESCS_ = ABSOLUTE (.)
+                0x40875ce0                        __XT_EXCEPTION_DESCS_ = ABSOLUTE (.)
  *(.xt_except_desc)
  *(.gnu.linkonce.h.*)
-                0x40876e64                        __XT_EXCEPTION_DESCS_END__ = ABSOLUTE (.)
+                0x40875ce0                        __XT_EXCEPTION_DESCS_END__ = ABSOLUTE (.)
  *(.xt_except_desc_end)
  *(.dynamic)
  *(.gnu.version_d)
-                0x40876e64                        _rodata_end = ABSOLUTE (.)
-                0x40876e64                        _lit4_start = ABSOLUTE (.)
+                0x40875ce0                        _rodata_end = ABSOLUTE (.)
+                0x40875ce0                        _lit4_start = ABSOLUTE (.)
  *(*.lit4)
  *(.lit4.*)
  *(.gnu.linkonce.lit4.*)
-                0x40876e64                        _lit4_end = ABSOLUTE (.)
-                0x40876e64                        . = ALIGN (0x4)
-                0x40876e64                        _dram_end = ABSOLUTE (.)
+                0x40875ce0                        _lit4_end = ABSOLUTE (.)
+                0x40875ce0                        . = ALIGN (0x4)
+                0x40875ce0                        _dram_end = ABSOLUTE (.)
 
-.iram.text      0x4086b910      0xe76
+.iram.text      0x4086b910      0xba6
                 0x4086b910                        _stext = .
                 0x4086b910                        _text_start = ABSOLUTE (.)
  *(.literal .text .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
  .text.call_start_cpu0
-                0x4086b910       0x82 .pio/build/esp32-c6-mini/bootloader/esp-idf/main/libmain.a(bootloader_start.c.o)
+                0x4086b910       0x62 .pio/build/esp32-c6-mini/bootloader/esp-idf/main/libmain.a(bootloader_start.c.o)
                 0x4086b910                call_start_cpu0
  .text.bootloader_init
-                0x4086b992      0x1c6 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
-                0x4086b992                bootloader_init
+                0x4086b972      0x174 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
+                0x4086b972                bootloader_init
  .text.bootloader_clock_configure
-                0x4086bb58      0x148 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_clock_init.c.o)
-                0x4086bb58                bootloader_clock_configure
+                0x4086bae6      0x148 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_clock_init.c.o)
+                0x4086bae6                bootloader_clock_configure
  .text.bootloader_init_mem
-                0x4086bca0        0x2 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_mem.c.o)
-                0x4086bca0                bootloader_init_mem
+                0x4086bc2e        0x2 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_mem.c.o)
+                0x4086bc2e                bootloader_init_mem
  .text.bootloader_flash_update_id
-                0x4086bca2       0x1c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
-                0x4086bca2                bootloader_flash_update_id
+                0x4086bc30       0x1c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
+                0x4086bc30                bootloader_flash_update_id
  .text.bootloader_init_spi_flash
-                0x4086bcbe      0x210 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
-                0x4086bcbe                bootloader_init_spi_flash
+                0x4086bc4c       0xd2 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
+                0x4086bc4c                bootloader_init_spi_flash
  .text.bootloader_clear_bss_section
-                0x4086bece       0x22 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
-                0x4086bece                bootloader_clear_bss_section
+                0x4086bd1e       0x22 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
+                0x4086bd1e                bootloader_clear_bss_section
  .text.bootloader_read_bootloader_header
-                0x4086bef0       0x3e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
-                0x4086bef0                bootloader_read_bootloader_header
+                0x4086bd40       0x24 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
+                0x4086bd40                bootloader_read_bootloader_header
  .text.bootloader_check_bootloader_validity
-                0x4086bf2e       0x84 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
-                0x4086bf2e                bootloader_check_bootloader_validity
+                0x4086bd64       0x28 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
+                0x4086bd64                bootloader_check_bootloader_validity
  .text.bootloader_config_wdt
-                0x4086bfb2       0xaa .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
-                0x4086bfb2                bootloader_config_wdt
+                0x4086bd8c       0xaa .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
+                0x4086bd8c                bootloader_config_wdt
  .text.bootloader_enable_random
-                0x4086c05c       0x2a .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
-                0x4086c05c                bootloader_enable_random
+                0x4086be36        0x4 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
+                0x4086be36                bootloader_enable_random
  .text.bootloader_print_banner
-                0x4086c086       0x54 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
-                0x4086c086                bootloader_print_banner
+                0x4086be3a        0x2 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
+                0x4086be3a                bootloader_print_banner
  .text.bootloader_console_init
-                0x4086c0da       0x60 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o)
-                0x4086c0da                bootloader_console_init
- .text.esp_bootloader_get_description
-                0x4086c13a        0xa .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_bootloader_format/libesp_bootloader_format.a(esp_bootloader_desc.c.o)
-                0x4086c13a                esp_bootloader_get_description
+                0x4086be3c       0x56 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o)
+                0x4086be3c                bootloader_console_init
  .text.esp_cpu_configure_region_protection
-                0x4086c144      0x198 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(cpu_region_protect.c.o)
-                0x4086c144                esp_cpu_configure_region_protection
+                0x4086be92      0x198 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(cpu_region_protect.c.o)
+                0x4086be92                esp_cpu_configure_region_protection
  .text.rtc_clk_init
-                0x4086c2dc      0x214 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o)
-                0x4086c2dc                rtc_clk_init
+                0x4086c02a      0x1f6 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o)
+                0x4086c02a                rtc_clk_init
  .text.get_act_hp_dbias
-                0x4086c4f0       0x34 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(pmu_param.c.o)
-                0x4086c4f0                get_act_hp_dbias
+                0x4086c220       0x34 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(pmu_param.c.o)
+                0x4086c220                get_act_hp_dbias
  .text.get_act_lp_dbias
-                0x4086c524       0x34 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(pmu_param.c.o)
-                0x4086c524                get_act_lp_dbias
+                0x4086c254       0x34 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(pmu_param.c.o)
+                0x4086c254                get_act_lp_dbias
  .text.esp_rom_install_channel_putc
-                0x4086c558       0x32 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
-                0x4086c558                esp_rom_install_channel_putc
+                0x4086c288       0x32 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
+                0x4086c288                esp_rom_install_channel_putc
  .text.wdt_hal_init
-                0x4086c58a      0x1ec .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
-                0x4086c58a                wdt_hal_init
+                0x4086c2ba      0x1ec .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
+                0x4086c2ba                wdt_hal_init
  *(.iram .iram.*)
  *(.fini.literal)
  *(.fini)
  *(.gnu.version)
-                0x4086c786                        . = (. + 0x10)
- *fill*         0x4086c776       0x10 
-                0x4086c786                        _text_end = ABSOLUTE (.)
-                0x4086c786                        _etext = .
+                0x4086c4b6                        . = (. + 0x10)
+ *fill*         0x4086c4a6       0x10 
+                0x4086c4b6                        _text_end = ABSOLUTE (.)
+                0x4086c4b6                        _etext = .
 
 .riscv.attributes
                 0x00000000       0x60
@@ -2946,27 +2849,23 @@ LOAD /root/.platformio/packages/toolchain-riscv32-esp/bin/../lib/gcc/riscv32-esp
  .riscv.attributes
                 0x000008ac       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
  .riscv.attributes
-                0x00000908       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_uart.c.o)
+                0x00000908       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
  .riscv.attributes
-                0x00000964       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
+                0x00000964       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
  .riscv.attributes
-                0x000009c0       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
+                0x000009c0       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
  .riscv.attributes
-                0x00000a1c       0x60 .pio/build/esp32-c6-mini/bootloader/esp-idf/log/liblog.a(log_timestamp.c.o)
+                0x00000a1c       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/soc/libsoc.a(uart_periph.c.o)
  .riscv.attributes
-                0x00000a7c       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
+                0x00000a78       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
  .riscv.attributes
-                0x00000ad8       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/soc/libsoc.a(uart_periph.c.o)
+                0x00000ad4       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
  .riscv.attributes
-                0x00000b34       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+                0x00000b30       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(lp_timer_hal.c.o)
  .riscv.attributes
-                0x00000b90       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+                0x00000b8c       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
  .riscv.attributes
-                0x00000bec       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(lp_timer_hal.c.o)
- .riscv.attributes
-                0x00000c48       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
- .riscv.attributes
-                0x00000ca4       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
+                0x00000be8       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
 
 .debug
  *(.debug)
@@ -2980,310 +2879,295 @@ LOAD /root/.platformio/packages/toolchain-riscv32-esp/bin/../lib/gcc/riscv32-esp
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x00000000      0x968
+.debug_aranges  0x00000000      0x920
  *(.debug_aranges)
  .debug_aranges
                 0x00000000       0x28 .pio/build/esp32-c6-mini/bootloader/esp-idf/main/libmain.a(bootloader_start.c.o)
  .debug_aranges
-                0x00000028       0x90 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
+                0x00000028       0x88 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
  .debug_aranges
-                0x000000b8       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
+                0x000000b0       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
  .debug_aranges
-                0x000000d8       0x80 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
+                0x000000d0       0x80 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
  .debug_aranges
-                0x00000158       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
+                0x00000150       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
  .debug_aranges
-                0x00000188       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console_loader.c.o)
+                0x00000180       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console_loader.c.o)
  .debug_aranges
-                0x000001a8       0x28 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
+                0x000001a0       0x28 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
  .debug_aranges
-                0x000001d0       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
+                0x000001c8       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
  .debug_aranges
-                0x000001f0       0x28 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
+                0x000001e8       0x28 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
  .debug_aranges
-                0x00000218       0x58 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
+                0x00000210       0x58 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
  .debug_aranges
-                0x00000270       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_clock_init.c.o)
+                0x00000268       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_clock_init.c.o)
  .debug_aranges
-                0x00000290       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_mem.c.o)
+                0x00000288       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_mem.c.o)
  .debug_aranges
-                0x000002b0       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random.c.o)
+                0x000002a8       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random.c.o)
  .debug_aranges
-                0x000002d0       0x40 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
+                0x000002c8       0x40 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
  .debug_aranges
-                0x00000310       0x28 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random_esp32c6.c.o)
+                0x00000308       0x28 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random_esp32c6.c.o)
  .debug_aranges
-                0x00000338       0xb8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
+                0x00000330       0xb8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
  .debug_aranges
-                0x000003f0       0x48 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
+                0x000003e8       0x48 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
  .debug_aranges
-                0x00000438       0x48 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
+                0x00000430       0x48 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
  .debug_aranges
-                0x00000480       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o)
+                0x00000478       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o)
  .debug_aranges
-                0x000004a0       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_bootloader_format/libesp_bootloader_format.a(esp_bootloader_desc.c.o)
+                0x00000498       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_bootloader_format/libesp_bootloader_format.a(esp_bootloader_desc.c.o)
  .debug_aranges
-                0x000004c0       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(cpu_region_protect.c.o)
+                0x000004b8       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(cpu_region_protect.c.o)
  .debug_aranges
-                0x000004e0       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o)
+                0x000004d8       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o)
  .debug_aranges
-                0x00000500      0x130 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+                0x000004f8      0x130 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
  .debug_aranges
-                0x00000630       0x60 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(pmu_param.c.o)
+                0x00000628       0x60 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(pmu_param.c.o)
  .debug_aranges
-                0x00000690       0x28 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
+                0x00000688       0x28 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
  .debug_aranges
-                0x000006b8       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_uart.c.o)
+                0x000006b0       0x40 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
  .debug_aranges
-                0x000006d8       0x40 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
+                0x000006f0       0x28 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
  .debug_aranges
-                0x00000718       0x28 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
+                0x00000718       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
  .debug_aranges
-                0x00000740       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/log/liblog.a(log_timestamp.c.o)
+                0x00000738       0x18 .pio/build/esp32-c6-mini/bootloader/esp-idf/soc/libsoc.a(uart_periph.c.o)
  .debug_aranges
-                0x00000760       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
+                0x00000750       0x50 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
  .debug_aranges
-                0x00000780       0x18 .pio/build/esp32-c6-mini/bootloader/esp-idf/soc/libsoc.a(uart_periph.c.o)
+                0x000007a0       0x58 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
  .debug_aranges
-                0x00000798       0x50 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+                0x000007f8       0x38 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(lp_timer_hal.c.o)
  .debug_aranges
-                0x000007e8       0x58 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+                0x00000830       0x68 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
  .debug_aranges
-                0x00000840       0x38 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(lp_timer_hal.c.o)
- .debug_aranges
-                0x00000878       0x68 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
- .debug_aranges
-                0x000008e0       0x88 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
+                0x00000898       0x88 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
 
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000    0x3fd7a
+.debug_info     0x00000000    0x3ce50
  *(.debug_info .gnu.linkonce.wi.*)
- .debug_info    0x00000000      0xd59 .pio/build/esp32-c6-mini/bootloader/esp-idf/main/libmain.a(bootloader_start.c.o)
- .debug_info    0x00000d59     0x22b5 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
- .debug_info    0x0000300e      0x678 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
- .debug_info    0x00003686     0x2915 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
- .debug_info    0x00005f9b      0x44e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
- .debug_info    0x000063e9       0x8c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console_loader.c.o)
- .debug_info    0x00006475      0x15f .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
- .debug_info    0x000065d4     0x45c1 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
- .debug_info    0x0000ab95      0x1f6 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
- .debug_info    0x0000ad8b      0xbce .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
- .debug_info    0x0000b959      0x36d .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_clock_init.c.o)
- .debug_info    0x0000bcc6       0xa6 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_mem.c.o)
- .debug_info    0x0000bd6c      0x2c4 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random.c.o)
- .debug_info    0x0000c030      0xb0c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
- .debug_info    0x0000cb3c     0x4ad1 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random_esp32c6.c.o)
- .debug_info    0x0001160d     0x5b14 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
- .debug_info    0x00017121      0xcb8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
- .debug_info    0x00017dd9     0x20ce .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
- .debug_info    0x00019ea7     0x12a6 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o)
- .debug_info    0x0001b14d      0x18e .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_bootloader_format/libesp_bootloader_format.a(esp_bootloader_desc.c.o)
- .debug_info    0x0001b2db      0x366 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(cpu_region_protect.c.o)
- .debug_info    0x0001b641     0x7154 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o)
- .debug_info    0x00022795     0x52b7 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
- .debug_info    0x00027a4c     0x499c .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(pmu_param.c.o)
- .debug_info    0x0002c3e8      0x1ea .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
- .debug_info    0x0002c5d2      0x376 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_uart.c.o)
- .debug_info    0x0002c948      0xc32 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
- .debug_info    0x0002d57a     0x4ce3 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
- .debug_info    0x0003225d      0x13e .pio/build/esp32-c6-mini/bootloader/esp-idf/log/liblog.a(log_timestamp.c.o)
- .debug_info    0x0003239b       0xd1 .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
- .debug_info    0x0003246c      0x7d8 .pio/build/esp32-c6-mini/bootloader/esp-idf/soc/libsoc.a(uart_periph.c.o)
- .debug_info    0x00032c44     0x3869 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
- .debug_info    0x000364ad     0x3a97 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
- .debug_info    0x00039f44      0x999 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(lp_timer_hal.c.o)
- .debug_info    0x0003a8dd     0x457e .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
- .debug_info    0x0003ee5b      0xf1f .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
+ .debug_info    0x00000000      0xd0d .pio/build/esp32-c6-mini/bootloader/esp-idf/main/libmain.a(bootloader_start.c.o)
+ .debug_info    0x00000d0d     0x1c8d .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
+ .debug_info    0x0000299a      0x5cd .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
+ .debug_info    0x00002f67     0x23ca .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
+ .debug_info    0x00005331      0x44e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
+ .debug_info    0x0000577f       0x8c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console_loader.c.o)
+ .debug_info    0x0000580b      0x15f .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
+ .debug_info    0x0000596a     0x4145 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
+ .debug_info    0x00009aaf      0x1f6 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
+ .debug_info    0x00009ca5      0x848 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
+ .debug_info    0x0000a4ed      0x36d .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_clock_init.c.o)
+ .debug_info    0x0000a85a       0xa6 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_mem.c.o)
+ .debug_info    0x0000a900      0x2c4 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random.c.o)
+ .debug_info    0x0000abc4      0x8d1 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
+ .debug_info    0x0000b495     0x4ad1 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random_esp32c6.c.o)
+ .debug_info    0x0000ff66     0x5788 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
+ .debug_info    0x000156ee      0x9ad .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
+ .debug_info    0x0001609b     0x1c96 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
+ .debug_info    0x00017d31     0x1274 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o)
+ .debug_info    0x00018fa5      0x18e .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_bootloader_format/libesp_bootloader_format.a(esp_bootloader_desc.c.o)
+ .debug_info    0x00019133      0x366 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(cpu_region_protect.c.o)
+ .debug_info    0x00019499     0x6cf0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o)
+ .debug_info    0x00020189     0x4e4d .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+ .debug_info    0x00024fd6     0x499c .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(pmu_param.c.o)
+ .debug_info    0x00029972      0x1ea .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
+ .debug_info    0x00029b5c      0xc32 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
+ .debug_info    0x0002a78e     0x4ce3 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
+ .debug_info    0x0002f471       0xd1 .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
+ .debug_info    0x0002f542      0x7d8 .pio/build/esp32-c6-mini/bootloader/esp-idf/soc/libsoc.a(uart_periph.c.o)
+ .debug_info    0x0002fd1a     0x3869 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+ .debug_info    0x00033583     0x3a97 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+ .debug_info    0x0003701a      0x999 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(lp_timer_hal.c.o)
+ .debug_info    0x000379b3     0x457e .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
+ .debug_info    0x0003bf31      0xf1f .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
 
-.debug_abbrev   0x00000000     0x5f0f
+.debug_abbrev   0x00000000     0x5cdf
  *(.debug_abbrev)
- .debug_abbrev  0x00000000      0x33b .pio/build/esp32-c6-mini/bootloader/esp-idf/main/libmain.a(bootloader_start.c.o)
- .debug_abbrev  0x0000033b      0x540 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
- .debug_abbrev  0x0000087b      0x23e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
- .debug_abbrev  0x00000ab9      0x545 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
- .debug_abbrev  0x00000ffe      0x1ca .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
- .debug_abbrev  0x000011c8       0x44 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console_loader.c.o)
- .debug_abbrev  0x0000120c       0xdc .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
- .debug_abbrev  0x000012e8      0x421 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
- .debug_abbrev  0x00001709      0x11b .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
- .debug_abbrev  0x00001824      0x2b9 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
- .debug_abbrev  0x00001add      0x143 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_clock_init.c.o)
- .debug_abbrev  0x00001c20       0x65 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_mem.c.o)
- .debug_abbrev  0x00001c85      0x19b .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random.c.o)
- .debug_abbrev  0x00001e20      0x34c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
- .debug_abbrev  0x0000216c      0x3cc .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random_esp32c6.c.o)
- .debug_abbrev  0x00002538      0x57c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
- .debug_abbrev  0x00002ab4      0x328 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
- .debug_abbrev  0x00002ddc      0x358 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
- .debug_abbrev  0x00003134      0x2a6 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o)
- .debug_abbrev  0x000033da       0xaa .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_bootloader_format/libesp_bootloader_format.a(esp_bootloader_desc.c.o)
- .debug_abbrev  0x00003484      0x163 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(cpu_region_protect.c.o)
- .debug_abbrev  0x000035e7      0x4f8 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o)
- .debug_abbrev  0x00003adf      0x630 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
- .debug_abbrev  0x0000410f      0x327 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(pmu_param.c.o)
- .debug_abbrev  0x00004436      0x110 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
- .debug_abbrev  0x00004546       0xec .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_uart.c.o)
- .debug_abbrev  0x00004632      0x202 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
- .debug_abbrev  0x00004834      0x39a .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
- .debug_abbrev  0x00004bce       0xec .pio/build/esp32-c6-mini/bootloader/esp-idf/log/liblog.a(log_timestamp.c.o)
- .debug_abbrev  0x00004cba       0x7b .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
- .debug_abbrev  0x00004d35      0x172 .pio/build/esp32-c6-mini/bootloader/esp-idf/soc/libsoc.a(uart_periph.c.o)
- .debug_abbrev  0x00004ea7      0x22d .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
- .debug_abbrev  0x000050d4      0x37a .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
- .debug_abbrev  0x0000544e      0x2b1 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(lp_timer_hal.c.o)
- .debug_abbrev  0x000056ff      0x43b .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
- .debug_abbrev  0x00005b3a      0x3d5 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
+ .debug_abbrev  0x00000000      0x323 .pio/build/esp32-c6-mini/bootloader/esp-idf/main/libmain.a(bootloader_start.c.o)
+ .debug_abbrev  0x00000323      0x550 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
+ .debug_abbrev  0x00000873      0x229 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
+ .debug_abbrev  0x00000a9c      0x566 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
+ .debug_abbrev  0x00001002      0x1ca .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
+ .debug_abbrev  0x000011cc       0x44 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console_loader.c.o)
+ .debug_abbrev  0x00001210       0xdc .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
+ .debug_abbrev  0x000012ec      0x41a .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
+ .debug_abbrev  0x00001706      0x11b .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
+ .debug_abbrev  0x00001821      0x2d1 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
+ .debug_abbrev  0x00001af2      0x143 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_clock_init.c.o)
+ .debug_abbrev  0x00001c35       0x65 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_mem.c.o)
+ .debug_abbrev  0x00001c9a      0x19b .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random.c.o)
+ .debug_abbrev  0x00001e35      0x32a .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
+ .debug_abbrev  0x0000215f      0x3cc .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random_esp32c6.c.o)
+ .debug_abbrev  0x0000252b      0x573 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
+ .debug_abbrev  0x00002a9e      0x33d .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
+ .debug_abbrev  0x00002ddb      0x360 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
+ .debug_abbrev  0x0000313b      0x2a6 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o)
+ .debug_abbrev  0x000033e1       0xaa .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_bootloader_format/libesp_bootloader_format.a(esp_bootloader_desc.c.o)
+ .debug_abbrev  0x0000348b      0x163 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(cpu_region_protect.c.o)
+ .debug_abbrev  0x000035ee      0x4d3 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o)
+ .debug_abbrev  0x00003ac1      0x5f6 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+ .debug_abbrev  0x000040b7      0x327 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(pmu_param.c.o)
+ .debug_abbrev  0x000043de      0x110 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
+ .debug_abbrev  0x000044ee      0x202 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
+ .debug_abbrev  0x000046f0      0x39a .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
+ .debug_abbrev  0x00004a8a       0x7b .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
+ .debug_abbrev  0x00004b05      0x172 .pio/build/esp32-c6-mini/bootloader/esp-idf/soc/libsoc.a(uart_periph.c.o)
+ .debug_abbrev  0x00004c77      0x22d .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+ .debug_abbrev  0x00004ea4      0x37a .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+ .debug_abbrev  0x0000521e      0x2b1 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(lp_timer_hal.c.o)
+ .debug_abbrev  0x000054cf      0x43b .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
+ .debug_abbrev  0x0000590a      0x3d5 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
 
-.debug_line     0x00000000    0x16d95
+.debug_line     0x00000000    0x1460f
  *(.debug_line)
- .debug_line    0x00000000      0x68c .pio/build/esp32-c6-mini/bootloader/esp-idf/main/libmain.a(bootloader_start.c.o)
- .debug_line    0x0000068c     0x283a .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
- .debug_line    0x00002ec6      0x79c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
- .debug_line    0x00003662     0x2826 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
- .debug_line    0x00005e88      0x3e8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
- .debug_line    0x00006270       0xa4 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console_loader.c.o)
- .debug_line    0x00006314      0x21f .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
- .debug_line    0x00006533      0xbf4 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
- .debug_line    0x00007127      0x3b7 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
- .debug_line    0x000074de      0xb14 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
- .debug_line    0x00007ff2      0x572 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_clock_init.c.o)
- .debug_line    0x00008564       0xf5 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_mem.c.o)
- .debug_line    0x00008659      0x48c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random.c.o)
- .debug_line    0x00008ae5     0x1006 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
- .debug_line    0x00009aeb      0xa7b .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random_esp32c6.c.o)
- .debug_line    0x0000a566     0x1e52 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
- .debug_line    0x0000c3b8      0xbd8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
- .debug_line    0x0000cf90      0xc34 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
- .debug_line    0x0000dbc4      0x431 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o)
- .debug_line    0x0000dff5      0x1e0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_bootloader_format/libesp_bootloader_format.a(esp_bootloader_desc.c.o)
- .debug_line    0x0000e1d5      0x729 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(cpu_region_protect.c.o)
- .debug_line    0x0000e8fe      0xc18 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o)
- .debug_line    0x0000f516     0x206e .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
- .debug_line    0x00011584      0x8df .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(pmu_param.c.o)
- .debug_line    0x00011e63      0x2db .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
- .debug_line    0x0001213e      0x1e6 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_uart.c.o)
- .debug_line    0x00012324      0x82d .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
- .debug_line    0x00012b51      0xcc3 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
- .debug_line    0x00013814      0x2c4 .pio/build/esp32-c6-mini/bootloader/esp-idf/log/liblog.a(log_timestamp.c.o)
- .debug_line    0x00013ad8      0x1c5 .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
- .debug_line    0x00013c9d      0x20f .pio/build/esp32-c6-mini/bootloader/esp-idf/soc/libsoc.a(uart_periph.c.o)
- .debug_line    0x00013eac      0x49b .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
- .debug_line    0x00014347      0x6da .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
- .debug_line    0x00014a21      0x42c .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(lp_timer_hal.c.o)
- .debug_line    0x00014e4d     0x138c .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
- .debug_line    0x000161d9      0xbbc .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
+ .debug_line    0x00000000      0x611 .pio/build/esp32-c6-mini/bootloader/esp-idf/main/libmain.a(bootloader_start.c.o)
+ .debug_line    0x00000611     0x1fbe .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
+ .debug_line    0x000025cf      0x5c8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
+ .debug_line    0x00002b97     0x2150 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
+ .debug_line    0x00004ce7      0x3e8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
+ .debug_line    0x000050cf       0xa4 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console_loader.c.o)
+ .debug_line    0x00005173      0x21f .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
+ .debug_line    0x00005392      0xaca .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
+ .debug_line    0x00005e5c      0x3b7 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
+ .debug_line    0x00006213      0x7f0 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
+ .debug_line    0x00006a03      0x572 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_clock_init.c.o)
+ .debug_line    0x00006f75       0xf5 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_mem.c.o)
+ .debug_line    0x0000706a      0x48c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random.c.o)
+ .debug_line    0x000074f6      0xcba .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
+ .debug_line    0x000081b0      0xa7b .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random_esp32c6.c.o)
+ .debug_line    0x00008c2b     0x1b2e .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
+ .debug_line    0x0000a759      0xa5f .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
+ .debug_line    0x0000b1b8      0x996 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
+ .debug_line    0x0000bb4e      0x428 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o)
+ .debug_line    0x0000bf76      0x1e0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_bootloader_format/libesp_bootloader_format.a(esp_bootloader_desc.c.o)
+ .debug_line    0x0000c156      0x729 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(cpu_region_protect.c.o)
+ .debug_line    0x0000c87f      0xb43 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o)
+ .debug_line    0x0000d3c2     0x1ee6 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+ .debug_line    0x0000f2a8      0x8df .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(pmu_param.c.o)
+ .debug_line    0x0000fb87      0x2db .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
+ .debug_line    0x0000fe62      0x82d .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
+ .debug_line    0x0001068f      0xcc3 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
+ .debug_line    0x00011352      0x1c5 .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
+ .debug_line    0x00011517      0x20f .pio/build/esp32-c6-mini/bootloader/esp-idf/soc/libsoc.a(uart_periph.c.o)
+ .debug_line    0x00011726      0x49b .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+ .debug_line    0x00011bc1      0x6da .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+ .debug_line    0x0001229b      0x42c .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(lp_timer_hal.c.o)
+ .debug_line    0x000126c7     0x138c .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
+ .debug_line    0x00013a53      0xbbc .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
 
-.debug_frame    0x00000000     0x1898
+.debug_frame    0x00000000     0x173c
  *(.debug_frame)
  .debug_frame   0x00000000       0x38 .pio/build/esp32-c6-mini/bootloader/esp-idf/main/libmain.a(bootloader_start.c.o)
- .debug_frame   0x00000038      0x26c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
- .debug_frame   0x000002a4       0x58 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
- .debug_frame   0x000002fc      0x1c8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
- .debug_frame   0x000004c4       0x68 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
- .debug_frame   0x0000052c       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console_loader.c.o)
- .debug_frame   0x0000054c       0x3c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
- .debug_frame   0x00000588       0x34 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
- .debug_frame   0x000005bc       0x40 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
- .debug_frame   0x000005fc      0x120 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
- .debug_frame   0x0000071c       0x38 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_clock_init.c.o)
- .debug_frame   0x00000754       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_mem.c.o)
- .debug_frame   0x00000774       0x44 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random.c.o)
- .debug_frame   0x000007b8       0xb4 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
- .debug_frame   0x0000086c       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random_esp32c6.c.o)
- .debug_frame   0x000008c8      0x2d8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
- .debug_frame   0x00000ba0       0xac .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
- .debug_frame   0x00000c4c       0xc4 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
- .debug_frame   0x00000d10       0x2c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o)
- .debug_frame   0x00000d3c       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_bootloader_format/libesp_bootloader_format.a(esp_bootloader_desc.c.o)
- .debug_frame   0x00000d5c       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(cpu_region_protect.c.o)
- .debug_frame   0x00000d8c       0x38 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o)
- .debug_frame   0x00000dc4      0x33c .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
- .debug_frame   0x00001100      0x10c .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(pmu_param.c.o)
- .debug_frame   0x0000120c       0x4c .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
- .debug_frame   0x00001258       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_uart.c.o)
- .debug_frame   0x00001288       0xdc .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
- .debug_frame   0x00001364       0x54 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
- .debug_frame   0x000013b8       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/log/liblog.a(log_timestamp.c.o)
- .debug_frame   0x000013e8       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
- .debug_frame   0x00001408       0x90 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
- .debug_frame   0x00001498       0xb0 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
- .debug_frame   0x00001548       0x60 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(lp_timer_hal.c.o)
- .debug_frame   0x000015a8      0x170 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
- .debug_frame   0x00001718      0x180 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
+ .debug_frame   0x00000038      0x200 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
+ .debug_frame   0x00000238       0x50 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
+ .debug_frame   0x00000288      0x1b4 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
+ .debug_frame   0x0000043c       0x68 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
+ .debug_frame   0x000004a4       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console_loader.c.o)
+ .debug_frame   0x000004c4       0x3c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
+ .debug_frame   0x00000500       0x34 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
+ .debug_frame   0x00000534       0x40 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
+ .debug_frame   0x00000574      0x100 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
+ .debug_frame   0x00000674       0x38 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_clock_init.c.o)
+ .debug_frame   0x000006ac       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_mem.c.o)
+ .debug_frame   0x000006cc       0x44 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random.c.o)
+ .debug_frame   0x00000710       0xa4 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
+ .debug_frame   0x000007b4       0x5c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random_esp32c6.c.o)
+ .debug_frame   0x00000810      0x2d4 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
+ .debug_frame   0x00000ae4       0xa8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
+ .debug_frame   0x00000b8c       0x98 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
+ .debug_frame   0x00000c24       0x2c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o)
+ .debug_frame   0x00000c50       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_bootloader_format/libesp_bootloader_format.a(esp_bootloader_desc.c.o)
+ .debug_frame   0x00000c70       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(cpu_region_protect.c.o)
+ .debug_frame   0x00000ca0       0x38 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o)
+ .debug_frame   0x00000cd8      0x32c .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+ .debug_frame   0x00001004      0x10c .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(pmu_param.c.o)
+ .debug_frame   0x00001110       0x4c .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
+ .debug_frame   0x0000115c       0xdc .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
+ .debug_frame   0x00001238       0x54 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
+ .debug_frame   0x0000128c       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
+ .debug_frame   0x000012ac       0x90 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+ .debug_frame   0x0000133c       0xb0 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+ .debug_frame   0x000013ec       0x60 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(lp_timer_hal.c.o)
+ .debug_frame   0x0000144c      0x170 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
+ .debug_frame   0x000015bc      0x180 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
 
-.debug_str      0x00000000    0x127c4
+.debug_str      0x00000000    0x12217
  *(.debug_str)
- .debug_str     0x00000000    0x127c4 .pio/build/esp32-c6-mini/bootloader/esp-idf/main/libmain.a(bootloader_start.c.o)
-                                0xad9 (size before relaxing)
- .debug_str     0x000127c4     0x1aea .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
- .debug_str     0x000127c4      0x55c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
- .debug_str     0x000127c4     0x1b57 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
- .debug_str     0x000127c4      0x405 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
- .debug_str     0x000127c4      0x256 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console_loader.c.o)
- .debug_str     0x000127c4      0x2c0 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
- .debug_str     0x000127c4     0x39aa .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
- .debug_str     0x000127c4      0x2de .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
- .debug_str     0x000127c4     0x1241 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
- .debug_str     0x000127c4      0x708 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_clock_init.c.o)
- .debug_str     0x000127c4      0x26f .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_mem.c.o)
- .debug_str     0x000127c4      0x34f .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random.c.o)
- .debug_str     0x000127c4      0xac6 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
- .debug_str     0x000127c4     0x31e8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random_esp32c6.c.o)
- .debug_str     0x000127c4     0x3deb .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
- .debug_str     0x000127c4     0x1549 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
- .debug_str     0x000127c4     0x1dee .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
- .debug_str     0x000127c4      0xa8c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o)
- .debug_str     0x000127c4      0x2eb .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_bootloader_format/libesp_bootloader_format.a(esp_bootloader_desc.c.o)
- .debug_str     0x000127c4      0x344 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(cpu_region_protect.c.o)
- .debug_str     0x000127c4     0x55bc .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o)
- .debug_str     0x000127c4     0x3c49 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
- .debug_str     0x000127c4     0x3409 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(pmu_param.c.o)
- .debug_str     0x000127c4      0x3bf .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
- .debug_str     0x000127c4      0x529 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_uart.c.o)
- .debug_str     0x000127c4      0x9c7 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
- .debug_str     0x000127c4     0x2bbb .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
- .debug_str     0x000127c4      0x2bc .pio/build/esp32-c6-mini/bootloader/esp-idf/log/liblog.a(log_timestamp.c.o)
- .debug_str     0x000127c4      0x271 .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
- .debug_str     0x000127c4     0x1198 .pio/build/esp32-c6-mini/bootloader/esp-idf/soc/libsoc.a(uart_periph.c.o)
- .debug_str     0x000127c4     0x2980 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
- .debug_str     0x000127c4     0x2afb .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
- .debug_str     0x000127c4      0x5cb .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(lp_timer_hal.c.o)
- .debug_str     0x000127c4     0x2bae .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
- .debug_str     0x000127c4      0x726 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
+ .debug_str     0x00000000    0x12217 .pio/build/esp32-c6-mini/bootloader/esp-idf/main/libmain.a(bootloader_start.c.o)
+                                0xab8 (size before relaxing)
+ .debug_str     0x00012217     0x1107 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
+ .debug_str     0x00012217      0x53b .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
+ .debug_str     0x00012217     0x1235 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
+ .debug_str     0x00012217      0x405 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
+ .debug_str     0x00012217      0x256 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console_loader.c.o)
+ .debug_str     0x00012217      0x2c0 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
+ .debug_str     0x00012217     0x2c89 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
+ .debug_str     0x00012217      0x2de .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
+ .debug_str     0x00012217      0x88f .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
+ .debug_str     0x00012217      0x708 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_clock_init.c.o)
+ .debug_str     0x00012217      0x26f .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_mem.c.o)
+ .debug_str     0x00012217      0x34f .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random.c.o)
+ .debug_str     0x00012217      0xaa5 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
+ .debug_str     0x00012217     0x31e8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random_esp32c6.c.o)
+ .debug_str     0x00012217     0x34c9 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
+ .debug_str     0x00012217      0xc27 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
+ .debug_str     0x00012217     0x1345 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
+ .debug_str     0x00012217      0xa51 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o)
+ .debug_str     0x00012217      0x2eb .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_bootloader_format/libesp_bootloader_format.a(esp_bootloader_desc.c.o)
+ .debug_str     0x00012217      0x344 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(cpu_region_protect.c.o)
+ .debug_str     0x00012217     0x4858 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o)
+ .debug_str     0x00012217     0x2f4b .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+ .debug_str     0x00012217     0x3409 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(pmu_param.c.o)
+ .debug_str     0x00012217      0x3bf .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
+ .debug_str     0x00012217      0x9c7 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
+ .debug_str     0x00012217     0x2bbb .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
+ .debug_str     0x00012217      0x271 .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
+ .debug_str     0x00012217     0x1198 .pio/build/esp32-c6-mini/bootloader/esp-idf/soc/libsoc.a(uart_periph.c.o)
+ .debug_str     0x00012217     0x2980 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+ .debug_str     0x00012217     0x2afb .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+ .debug_str     0x00012217      0x5cb .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(lp_timer_hal.c.o)
+ .debug_str     0x00012217     0x2bae .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
+ .debug_str     0x00012217      0x726 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
 
-.debug_loc      0x00000000     0xa148
+.debug_loc      0x00000000     0x9308
  *(.debug_loc)
- .debug_loc     0x00000000       0xc7 .pio/build/esp32-c6-mini/bootloader/esp-idf/main/libmain.a(bootloader_start.c.o)
- .debug_loc     0x000000c7     0x11ee .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
- .debug_loc     0x000012b5      0x1d9 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
- .debug_loc     0x0000148e     0x263d .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
- .debug_loc     0x00003acb      0x17d .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
- .debug_loc     0x00003c48       0x32 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
- .debug_loc     0x00003c7a       0xd8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
- .debug_loc     0x00003d52       0xc8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
- .debug_loc     0x00003e1a      0x49c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
- .debug_loc     0x000042b6      0x19c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random.c.o)
- .debug_loc     0x00004452      0x1e5 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
- .debug_loc     0x00004637      0x3f6 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random_esp32c6.c.o)
- .debug_loc     0x00004a2d     0x153c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
- .debug_loc     0x00005f69      0x135 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
- .debug_loc     0x0000609e      0x141 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
- .debug_loc     0x000061df       0x3c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o)
- .debug_loc     0x0000621b       0x60 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(cpu_region_protect.c.o)
- .debug_loc     0x0000627b      0x1b0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o)
- .debug_loc     0x0000642b      0xd9b .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
- .debug_loc     0x000071c6      0x268 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(pmu_param.c.o)
- .debug_loc     0x0000742e       0xd4 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
- .debug_loc     0x00007502       0x32 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_uart.c.o)
- .debug_loc     0x00007534      0x721 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
- .debug_loc     0x00007c55      0x518 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
- .debug_loc     0x0000816d       0x13 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
- .debug_loc     0x00008180      0x182 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
- .debug_loc     0x00008302      0x175 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(lp_timer_hal.c.o)
- .debug_loc     0x00008477      0xfed .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
- .debug_loc     0x00009464      0xce4 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
+ .debug_loc     0x00000000       0x97 .pio/build/esp32-c6-mini/bootloader/esp-idf/main/libmain.a(bootloader_start.c.o)
+ .debug_loc     0x00000097     0x1076 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
+ .debug_loc     0x0000110d      0x16b .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
+ .debug_loc     0x00001278     0x1d55 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
+ .debug_loc     0x00002fcd      0x17d .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
+ .debug_loc     0x0000314a       0x32 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
+ .debug_loc     0x0000317c       0xad .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
+ .debug_loc     0x00003229       0xc8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
+ .debug_loc     0x000032f1      0x4a9 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
+ .debug_loc     0x0000379a      0x19c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random.c.o)
+ .debug_loc     0x00003936      0x19f .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
+ .debug_loc     0x00003ad5      0x3f6 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random_esp32c6.c.o)
+ .debug_loc     0x00003ecb     0x144d .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
+ .debug_loc     0x00005318       0xb5 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
+ .debug_loc     0x000053cd       0x17 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
+ .debug_loc     0x000053e4       0x3c .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o)
+ .debug_loc     0x00005420       0x60 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(cpu_region_protect.c.o)
+ .debug_loc     0x00005480      0x1b0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o)
+ .debug_loc     0x00005630      0xd88 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+ .debug_loc     0x000063b8      0x268 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(pmu_param.c.o)
+ .debug_loc     0x00006620       0xd4 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
+ .debug_loc     0x000066f4      0x721 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
+ .debug_loc     0x00006e15      0x518 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
+ .debug_loc     0x0000732d       0x13 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+ .debug_loc     0x00007340      0x182 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+ .debug_loc     0x000074c2      0x175 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(lp_timer_hal.c.o)
+ .debug_loc     0x00007637      0xfed .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
+ .debug_loc     0x00008624      0xce4 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -3291,43 +3175,41 @@ LOAD /root/.platformio/packages/toolchain-riscv32-esp/bin/../lib/gcc/riscv32-esp
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x00000000     0x2138
+.debug_ranges   0x00000000     0x1f68
  *(.debug_ranges)
- .debug_ranges  0x00000000       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/main/libmain.a(bootloader_start.c.o)
- .debug_ranges  0x00000030      0x250 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
- .debug_ranges  0x00000280       0x70 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
- .debug_ranges  0x000002f0      0x420 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
- .debug_ranges  0x00000710       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
- .debug_ranges  0x00000730       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console_loader.c.o)
- .debug_ranges  0x00000740       0x18 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
- .debug_ranges  0x00000758       0xd0 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
- .debug_ranges  0x00000828       0x18 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
- .debug_ranges  0x00000840       0x48 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
- .debug_ranges  0x00000888       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_clock_init.c.o)
- .debug_ranges  0x00000898       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_mem.c.o)
- .debug_ranges  0x000008a8       0x40 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random.c.o)
- .debug_ranges  0x000008e8       0x90 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
- .debug_ranges  0x00000978      0x1f0 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random_esp32c6.c.o)
- .debug_ranges  0x00000b68      0x2a0 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
- .debug_ranges  0x00000e08       0xa8 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
- .debug_ranges  0x00000eb0       0x70 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
- .debug_ranges  0x00000f20       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o)
- .debug_ranges  0x00000f30       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_bootloader_format/libesp_bootloader_format.a(esp_bootloader_desc.c.o)
- .debug_ranges  0x00000f40       0x58 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(cpu_region_protect.c.o)
- .debug_ranges  0x00000f98      0x108 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o)
- .debug_ranges  0x000010a0      0x628 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
- .debug_ranges  0x000016c8       0x68 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(pmu_param.c.o)
- .debug_ranges  0x00001730       0x18 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
- .debug_ranges  0x00001748       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_uart.c.o)
- .debug_ranges  0x00001758       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
- .debug_ranges  0x00001788      0x280 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
- .debug_ranges  0x00001a08       0x28 .pio/build/esp32-c6-mini/bootloader/esp-idf/log/liblog.a(log_timestamp.c.o)
- .debug_ranges  0x00001a30       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
- .debug_ranges  0x00001a40       0x90 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
- .debug_ranges  0x00001ad0       0x98 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
- .debug_ranges  0x00001b68       0x88 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(lp_timer_hal.c.o)
- .debug_ranges  0x00001bf0      0x3c8 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
- .debug_ranges  0x00001fb8      0x180 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
+ .debug_ranges  0x00000000       0x18 .pio/build/esp32-c6-mini/bootloader/esp-idf/main/libmain.a(bootloader_start.c.o)
+ .debug_ranges  0x00000018      0x230 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
+ .debug_ranges  0x00000248       0x50 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
+ .debug_ranges  0x00000298      0x330 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
+ .debug_ranges  0x000005c8       0x20 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_sha.c.o)
+ .debug_ranges  0x000005e8       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console_loader.c.o)
+ .debug_ranges  0x000005f8       0x18 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_soc.c.o)
+ .debug_ranges  0x00000610       0xd0 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
+ .debug_ranges  0x000006e0       0x18 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
+ .debug_ranges  0x000006f8       0x60 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
+ .debug_ranges  0x00000758       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_clock_init.c.o)
+ .debug_ranges  0x00000768       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_mem.c.o)
+ .debug_ranges  0x00000778       0x40 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random.c.o)
+ .debug_ranges  0x000007b8       0x78 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
+ .debug_ranges  0x00000830      0x1f0 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_random_esp32c6.c.o)
+ .debug_ranges  0x00000a20      0x2c0 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
+ .debug_ranges  0x00000ce0       0x88 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
+ .debug_ranges  0x00000d68       0x38 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
+ .debug_ranges  0x00000da0       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o)
+ .debug_ranges  0x00000db0       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_bootloader_format/libesp_bootloader_format.a(esp_bootloader_desc.c.o)
+ .debug_ranges  0x00000dc0       0x58 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(cpu_region_protect.c.o)
+ .debug_ranges  0x00000e18      0x108 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o)
+ .debug_ranges  0x00000f20      0x610 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
+ .debug_ranges  0x00001530       0x68 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(pmu_param.c.o)
+ .debug_ranges  0x00001598       0x18 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
+ .debug_ranges  0x000015b0       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
+ .debug_ranges  0x000015e0      0x280 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
+ .debug_ranges  0x00001860       0x10 .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
+ .debug_ranges  0x00001870       0x90 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+ .debug_ranges  0x00001900       0x98 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
+ .debug_ranges  0x00001998       0x88 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(lp_timer_hal.c.o)
+ .debug_ranges  0x00001a20      0x3c8 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(mmu_hal.c.o)
+ .debug_ranges  0x00001de8      0x180 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(cache_hal.c.o)
 
 .debug_weaknames
  *(.debug_weaknames)
@@ -3399,10 +3281,8 @@ LOAD /root/.platformio/packages/toolchain-riscv32-esp/bin/../lib/gcc/riscv32-esp
  .comment       0x0000002f       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
  .comment       0x0000002f       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(pmu_param.c.o)
  .comment       0x0000002f       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
- .comment       0x0000002f       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_uart.c.o)
  .comment       0x0000002f       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
  .comment       0x0000002f       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
- .comment       0x0000002f       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/log/liblog.a(log_timestamp.c.o)
  .comment       0x0000002f       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
  .comment       0x0000002f       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/soc/libsoc.a(uart_periph.c.o)
  .comment       0x0000002f       0x30 .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(efuse_hal.c.o)
@@ -3465,13 +3345,9 @@ LOAD /root/.platformio/packages/toolchain-riscv32-esp/bin/../lib/gcc/riscv32-esp
  .note.GNU-stack
                 0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
  .note.GNU-stack
-                0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_uart.c.o)
- .note.GNU-stack
                 0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
  .note.GNU-stack
                 0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_wdt.c.o)
- .note.GNU-stack
-                0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/log/liblog.a(log_timestamp.c.o)
  .note.GNU-stack
                 0x00000000        0x0 .pio/build/esp32-c6-mini/bootloader/esp-idf/riscv/libriscv.a(rv_utils.c.o)
  .note.GNU-stack
@@ -3750,7 +3626,6 @@ ESP_EFUSE_WR_DIS_WAFER_VERSION_MAJOR              .pio/build/esp32-c6-mini/bootl
 ESP_EFUSE_WR_DIS_WAFER_VERSION_MINOR              .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_table.c.o)
 ESP_EFUSE_WR_DIS_WDT_DELAY_SEL                    .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_table.c.o)
 GPIO                                              .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o)
-GetUartDevice                                     .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_uart.c.o)
 LP_ANA_PERI                                       .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
 LP_CLKRST                                         .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
 LP_TIMER                                          .pio/build/esp32-c6-mini/bootloader/esp-idf/hal/libhal.a(lp_timer_hal.c.o)
@@ -3991,7 +3866,6 @@ efuse_hal_set_timing                              .pio/build/esp32-c6-mini/bootl
                                                   .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
 esp_bootloader_desc                               .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_bootloader_format/libesp_bootloader_format.a(esp_bootloader_desc.c.o)
 esp_bootloader_get_description                    .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_bootloader_format/libesp_bootloader_format.a(esp_bootloader_desc.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
 esp_cpu_configure_region_protection               .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(cpu_region_protect.c.o)
                                                   .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_mem.c.o)
 esp_efuse_batch_write_begin                       .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
@@ -4122,31 +3996,12 @@ esp_image_get_metadata                            .pio/build/esp32-c6-mini/bootl
 esp_image_verify                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
 esp_image_verify_bootloader                       .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
 esp_image_verify_bootloader_data                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
-esp_log_early_timestamp                           .pio/build/esp32-c6-mini/bootloader/esp-idf/log/liblog.a(log_timestamp.c.o)
-esp_log_timestamp                                 .pio/build/esp32-c6-mini/bootloader/esp-idf/log/liblog.a(log_timestamp.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/main/libmain.a(bootloader_start.c.o)
 esp_partition_table_verify                        .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
                                                   .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
 esp_rom_crc32_le                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
 esp_rom_delay_us                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
                                                   .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
                                                   .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
-esp_rom_get_cpu_ticks_per_us                      .pio/build/esp32-c6-mini/bootloader/esp-idf/log/liblog.a(log_timestamp.c.o)
 esp_rom_get_reset_reason                          .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_clock_init.c.o)
                                                   .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
                                                   .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
@@ -4159,30 +4014,12 @@ esp_rom_md5_final                                 .pio/build/esp32-c6-mini/bootl
 esp_rom_md5_init                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
 esp_rom_md5_update                                .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
 esp_rom_output_putc                               .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
-esp_rom_output_set_as_console                     .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o)
-esp_rom_output_switch_buffer                      .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_uart.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o)
 esp_rom_output_to_channels                        .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_sys.c.o)
 esp_rom_output_tx_wait_idle                       .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o)
                                                   .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_console.c.o)
                                                   .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_clock_init.c.o)
-esp_rom_printf                                    .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_hw_support/libesp_hw_support.a(rtc_clk_init.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api_key.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_api.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_init.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash_config_esp32c6.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_flash.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_encrypt.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_common_loader.c.o)
+esp_rom_printf                                    .pio/build/esp32-c6-mini/bootloader/esp-idf/efuse/libefuse.a(esp_efuse_utility.c.o)
                                                   .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_panic.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_esp32c6.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(esp_image_format.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(flash_partitions.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/bootloader_support/libbootloader_support.a(bootloader_utility.c.o)
-                                                  .pio/build/esp32-c6-mini/bootloader/esp-idf/main/libmain.a(bootloader_start.c.o)
 esp_rom_regi2c_read                               .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
 esp_rom_regi2c_read_mask                          .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)
 esp_rom_regi2c_write                              .pio/build/esp32-c6-mini/bootloader/esp-idf/esp_rom/libesp_rom.a(esp_rom_hp_regi2c_esp32c6.c.o)

@@ -670,7 +670,7 @@
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "/opt/ai_builder_data/users/763684262/projects/TCM-Emu-Gemini/.pio/build/esp32-c6-mini/esp-idf/esp_driver_usb_serial_jtag/libesp_driver_usb_serial_jtag.a",
-            "sources": [ "/root/.platformio/packages/framework-espidf/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag.c", "/root/.platformio/packages/framework-espidf/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag_connection_monitor.c", "/root/.platformio/packages/framework-espidf/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag_vfs.c" ],
+            "sources": [ "/root/.platformio/packages/framework-espidf/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag.c", "/root/.platformio/packages/framework-espidf/components/esp_driver_usb_serial_jtag/src/usb_serial_jtag_connection_monitor.c" ],
             "include_dirs": [ "include" ]
         },
         "esp_eth": {
