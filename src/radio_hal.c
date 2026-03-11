@@ -180,6 +180,7 @@ void radio_hal_init(void) {
     for (int i = 0; i < sizeof(erp1_config)/sizeof(cc1101_cfg_t); i++) cc1101_write_reg(erp1_config[i].addr, erp1_config[i].val);
     cc1101_write_reg(0x0D, 0x21); cc1101_write_reg(0x0E, 0x65); cc1101_write_reg(0x0F, 0x6A); 
     cc1101_write_reg(0x10, 0x2D); cc1101_write_reg(0x11, 0x3B); cc1101_write_reg(0x12, 0x30); 
+    cc1101_write_reg(0x1B, 0x07); cc1101_write_reg(0x1C, 0x00); cc1101_write_reg(0x1D, 0x91); 
     cc1101_write_burst(0x3E, patable_ook, 2);
     gpio_install_isr_service(0); radio_rmt_rx_init(); cc1101_strobe(CC1101_SRX);
 }

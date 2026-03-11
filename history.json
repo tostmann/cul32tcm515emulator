@@ -1826,5 +1826,33 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "    cc1101_write_reg(0x10, 0x2D); cc1101_write_reg(0x11, 0x3B); cc1101_write_reg(0x12, 0x30); \n    cc1101_write_reg(0x1B, 0x07); cc1101_write_reg(0x1C, 0x00); cc1101_write_reg(0x1D, 0x91); \n    cc1101_write_burst(0x3E, patable_ook, 2);",
+            "path": "src/radio_hal.c",
+            "original_text": "    cc1101_write_reg(0x10, 0x2D); cc1101_write_reg(0x11, 0x3B); cc1101_write_reg(0x12, 0x30); \n    cc1101_write_burst(0x3E, patable_ook, 2);"
+          }
+        }
+      }
+    ]
   }
 ]
