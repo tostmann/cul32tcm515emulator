@@ -1635,5 +1635,33 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "// RMT Configuration\n#define RMT_RESOLUTION_HZ   1000000 // 1 MHz -> 1 \u00b5s\n#define MAX_RMT_SYMBOLS     1024\n#define THRESHOLD_SHORT_MIN 3   // 3.0 \u00b5s\n#define THRESHOLD_SHORT_MAX 5   // 5.0 \u00b5s\n#define THRESHOLD_LONG_MIN  6   // 6.0 \u00b5s\n#define THRESHOLD_LONG_MAX  10  // 10.0 \u00b5s",
+            "path": "src/radio_hal.c",
+            "original_text": "// RMT Configuration\n#define RMT_RESOLUTION_HZ   4000000 // 4 MHz -> 0.25 \u00b5s\n#define MAX_RMT_SYMBOLS     1024\n#define THRESHOLD_SHORT_MIN 8   // 2.0 \u00b5s\n#define THRESHOLD_SHORT_MAX 23  // 5.75 \u00b5s\n#define THRESHOLD_LONG_MIN  24  // 6.0 \u00b5s\n#define THRESHOLD_LONG_MAX  48  // 12.0 \u00b5s"
+          }
+        }
+      }
+    ]
   }
 ]

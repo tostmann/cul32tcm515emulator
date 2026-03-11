@@ -17,12 +17,12 @@ SemaphoreHandle_t rf_rx_semaphore = NULL;
 volatile bool is_transmitting = false;
 
 // RMT Configuration
-#define RMT_RESOLUTION_HZ   4000000 // 4 MHz -> 0.25 µs
+#define RMT_RESOLUTION_HZ   1000000 // 1 MHz -> 1 µs
 #define MAX_RMT_SYMBOLS     1024
-#define THRESHOLD_SHORT_MIN 8   // 2.0 µs
-#define THRESHOLD_SHORT_MAX 23  // 5.75 µs
-#define THRESHOLD_LONG_MIN  24  // 6.0 µs
-#define THRESHOLD_LONG_MAX  48  // 12.0 µs
+#define THRESHOLD_SHORT_MIN 3   // 3.0 µs
+#define THRESHOLD_SHORT_MAX 5   // 5.0 µs
+#define THRESHOLD_LONG_MIN  6   // 6.0 µs
+#define THRESHOLD_LONG_MAX  10  // 10.0 µs
 
 static rmt_channel_handle_t rx_channel = NULL;
 static TaskHandle_t rf_task_handle = NULL;
