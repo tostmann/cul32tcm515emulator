@@ -8,20 +8,25 @@ test/README
 # ESP-IDF
 sdkconfig
 sdkconfig.old
+sdkconfig.*
 build/
 
 # Python
 __pycache__/
 *.py[cod]
-*$py.class
+*.class
 venv/
 .venv/
 
 # Project Specific
 binaries/
-last_execution.log
+*.log
 history.json
-sdkconfig.*
+
+# Sensitive files
+project_config.json
+FACTS.md
+MEMORY.md
 
 # Deploy Keys
 .deploy_key
@@ -30,6 +35,3 @@ sdkconfig.*
 # OS files
 .DS_Store
 .vscode/
-# Sensible Konfigurationen
-project_config.json
-*.log
