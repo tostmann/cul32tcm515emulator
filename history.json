@@ -603,5 +603,33 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "void cc1101_strobe(uint8_t cmd) {\n    xSemaphoreTake(spi_mutex, portMAX_DELAY);\n    spi_transaction_t t = { .length = 8, .tx_data = {cmd}, .flags = SPI_TRANS_USE_TXDATA };\n    spi_device_polling_transmit(spi_handle, &t);\n    xSemaphoreGive(spi_mutex);\n}\n\nvoid cc1101_write_reg(uint8_t addr, uint8_t value) {\n    xSemaphoreTake(spi_mutex, portMAX_DELAY);\n    uint8_t tx_data[2] = { addr, value };\n    spi_transaction_t t = { .length = 16, .tx_buffer = tx_data };\n    spi_device_polling_transmit(spi_handle, &t);\n    xSemaphoreGive(spi_mutex);\n}\n\nuint8_t cc1101_read_reg(uint8_t addr) {\n    xSemaphoreTake(spi_mutex, portMAX_DELAY);\n    uint8_t tx_data[2] = { (uint8_t)(addr | 0x80), 0x00 };\n    uint8_t rx_data[2] = { 0 };\n    spi_transaction_t t = { .length = 16, .tx_buffer = tx_data, .rx_buffer = rx_data };\n    spi_device_polling_transmit(spi_handle, &t);\n    xSemaphoreGive(spi_mutex);\n    return rx_data[1];\n}\n\nuint8_t cc1101_read_status(uint8_t addr) {\n    xSemaphoreTake(spi_mutex, portMAX_DELAY);\n    uint8_t tx_data[2] = { (uint8_t)(addr | 0xC0), 0x00 };\n    uint8_t rx_data[2] = { 0 };\n    spi_transaction_t t = { .length = 16, .tx_buffer = tx_data, .rx_buffer = rx_data };\n    spi_device_polling_transmit(spi_handle, &t);\n    xSemaphoreGive(spi_mutex);\n    return rx_data[1];\n}\n\nvoid cc1101_write_burst(uint8_t addr, const uint8_t *data, uint8_t len) {\n    xSemaphoreTake(spi_mutex, portMAX_DELAY);\n    uint8_t header = addr | 0x40;\n    spi_transaction_t t = { .length = 8, .tx_data = {header}, .flags = SPI_TRANS_USE_TXDATA };\n    spi_device_polling_transmit(spi_handle, &t);\n    spi_transaction_t t_data = { .length = len * 8, .tx_buffer = data };\n    spi_device_polling_transmit(spi_handle, &t_data);\n    xSemaphoreGive(spi_mutex);\n}\n\nvoid cc1101_read_burst(uint8_t addr, uint8_t *data, uint8_t len) {\n    xSemaphoreTake(spi_mutex, portMAX_DELAY);\n    uint8_t header = addr | 0xC0;\n    spi_transaction_t t = { .length = 8, .tx_data = {header}, .flags = SPI_TRANS_USE_TXDATA };\n    spi_device_polling_transmit(spi_handle, &t);\n    spi_transaction_t t_data = { .length = len * 8, .rx_buffer = data };\n    spi_device_polling_transmit(spi_handle, &t_data);\n    xSemaphoreGive(spi_mutex);\n}",
+            "path": "src/radio_hal.c",
+            "original_text": "void cc1101_strobe(uint8_t cmd) {\n    spi_transaction_t t = { .length = 8, .tx_data = {cmd}, .flags = SPI_TRANS_USE_TXDATA };\n    spi_device_polling_transmit(spi_handle, &t);\n}\n\nvoid cc1101_write_reg(uint8_t addr, uint8_t value) {\n    uint8_t tx_data[2] = { addr, value };\n    spi_transaction_t t = { .length = 16, .tx_buffer = tx_data };\n    spi_device_polling_transmit(spi_handle, &t);\n}\n\nuint8_t cc1101_read_reg(uint8_t addr) {\n    uint8_t tx_data[2] = { (uint8_t)(addr | 0x80), 0x00 };\n    uint8_t rx_data[2] = { 0 };\n    spi_transaction_t t = { .length = 16, .tx_buffer = tx_data, .rx_buffer = rx_data };\n    spi_device_polling_transmit(spi_handle, &t);\n    return rx_data[1];\n}\n\nuint8_t cc1101_read_status(uint8_t addr) {\n    uint8_t tx_data[2] = { (uint8_t)(addr | 0xC0), 0x00 };\n    uint8_t rx_data[2] = { 0 };\n    spi_transaction_t t = { .length = 16, .tx_buffer = tx_data, .rx_buffer = rx_data };\n    spi_device_polling_transmit(spi_handle, &t);\n    return rx_data[1];\n}\n\nvoid cc1101_write_burst(uint8_t addr, const uint8_t *data, uint8_t len) {\n    uint8_t header = addr | 0x40;\n    spi_transaction_t t = { .length = 8, .tx_data = {header}, .flags = SPI_TRANS_USE_TXDATA };\n    spi_device_polling_transmit(spi_handle, &t);\n    spi_transaction_t t_data = { .length = len * 8, .tx_buffer = data };\n    spi_device_polling_transmit(spi_handle, &t_data);\n}\n\nvoid cc1101_read_burst(uint8_t addr, uint8_t *data, uint8_t len) {\n    uint8_t header = addr | 0xC0;\n    spi_transaction_t t = { .length = 8, .tx_data = {header}, .flags = SPI_TRANS_USE_TXDATA };\n    spi_device_polling_transmit(spi_handle, &t);\n    spi_transaction_t t_data = { .length = len * 8, .rx_buffer = data };\n    spi_device_polling_transmit(spi_handle, &t_data);\n}"
+          }
+        }
+      }
+    ]
   }
 ]

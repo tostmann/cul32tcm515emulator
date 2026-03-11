@@ -67,46 +67,58 @@ static void spi_init(void) {
 }
 
 void cc1101_strobe(uint8_t cmd) {
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
     spi_transaction_t t = { .length = 8, .tx_data = {cmd}, .flags = SPI_TRANS_USE_TXDATA };
     spi_device_polling_transmit(spi_handle, &t);
+    xSemaphoreGive(spi_mutex);
 }
 
 void cc1101_write_reg(uint8_t addr, uint8_t value) {
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
     uint8_t tx_data[2] = { addr, value };
     spi_transaction_t t = { .length = 16, .tx_buffer = tx_data };
     spi_device_polling_transmit(spi_handle, &t);
+    xSemaphoreGive(spi_mutex);
 }
 
 uint8_t cc1101_read_reg(uint8_t addr) {
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
     uint8_t tx_data[2] = { (uint8_t)(addr | 0x80), 0x00 };
     uint8_t rx_data[2] = { 0 };
     spi_transaction_t t = { .length = 16, .tx_buffer = tx_data, .rx_buffer = rx_data };
     spi_device_polling_transmit(spi_handle, &t);
+    xSemaphoreGive(spi_mutex);
     return rx_data[1];
 }
 
 uint8_t cc1101_read_status(uint8_t addr) {
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
     uint8_t tx_data[2] = { (uint8_t)(addr | 0xC0), 0x00 };
     uint8_t rx_data[2] = { 0 };
     spi_transaction_t t = { .length = 16, .tx_buffer = tx_data, .rx_buffer = rx_data };
     spi_device_polling_transmit(spi_handle, &t);
+    xSemaphoreGive(spi_mutex);
     return rx_data[1];
 }
 
 void cc1101_write_burst(uint8_t addr, const uint8_t *data, uint8_t len) {
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
     uint8_t header = addr | 0x40;
     spi_transaction_t t = { .length = 8, .tx_data = {header}, .flags = SPI_TRANS_USE_TXDATA };
     spi_device_polling_transmit(spi_handle, &t);
     spi_transaction_t t_data = { .length = len * 8, .tx_buffer = data };
     spi_device_polling_transmit(spi_handle, &t_data);
+    xSemaphoreGive(spi_mutex);
 }
 
 void cc1101_read_burst(uint8_t addr, uint8_t *data, uint8_t len) {
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
     uint8_t header = addr | 0xC0;
     spi_transaction_t t = { .length = 8, .tx_data = {header}, .flags = SPI_TRANS_USE_TXDATA };
     spi_device_polling_transmit(spi_handle, &t);
     spi_transaction_t t_data = { .length = len * 8, .rx_buffer = data };
     spi_device_polling_transmit(spi_handle, &t_data);
+    xSemaphoreGive(spi_mutex);
 }
 
 // Manchester Decoding
