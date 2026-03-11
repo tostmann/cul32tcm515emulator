@@ -315,7 +315,7 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
         // Warten bis Senden beendet (GDO2 Pin 3 geht Low)
         int timeout = 1000;
         while(gpio_get_level(GPIO_NUM_3) && --timeout > 0) {
-            ets_delay_us(10);
+            esp_rom_delay_us(10);
         }
 
         if (sub < 2) {

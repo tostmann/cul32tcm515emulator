@@ -459,5 +459,59 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "$HOME/.platformio/penv/bin/pio run -t upload --upload-port /dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:90:B0-if00"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 1\nOutput:\n\n... [OUTPUT TRUNCATED. Total size: 1800 bytes. Showing last 1500 bytes. Full output saved in 'last_execution.log'. Use 'grep' or 'read_file last_execution.log' to analyze!]\nPLATFORM: Espressif 32 (55.3.37) > Espressif ESP32-C6-DevKitC-1\nHARDWARE: ESP32C6 160MHz, 320KB RAM, 8MB Flash\nDEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)\nPACKAGES: \n - contrib-piohome @ 3.4.4 \n - framework-espidf @ 3.50502.0 (5.5.2) \n - tool-cmake @ 4.0.3 \n - tool-esp-rom-elfs @ 2024.10.11 \n - tool-esptoolpy @ 5.1.2 \n - tool-ninja @ 1.13.1 \n - tool-scons @ 4.40801.0 (4.8.1) \n - toolchain-riscv32-esp @ 14.2.0+20251107\nReading CMake configuration...\nWarning! Flash memory size mismatch detected. Expected 8MB, found 2MB!\nPlease select a proper value in your `sdkconfig.defaults` or via the `menuconfig` target!\nLDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf\nLDF Modes: Finder ~ chain, Compatibility ~ soft\nFound 0 compatible libraries\nScanning dependencies...\nNo dependencies\nBuilding in release mode\nCompiling .pio/build/esp32-c6-mini/src/radio_hal.c.o\nsrc/radio_hal.c: In function 'radio_transmit':\nsrc/radio_hal.c:318:13: error: implicit declaration of function 'ets_delay_us'; did you mean 'esp_rom_delay_us'? [-Wimplicit-function-declaration]\n  318 |             ets_delay_us(10);\n      |             ^~~~~~~~~~~~\n      |             esp_rom_delay_us\n*** [.pio/build/esp32-c6-mini/src/radio_hal.c.o] Error 1\n========================= [FAILED] Took 16.54 seconds =========================\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "        // Warten bis Senden beendet (GDO2 Pin 3 geht Low)\n        int timeout = 1000;\n        while(gpio_get_level(GPIO_NUM_3) && --timeout > 0) {\n            esp_rom_delay_us(10);\n        }",
+            "path": "src/radio_hal.c",
+            "original_text": "        // Warten bis Senden beendet (GDO2 Pin 3 geht Low)\n        int timeout = 1000;\n        while(gpio_get_level(GPIO_NUM_3) && --timeout > 0) {\n            ets_delay_us(10);\n        }"
+          }
+        }
+      }
+    ]
   }
 ]
