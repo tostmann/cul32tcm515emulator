@@ -217,14 +217,14 @@ void radio_rmt_rx_init(void) {
     xTaskCreate(rf_rx_task_impl, "rf_rx_task", 4096, NULL, 5, &rf_task_handle);
     
     gpio_config_t io_conf = {
-        .pin_bit_mask = (1ULL << PIN_GDO0),
+        .pin_bit_mask = (1ULL << PIN_GDO2),
         .mode = GPIO_MODE_INPUT,
         .pull_up_en = 0,
-        .pull_down_en = 0,
+        .pull_down_en = 1,
         .intr_type = GPIO_INTR_POSEDGE
     };
     gpio_config(&io_conf);
-    gpio_isr_handler_add(PIN_GDO0, gdo0_data_isr_handler, NULL);
+    gpio_isr_handler_add(PIN_GDO2, gdo2_cs_isr_handler, NULL);
 }
 
 void radio_hal_init(void) {
