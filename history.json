@@ -1083,5 +1083,33 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "static void rf_rx_task_impl(void *pvParameters) {\n    rmt_receive_config_t rec_config = {\n        .signal_range_min_ns = 1000,\n        .signal_range_max_ns = 40000,\n    };\n    while (1) {\n        if (xSemaphoreTake(carrier_sense_sem, portMAX_DELAY) == pdTRUE) {\n            if (is_transmitting) {\n                gpio_intr_enable(PIN_GDO2);\n                continue;\n            }\n            \n            rmt_enable(rx_channel);\n            if (rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t), &rec_config) == ESP_OK) {\n                if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(40)) == pdTRUE) {\n                    size_t rx_symbols_count = 0;\n                    for(int i=0; i<MAX_RMT_SYMBOLS; i++) {\n                        if(rmt_rx_buffer[i].duration0 == 0) break;\n                        rx_symbols_count++;\n                    }\n                    if (rx_symbols_count > 10) {\n                        rmt_to_manchester_decode(rmt_rx_buffer, rx_symbols_count);\n                    }\n                }\n            }\n            rmt_disable(rx_channel);\n            \n            // Debounce / Wait for carrier to clear\n            int wait_tout = 50;\n            while (gpio_get_level(PIN_GDO2) == 1 && wait_tout > 0) {\n                vTaskDelay(pdMS_TO_TICKS(1));\n                wait_tout--;\n            }\n            vTaskDelay(pdMS_TO_TICKS(10));\n            xSemaphoreTake(carrier_sense_sem, 0); \n            gpio_intr_enable(PIN_GDO2);\n        }\n    }\n}",
+            "path": "src/radio_hal.c",
+            "original_text": "static void rf_rx_task_impl(void *pvParameters) {\n    while (1) {\n        if (xSemaphoreTake(carrier_sense_sem, portMAX_DELAY) == pdTRUE) {\n            // Just log that we got a carrier for now (if logs were enabled)\n            // But we keep it silent to avoid USB-CDC issues.\n            int wait_tout = 100;\n            while (gpio_get_level(PIN_GDO2) == 1 && wait_tout > 0) {\n                vTaskDelay(pdMS_TO_TICKS(1));\n                wait_tout--;\n            }\n            vTaskDelay(pdMS_TO_TICKS(2));\n            xSemaphoreTake(carrier_sense_sem, 0); \n        }\n    }\n}"
+          }
+        }
+      }
+    ]
   }
 ]
