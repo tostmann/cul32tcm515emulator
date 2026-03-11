@@ -372,10 +372,5 @@ void hal_inject_virtual_rmt(const char* hex_pulses) {
         int level = (val & 0x8000) ? 1 : 0;
         int duration = val & 0x7FFF;
         erp1_decode_pulse(&global_decoder, level, duration);
-        if (global_decoder.packet_ready) {
-            uint8_t opt[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x40, 0x00 };
-            esp3_send_packet(ESP3_TYPE_RADIO_ERP1, global_decoder.buffer, global_decoder.byte_idx, opt, 7);
-            erp1_decoder_reset(&global_decoder);
-        }
     }
 }
