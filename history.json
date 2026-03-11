@@ -1191,5 +1191,33 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file.\n\n[SYSTEM: Nur noch 5 Schritte bis zum Timeout!]"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "            if (rxbytes > 0 && rxbytes <= 64) {\n                cc1101_read_burst(0x3F, fifo_buf, rxbytes);\n                \n                // Construct ESP3 Optional Data (7 bytes for TCM515)\n                // SubTelNum(1), DestID(4), dBm(1), SecurityLevel(1)\n                uint8_t rssi_raw = cc1101_read_status(0x34);\n                int dbm = (rssi_raw >= 128) ? (rssi_raw - 256) / 2 - 74 : rssi_raw / 2 - 74;\n                \n                uint8_t opt_data[7] = {\n                    0x01,       // SubTelNum\n                    0xFF, 0xFF, 0xFF, 0xFF, // Destination ID (Broadcast)\n                    (uint8_t)(-dbm), // dBm (absolute value)\n                    0x00        // Security Level\n                };\n                \n                esp3_send_packet(ESP3_TYPE_RADIO_ERP1, fifo_buf, rxbytes, opt_data, 7);\n            }",
+            "path": "src/main.c",
+            "original_text": "            if (rxbytes > 0 && rxbytes <= 64) {\n                cc1101_read_burst(0x3F, fifo_buf, rxbytes);\n                \n                // EnOcean usually appends RSSI and LQI if configured\n                // For now, let's just send the raw packet as Data\n                // and a dummy RSSI as Optional Data\n                uint8_t rssi = cc1101_read_status(0x34);\n                uint8_t opt_data[1] = { rssi };\n                \n                esp3_send_packet(ESP3_TYPE_RADIO_ERP1, fifo_buf, rxbytes, opt_data, 1);\n            }"
+          }
+        }
+      }
+    ]
   }
 ]

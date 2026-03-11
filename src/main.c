@@ -32,13 +32,19 @@ void rf_rx_task(void *pvParameters) {
             if (rxbytes > 0 && rxbytes <= 64) {
                 cc1101_read_burst(0x3F, fifo_buf, rxbytes);
                 
-                // EnOcean usually appends RSSI and LQI if configured
-                // For now, let's just send the raw packet as Data
-                // and a dummy RSSI as Optional Data
-                uint8_t rssi = cc1101_read_status(0x34);
-                uint8_t opt_data[1] = { rssi };
+                // Construct ESP3 Optional Data (7 bytes for TCM515)
+                // SubTelNum(1), DestID(4), dBm(1), SecurityLevel(1)
+                uint8_t rssi_raw = cc1101_read_status(0x34);
+                int dbm = (rssi_raw >= 128) ? (rssi_raw - 256) / 2 - 74 : rssi_raw / 2 - 74;
                 
-                esp3_send_packet(ESP3_TYPE_RADIO_ERP1, fifo_buf, rxbytes, opt_data, 1);
+                uint8_t opt_data[7] = {
+                    0x01,       // SubTelNum
+                    0xFF, 0xFF, 0xFF, 0xFF, // Destination ID (Broadcast)
+                    (uint8_t)(-dbm), // dBm (absolute value)
+                    0x00        // Security Level
+                };
+                
+                esp3_send_packet(ESP3_TYPE_RADIO_ERP1, fifo_buf, rxbytes, opt_data, 7);
             }
             
             // Re-arm RX
