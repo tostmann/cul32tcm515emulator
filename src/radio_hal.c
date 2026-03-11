@@ -294,10 +294,10 @@ void radio_hal_init(void) {
         // Handle error
     }
     
-    radio_rmt_rx_init();
+    // radio_rmt_rx_init();
     
-    cc1101_strobe(CC1101_SRX);
-    ESP_LOGI(TAG, "CC1101 Initialized in Async RX Mode with RMT");
+    // cc1101_strobe(CC1101_SRX);
+    ESP_LOGI(TAG, "CC1101 Initialized (RX Task Disabled for Debug)");
 }
 
 static bool check_lbt(void) {
