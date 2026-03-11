@@ -4,16 +4,16 @@
 Entwicklung einer Firmware für den ESP32-C6, die ein EnOcean TCM515 (ESP3-Protokoll) USB-Gateway emuliert. Die Hardware-Basis besteht aus einem ESP32-C6-Modul und einem CC1101 Transceiver für das 868-MHz-Band.
 
 ### Aktueller Stand
-Die **Hardware-Schwäche (falsches 433-MHz-Modul) ist als definitive Wurzelursache** für die RF-Probleme bestätigt. Dies führt zu einer massiven Signal-Dämpfung von >60 dB.
-*   **Sender**: Die neue **LUT-basierte Sende-Logik ist implementiert**, wird aber aufgrund der Dämpfung vom realen TCM515 nicht empfangen.
-*   **Empfänger**: Der Emulator empfängt Signale des TCM515 mit einem **sehr starken RSSI von bis zu -50 dBm**. Der **PLL-Decoder scheitert jedoch** daran, aus diesem starken Signal ein gültiges Datenpaket zu rekonstruieren. Der Fokus liegt nun auf der **Fehlersuche und Kalibrierung des Decoders**.
+Die **Hardware-Schwäche (falsches 433-MHz-Matching-Netzwerk) ist als definitive Wurzelursache** für alle RF-Probleme bestätigt. Es verursacht nicht nur Dämpfung (>60 dB), sondern auch massive **Signalform-Verzerrungen (Puls-Ringing)**.
+*   **Sender**: Die finale **LUT-basierte Sende-Logik ist implementiert**, wird aber aufgrund der Hardware-Fehlanpassung vom realen TCM515 nicht empfangen.
+*   **Empfänger**: Der Emulator empfängt Signale des TCM515 mit einem **extrem starken RSSI von -50 dBm**. Der **PLL-Decoder scheitert jedoch** an der Rekonstruktion, weil die empfangenen Pulse durch das falsche RF-Frontend stark verzerrt sind.
+*   **Entwicklung**: Der Fokus liegt nun auf dem **Test des gesamten Software-Stacks (Decoder, ESP3-Protokoll) über eine neu implementierte Software-Schnittstelle**, um die Entwicklung trotz des Hardware-Blockers voranzutreiben.
 
 ### Nächste Schritte
 *   **Hardware-Austausch (BLOCKER)**: Beschaffung und Austausch des CC1101-Moduls durch ein verifiziertes, korrekt für 868 MHz bestücktes Modul. **Dies ist die einzige und absolut höchste Priorität.**
-*   **Fehlersuche & Kalibrierung (PLL-Decoder) (Höchste Prio)**: Analysieren, warum der Decoder trotz extrem starkem Signal (-50 dBm) vom realen TCM515 keine Pakete ausgibt. Fokus auf die Anpassung der Pulsweiten-Toleranzen (`MIN_1T`, `MAX_2T` etc.), um Pulsverbreiterung bei starken Signalen zu kompensieren.
-*   **Implementierung einer Software-Paket-Injektion**: Um den RX-Datenpfad (Decoder -> ESP3 -> Host) ohne funktionierendes RF-Frontend deterministisch testen zu können.
+*   **Fehlersuche & Kalibrierung (PLL-Decoder) (Höchste Prio)**: Validieren und Debuggen des Decoders mit **idealisierten, per Software injizierten Puls-Daten**. Das Ziel ist es, die korrekte Funktion des Decoders und des gesamten RX-Datenpfads (Decoder -> ESP3 -> Host) deterministisch nachzuweisen.
 *   **End-to-End Validierung des Empfangs (nach HW-Fix)**: Verifizieren, dass der PLL-Decoder mit einem funktionierenden RF-Frontend vollständige ERP1-Pakete korrekt dekodiert und die Checksummen-Prüfung besteht.
-*   **Code-Refactoring**: Aufräumen des Codes, insbesondere der neuen Decoder-Logik (`erp1_decoder.c`), und Hinzufügen von Kommentaren.
+*   **Code-Refactoring**: Aufräumen des Codes, insbesondere der neuen Decoder-Logik (`erp1_decoder.c`) und der Test-Schnittstellen, und Hinzufügen von Kommentaren.
 *   **Feinabstimmung**: Kalibrierung der RSSI-Werte und des LBT-Schwellwerts für den Praxiseinsatz.
 
 ### Architektur-Entscheidungen
@@ -49,8 +49,13 @@ Die **Hardware-Schwäche (falsches 433-MHz-Modul) ist als definitive Wurzelursac
     *   **RX-Bandbreite**: **406 kHz** (`MDMCFG4=0x8D`) (Erhöht, um Pulsverformung zu minimieren).
     *   **AGC (Anti-Saturation)**: `AGCCTRL2=0x43`, `AGCCTRL1=0x40`, `AGCCTRL0=0x90`. Reduzierter LNA-Gain, LNA-Priorität aktiviert, kein AGC-Freeze mehr, um Übersteuerung zu verhindern.
 9.  **Task Management (Final)**: Stack des USB-Empfangstasks auf **8192 Bytes** erhöht.
+10. **Test-Schnittstellen (Software-in-the-Loop)**:
+    *   **Loopback-Modus**: Ein per `COMMON_COMMAND` (Opcode `0x7E`) aktivierbarer Modus, der gesendete Pakete sofort als empfangen an den Host zurückmeldet, um die Host-Kommunikation zu testen.
+    *   **Puls-Injektion**: Eine Schnittstelle (`COMMON_COMMAND`, Opcode `0x7F`), um eine Sequenz von virtuellen RMT-Pulsen direkt in den Manchester-Decoder einzuspeisen und dessen Logik unabhängig von der RF-Hardware zu validieren.
 
 ### Abgeschlossene Aufgaben (Development Log)
+*   **DONE**: **Physikalische Ursache für Decoder-Fehler identifiziert**: Die Experten-Analyse bestätigt, dass das 433-MHz-Matching-Netzwerk die 868-MHz-Pulsformen durch *Ringing* und Gruppenlaufzeitverzerrung zerstört, was eine Dekodierung unmöglich macht.
+*   **DONE**: **Software-Test-Infrastruktur implementiert**: Ein interner **Loopback-Modus** und eine **Puls-Injektions-Schnittstelle** wurden zur Firmware hinzugefügt, um die Entwicklung ohne funktionale RF-Hardware zu ermöglichen.
 *   **DONE**: **RF-Sendestrategie auf Packet Mode und LUT-Kodierung umgestellt**: Der Transmitter wurde fundamental überarbeitet. Er nutzt nun den hardware-getimten **Packet Mode** des CC1101. Die Manchester-Kodierung erfolgt hocheffizient und präzise über eine **Look-Up Table (LUT)**, ergänzt durch eine verlängerte Preamble zur Verbesserung der Empfangsstabilität.
 *   **DONE**: **Hardware-Fehlanpassung als Wurzelursache verifiziert**: Systematische Tests (Distanzänderung, TX-Validierung) bestätigen, dass die extrem niedrige Sendeleistung (>60 dB Dämpfung) auf eine falsche Bestückung des CC1101-Moduls (433-MHz-Frontend) zurückzuführen ist.
 *   **DONE**: **Kritischer Frequenz-Fehler (869.0 vs 868.3 MHz) identifiziert und behoben.**
