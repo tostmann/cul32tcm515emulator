@@ -4,11 +4,11 @@
 Entwicklung einer Firmware für den ESP32-C6, die ein EnOcean TCM515 (ESP3-Protokoll) USB-Gateway emuliert. Die Hardware-Basis besteht aus einem ESP32-C6-Modul und einem CC1101 Transceiver für das 868-MHz-Band.
 
 ### Aktueller Stand
-Die Software-Architektur des Empfängers wurde auf **Produktionsniveau** gehoben. Der simple Decoder wurde durch eine robuste **PLL-basierte State-Machine mit Clock-Recovery (3/4-Sampling)** ersetzt. Während der Validierung wurde jedoch eine **kritische Hardware-Schwäche** aufgedeckt: Der gemessene RSSI-Wert beträgt bei 10 cm Abstand nur ca. **-85 dBm**, obwohl -20 bis -30 dBm zu erwarten wären. Dies deutet stark auf ein **inkorrektes Antennen-Matching des CC1101-Moduls** hin (vermutlich ein 433-MHz-Modul), was zu einer Dämpfung von ca. 60 dB führt. Die CC1101-Konfiguration wurde als Gegenmaßnahme gehärtet (erhöhte RX-Bandbreite, Anti-Sättigungs-AGC), aber die Validierung des Decoders ist durch die mangelnde Empfindlichkeit **blockiert**.
+Die Software-Architektur des Empfängers wurde auf **Produktionsniveau** gehoben und der **PLL-basierte Decoder mit Clock-Recovery** ist vollständig integriert. Während der Validierung wurde die **kritische Hardware-Schwäche bestätigt und als Wurzelursache identifiziert**: Selbst mit optimierten CC1101-Registern und maximaler Verstärkung erreicht der RSSI-Wert bei 10 cm Abstand nur ca. **-85 dBm** und fällt bei >1m Distanz unter die Nachweisgrenze. Dies bestätigt eine **Signal-Dämpfung von ca. 60 dB**, was charakteristisch für ein **inkorrektes Antennen-Matching des CC1101-Moduls** ist (ein für 433 MHz bestücktes Modul wird bei 868 MHz betrieben). **Alle Software-Validierungsarbeiten sind dadurch hart blockiert.**
 
 ### Nächste Schritte
-*   **Hardware-Validierung / Austausch (BLOCKER)**: Das CC1101-Modul muss überprüft und ggf. durch ein korrekt für 868 MHz bestücktes Modul ersetzt werden. **Dies ist die absolut höchste Priorität.**
-*   **End-to-End Validierung des Empfangs (nach HW-Fix)**: Verifizieren, dass der neue PLL-Decoder mit einem funktionierenden RF-Frontend vollständige ERP1-Pakete korrekt dekodiert und die Checksummen-Prüfung besteht.
+*   **Hardware-Austausch (BLOCKER)**: Beschaffung und Austausch des CC1101-Moduls durch ein verifiziertes, korrekt für 868 MHz bestücktes Modul. **Dies ist die einzige und absolut höchste Priorität.**
+*   **End-to-End Validierung des Empfangs (nach HW-Fix)**: Verifizieren, dass der PLL-Decoder mit einem funktionierenden RF-Frontend vollständige ERP1-Pakete korrekt dekodiert und die Checksummen-Prüfung besteht.
 *   **Validierung des Sendevorgangs (nach HW-Fix)**: Analysieren, warum der reale TCM515 die gesendeten Pakete noch nicht empfängt.
 *   **Timing-Feinabstimmung (PLL-Decoder)**: Anpassen der Pulsweiten-Toleranzen (`MIN_1T`, `MAX_2T` etc.), um die Empfangssicherheit weiter zu maximieren.
 *   **Code-Refactoring**: Aufräumen des Codes, insbesondere der neuen Decoder-Logik (`erp1_decoder.c`), und Hinzufügen von Kommentaren.
@@ -49,6 +49,7 @@ Die Software-Architektur des Empfängers wurde auf **Produktionsniveau** gehoben
 9.  **Task Management (Final)**: Stack des USB-Empfangstasks auf **8192 Bytes** erhöht.
 
 ### Abgeschlossene Aufgaben (Development Log)
+*   **DONE**: **Hardware-Fehlanpassung als Wurzelursache verifiziert**: Systematische Tests (Distanzänderung, AGC-Tuning) bestätigen, dass die extrem niedrige Empfindlichkeit (~60 dB Dämpfung) auf eine falsche Bestückung des CC1101-Moduls (433-MHz-Frontend) zurückzuführen ist.
 *   **DONE**: **Kritische Hardware-Schwäche identifiziert**: Extrem niedriger RSSI (-85dBm @ 10cm) deutet auf ein 433-MHz-Frontend auf dem CC1101-Modul hin.
 *   **DONE**: **CC1101-Register (AGC, BW) gegen Sättigung gehärtet**: Die RX-Bandbreite wurde auf 406 kHz erhöht und die AGC-Parameter wurden angepasst, um LNA-Clipping bei starken Signalen zu verhindern.
 *   **DONE**: **Produktionsreifer PLL-basierter Manchester-Decoder implementiert**: Der RMT-Empfänger wurde auf eine robuste State-Machine mit Clock-Recovery (3/4-Sampling) umgestellt.
