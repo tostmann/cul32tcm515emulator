@@ -280,39 +280,46 @@ static const uint8_t manchester_lut[16] = {
     0x95, 0x96, 0x99, 0x9A, 0xA5, 0xA6, 0xA9, 0xAA
 };
 
+bool g_radio_loopback_enabled = true; // Standardmäßig AN zum Testen
+
+static void erp1_decoder_reset(erp1_decoder_t *dec);
+static void erp1_decode_pulse(erp1_decoder_t *dec, int level, int duration);
+
 void radio_transmit(const uint8_t *data, uint8_t len) {
     if (!data || len == 0 || len > 24) return;
+
+    // LOOPBACK: Sofortiges Rücksenden an Host (SIMULATION)
+    if (g_radio_loopback_enabled) {
+        uint8_t opt[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x30, 0x00 }; // -48dBm RSSI Marker
+        esp3_send_packet(ESP3_TYPE_RADIO_ERP1, data, len, opt, 7);
+    }
 
     uint8_t tx_buf[64];
     size_t tx_idx = 0;
 
-    // 1. Extra lange Preamble (31 logische 1er) + SOF (1 logische 0)
-    // Das ergibt 8 physikalische Bytes im FIFO bei 250kbps
-    for(int i=0; i<7; i++) tx_buf[tx_idx++] = 0xAA; // Logisch 1111 -> 10101010
-    tx_buf[tx_idx++] = 0xA9; // Logisch 1110 -> 10101001 (SOF am Ende)
+    for(int i=0; i<7; i++) tx_buf[tx_idx++] = 0xAA;
+    tx_buf[tx_idx++] = 0xA9;
 
-    // 2. Payload Manchester-kodieren
     for (size_t i = 0; i < len; i++) {
         uint8_t byte = data[i];
         tx_buf[tx_idx++] = manchester_lut[byte >> 4];
         tx_buf[tx_idx++] = manchester_lut[byte & 0x0F];
     }
-    tx_buf[tx_idx++] = 0x00; // Post-amble (OOK off)
+    tx_buf[tx_idx++] = 0x00;
 
     is_transmitting = true;
 
     for (int sub = 0; sub < 3; sub++) {
         cc1101_strobe(CC1101_SIDLE);
-        cc1101_write_reg(0x02, 0x06); // GDO2: Packet End
-        cc1101_write_reg(0x12, 0x30); // MDMCFG2: OOK, No Sync
-        cc1101_write_reg(0x08, 0x00); // PKTCTRL0: Fixed Length
-        cc1101_write_reg(0x06, tx_idx); // PKTLEN
+        cc1101_write_reg(0x02, 0x06);
+        cc1101_write_reg(0x12, 0x30);
+        cc1101_write_reg(0x08, 0x00);
+        cc1101_write_reg(0x06, tx_idx);
 
         cc1101_strobe(CC1101_SFTX);
         cc1101_write_burst(0x3F, tx_buf, tx_idx);
         cc1101_strobe(CC1101_STX);
 
-        // Warten bis Senden beendet (GDO2 Pin 3 geht Low)
         int timeout = 1000;
         while(gpio_get_level(GPIO_NUM_3) && --timeout > 0) {
             esp_rom_delay_us(10);
@@ -323,11 +330,36 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
         }
     }
 
-    // Zurück in den RX-Modus (Async)
     cc1101_strobe(CC1101_SIDLE);
-    cc1101_write_reg(0x02, 0x0D); // GDO2: Async Serial Out
-    cc1101_write_reg(0x08, 0x32); // PKTCTRL0: Async + CS Auto-RX
+    cc1101_write_reg(0x02, 0x0D);
+    cc1101_write_reg(0x08, 0x32);
     cc1101_strobe(CC1101_SRX);
     
     is_transmitting = false;
+}
+
+static inline int hex2int(char c) {
+    if (c >= '0' && c <= '9') return c - '0';
+    if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+    if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+    return 0;
+}
+
+void hal_inject_virtual_rmt(const char* hex_pulses) {
+    if (!hex_pulses) return;
+    size_t len = strlen(hex_pulses);
+    for (size_t i = 0; i + 3 < len; i += 4) {
+        uint16_t val = (hex2int(hex_pulses[i]) << 12) |
+                       (hex2int(hex_pulses[i+1]) << 8) |
+                       (hex2int(hex_pulses[i+2]) << 4) |
+                       (hex2int(hex_pulses[i+3]));
+        int level = (val & 0x8000) ? 1 : 0;
+        int duration = val & 0x7FFF;
+        erp1_decode_pulse(&global_decoder, level, duration);
+        if (global_decoder.packet_ready) {
+            uint8_t opt[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x40, 0x00 };
+            esp3_send_packet(ESP3_TYPE_RADIO_ERP1, global_decoder.buffer, global_decoder.byte_idx, opt, 7);
+            erp1_decoder_reset(&global_decoder);
+        }
+    }
 }
