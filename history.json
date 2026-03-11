@@ -1502,5 +1502,138 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "$HOME/.platformio/penv/bin/pio run -t upload --upload-port /dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:90:B0-if00"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n\n... [OUTPUT TRUNCATED. Total size: 7381 bytes. Showing last 1500 bytes. Full output saved in 'last_execution.log'. Use 'grep' or 'read_file last_execution.log' to analyze!]\nWrote 3072 bytes (103 compressed) at 0x00008000 in 0.0 seconds (878.1 kbit/s).\nHash of data verified.\nCompressed 172032 bytes to 91656...\n\nWriting at 0x00010000 [\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]   0.0% 0/91656 bytes... \n\nWriting at 0x00019a2c [\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  17.9% 16384/91656 bytes... \n\nWriting at 0x00020eae [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  35.8% 32768/91656 bytes... \n\nWriting at 0x00027977 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  53.6% 49152/91656 bytes... \n\nWriting at 0x0002e1fe [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  71.5% 65536/91656 bytes... \n\nWriting at 0x00035506 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591]  89.4% 81920/91656 bytes... \n\nWriting at 0x0003a000 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588] 100.0% 91656/91656 bytes... \nWrote 172032 bytes (91656 compressed) at 0x00010000 in 1.0 seconds (1395.5 kbit/s).\nHash of data verified.\n\nHard resetting via RTS pin...\n========================= [SUCCESS] Took 19.43 seconds =========================\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "python3 diff_test_enocean.py > test_results_2.log 2>&1 & sleep 10; kill $!"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 1\nOutput:\n/bin/sh: 1: kill: No such process\n\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "cat test_results_2.log"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n\n... [OUTPUT TRUNCATED. Total size: 21444 bytes. Showing last 6000 bytes. Full output saved in 'last_execution.log'. Use 'grep' or 'read_file last_execution.log' to analyze!]\n[EMULATOR] Received: 4553502d524f4d3a657370333263362d32303232303931390d0a4275696c643a53657020313920323032320d0a7273743a307863202853575f435055292c626f6f743a3078316320285350495f464153545f464c4153485f424f4f54290d0a53617665642050433a307834303031393735610d0a53504957503a307865650d0a6d6f64653a44494f2c20636c6f636b206469763a320d0a6c6f61643a307834303837353733302c6c656e3a30783562300d0a6c6f61643a307834303836623931302c6c656e3a30786261380d0a6c6f61643a307834303836653631302c6c656e3a3078323735340d0a656e74727920307834303836623931300d0a\n[EMULATOR] Received: 4553502d524f4d3a657370333263362d32303232303931390d0a4275696c643a53657020313920323032320d0a7273743a307863202853575f435055292c626f6f743a3078316320285350495f464153545f464c4153485f424f4f54290d0a53617665642050433a307834303031393735610d0a53504957503a307865650d0a6d6f64653a44494f2c20636c6f636b206469763a320d0a6c6f61643a307834303837353733302c6c656e3a30783562300d0a6c6f61643a307834303836623931302c6c656e3a30786261380d0a\n[EMULATOR] Received: 6c6f61643a307834303836653631302c6c656e3a3078323735340d0a656e74727920307834303836623931300d0a\n[EMULATOR] Received: 4553502d524f4d3a657370333263362d32303232303931390d0a4275696c643a53657020313920323032320d0a7273743a307863202853575f435055292c626f6f743a3078316320285350495f464153545f464c4153485f424f4f54290d0a53617665642050433a307834303031393735610d0a53504957503a307865650d0a6d6f64653a44494f2c20636c6f636b206469763a320d0a6c6f61643a307834303837353733302c6c656e3a30783562300d0a6c6f61643a307834303836623931302c6c656e3a30786261380d0a6c6f61643a307834303836653631302c6c656e3a3078323735340d0a656e74727920307834303836623931300d0a\n[EMULATOR] Received: 4553502d524f4d3a657370333263362d32303232303931390d0a4275696c643a53657020313920323032320d0a7273743a307863202853575f435055292c626f6f743a3078316320285350495f464153545f464c4153485f424f4f54290d0a53617665642050433a307834303031393735610d0a53504957503a307865650d0a6d6f64653a44494f2c20636c6f636b206469763a320d0a6c6f61643a307834303837353733302c6c656e3a30783562300d0a6c6f61643a307834303836623931302c6c656e3a30786261380d0a6c6f61643a307834303836653631302c6c656e3a3078323735340d0a656e74727920307834303836623931300d0a\n[EMULATOR] Received: 4553502d524f4d3a657370333263362d32303232303931390d0a4275696c643a53657020313920323032320d0a7273743a307863202853575f435055292c626f6f743a3078316320285350495f464153545f464c4153485f424f4f54290d0a53617665642050433a307834303031393735610d0a53504957503a307865650d0a6d6f64653a44494f2c20636c6f636b206469763a320d0a6c6f61643a307834303837353733302c6c656e3a30783562300d0a6c6f61643a307834303836623931302c6c656e3a30786261380d0a6c6f61643a307834303836653631302c6c656e3a3078323735340d0a656e74727920307834303836623931300d0a\n[EMULATOR] Received: 4553502d524f4d3a657370333263362d32303232303931390d0a4275696c643a53657020313920323032320d0a7273743a307863202853575f435055292c626f6f743a3078316320285350495f464153545f464c4153485f424f4f54290d0a53617665642050433a307834303031393735610d0a53504957503a307865650d0a6d6f64653a44494f2c20636c6f636b206469763a320d0a6c6f61643a307834303837353733302c6c656e3a30783562300d0a6c6f61643a307834303836623931302c6c656e3a30786261380d0a6c6f61643a307834303836653631302c6c656e3a3078323735340d0a656e74727920307834303836623931300d0a\n[EMULATOR] Received: 4553502d524f4d3a657370333263362d32303232303931390d0a4275696c643a53657020313920323032320d0a7273743a307863202853575f435055292c626f6f743a3078316320285350495f464153545f464c4153485f424f4f54290d0a53617665642050433a307834303031393735610d0a53504957503a307865650d0a6d6f64653a44494f2c20636c6f636b206469763a320d0a6c6f61643a307834303837353733302c6c656e3a30783562300d0a6c6f61643a307834303836623931302c6c656e3a30786261380d0a6c6f61643a307834303836653631302c6c656e3a3078323735340d0a656e74727920307834303836623931300d0a\n[EMULATOR] Received: 4553502d524f4d3a657370333263362d32303232303931390d0a4275696c643a53657020313920323032320d0a7273743a307863202853575f435055292c626f6f743a3078316320285350495f464153545f464c4153485f424f4f54290d0a53617665642050433a307834303031393735610d0a53504957503a307865650d0a6d6f64653a44494f2c20636c6f636b206469763a320d0a6c6f61643a307834303837353733302c6c656e3a30783562300d0a6c6f61643a307834303836623931302c6c656e3a30786261380d0a6c6f61643a307834303836653631302c6c656e3a3078323735340d0a656e74727920307834303836623931300d0a\n[EMULATOR] Received: 4553502d524f4d3a657370333263362d32303232303931390d0a4275696c643a53657020313920323032320d0a7273743a307863202853575f435055292c626f6f743a3078316320285350495f464153545f464c4153485f424f4f54290d0a53617665642050433a307834303031393735610d0a53504957503a307865650d0a6d6f64653a44494f2c20636c6f636b206469763a320d0a6c6f61643a307834303837353733302c6c656e3a30783562300d0a6c6f61643a307834303836623931302c6c656e3a30786261380d0a6c6f61643a307834303836653631302c6c656e3a3078323735340d0a656e74727920307834303836623931300d0a\n[EMULATOR] Received: 4553502d524f4d3a657370333263362d32303232303931390d0a4275696c643a53657020313920323032320d0a7273743a307863202853575f435055292c626f6f743a3078316320285350495f464153545f464c4153485f424f4f54290d0a53617665642050433a307834303031393735610d0a53504957503a307865650d0a6d6f64653a44494f2c20636c6f636b206469763a320d0a6c6f61643a307834303837353733302c6c656e3a30783562300d0a6c6f61643a307834303836623931302c6c656e3a30786261380d0a6c6f61643a307834303836653631302c6c656e3a3078323735340d0a656e74727920307834303836623931300d0a\n[EMULATOR] Received: 4553502d524f4d3a657370333263362d32303232303931390d0a4275696c643a53657020313920323032320d0a7273743a307863202853575f435055292c626f6f743a3078316320285350495f464153545f464c4153485f424f4f54290d0a53617665642050433a307834303031393735610d0a53504957503a307865650d0a6d6f64653a44494f2c20636c6f636b206469763a320d0a6c6f61643a307834303837353733302c6c656e3a30783562300d0a6c6f61643a307834303836623931302c6c656e3a30786261380d0a6c6f61643a307834303836653631302c6c656e3a3078323735340d0a\n[EMULATOR] Received: 656e74727920307834303836623931300d0a\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "ask_pro_model",
+          "args": {
+            "question": "How do I properly initialize and use the RMT RX on an ESP32-C6 for 125kbps OOK signals without causing reboots? \nSpecifically:\n1. Should I use DMA? If so, how should the buffer be allocated?\n2. What are the correct `mem_block_symbols` and buffer size for EnOcean ERP1 (max ~42 bytes Manchester)?\n3. Is it possible that the RMT interrupt is firing too frequently due to OOK noise, causing a watchdog reset?\n4. Provide the correct init code and the receive loop for a robust implementation.\nThe ESP32-C6 has a native USB-JTAG port used for communication.\nNote: I am seeing SW_CPU resets. \nWait, is there an issue with using the native USB-CDC and RMT together?\nPlease provide a stable implementation.",
+            "context_data": "// Current RMT Init in radio_hal.c\nvoid radio_rmt_rx_init(void) {\n    rmt_done_sem = xSemaphoreCreateBinary();\n    rmt_rx_channel_config_t rx_chan_config = {\n        .clk_src = RMT_CLK_SRC_DEFAULT,\n        .resolution_hz = RMT_RESOLUTION_HZ,\n        .mem_block_symbols = 64, // Internal FIFO size\n        .gpio_num = PIN_GDO0,\n        .flags.invert_in = false,\n        .flags.with_dma = true // Use DMA\n    };\n    ESP_ERROR_CHECK(rmt_new_rx_channel(&rx_chan_config, &rx_channel));\n    ...\n}\n\n// Current buffer\nstatic rmt_symbol_word_t rmt_rx_buffer[1024];\n\n// Problem: Constant reboots with SW_CPU reset on ESP32-C6.\n// The device is connected to CC1101 GDO0 (Data) and GDO2 (Carrier Sense).\n// Bitrate is 125kbps OOK.\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "ask_pro_model",
+          "response": {
+            "result": "Experten-Analyse (gemini-pro-latest):\nAls Senior Expert Advisor analysiere ich dein Problem auf Architektur- und Treiberebene. \n\nDas Symptom, das du beschreibst (**SW_CPU Resets / Watchdog Reboots in Kombination mit abbrechendem nativem USB-CDC**), ist ein absolut klassisches Verhalten, wenn man OOK-Signale (On-Off Keying) mit dem RMT-Peripherieblock ohne korrekte Filterung oder Gating empf\u00e4ngt.\n\nHier ist die fundierte Analyse und die L\u00f6sung f\u00fcr dein Problem.\n\n### Die Root Cause Analyse (Warum dein ESP32-C6 abst\u00fcrzt)\n\nDas Problem liegt bei deiner Frage 3: **OOK Noise und Interrupt-St\u00fcrme.**\nEin CC1101, der auf OOK ohne anliegendes Tr\u00e4gersignal (Carrier) konfiguriert ist, gibt auf GDO0 reines, hochfrequentes \"Wei\u00dfes Rauschen\" aus. \nDer RMT-Block des ESP32 ist eigentlich f\u00fcr Infrarot-Signale (langsame, seltene Pulse) gedacht. Wenn du nun 125 kHz Rauschen auf den RMT gibst:\n1. Der RMT-Block sampelt dieses Rauschen und f\u00fcllt sein internes RAM (bzw. den DMA-Puffer) in Bruchteilen einer Millisekunde.\n2. Der RMT feuert kontinuierlich Buffer-Full- bzw. DMA-Done-Interrupts ab (Tausende pro Sekunde).\n3. **CPU Starvation:** Die CPU ist nur noch im Interrupt-Kontext gefangen (Interrupt Storm). Die FreeRTOS Idle-Task und das USB-CDC-Polling kommen nicht mehr zum Zug.\n4. Der Interrupt Watchdog (IWDT) oder Task Watchdog (TWDT) schl\u00e4gt zu und l\u00f6st einen `SW_CPU` Reset aus. Der USB-Port friert vorher ein.\n\n---\n\n### Antworten auf deine spezifischen Fragen\n\n#### 1. DMA-Nutzung und Puffer-Allokation\n**Ja, du musst zwingend DMA nutzen** bei 125 kbps. Ein statisches Array (`static rmt_symbol_word_t rmt_rx_buffer[1024];`) ist jedoch **falsch f\u00fcr DMA**, da ESP32-C6 DMA-Puffer spezielle Alignment-Anforderungen haben (im internen SRAM, cache-aligned). Wenn du ein statisches Array nutzt, das zuf\u00e4llig die Cache-Line-Boundaries verletzt, st\u00fcrzt der DMA-Controller ab.\n*L\u00f6sung:* Nutze `heap_caps_calloc` mit `MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL`.\n\n#### 2. `mem_block_symbols` und Puffergr\u00f6\u00dfe f\u00fcr EnOcean ERP1\n* **`mem_block_symbols`:** Der ESP32-C6 hat Hardware-seitig **nur 48 Words RAM pro RMT-Kanal**. Dein Wert `64` ist zu hoch und f\u00fchrt intern zu Fehlern. Setze ihn auf `48`.\n* **Puffergr\u00f6\u00dfe:** ERP1 hat max ~42 Bytes Payload + Preamble/Sync. Manchester-codiert sind das max ~800 Symbole (RMT-Flanken). Ein DMA-Puffer von **1024 Symbolen** ist perfekt dimensioniert.\n\n#### 3. Frequenz der Interrupts und Watchdog-Reset\nWie oben beschrieben: Ja. Das ist der Hauptausl\u00f6ser. Du darfst den RMT-RX **niemals** dauerhaft laufen lassen, wenn GDO0 Rauschen ausgibt.\n\n#### 4. Die L\u00f6sung: Carrier Sense (CS) Gating\nDu schreibst, du hast GDO2 als **Carrier Sense (CS)** konfiguriert. Das ist der Schl\u00fcssel!\nDu darfst den RMT (`rmt_enable` und `rmt_receive`) **nur dann aktivieren**, wenn der CC1101 via GDO2 meldet, dass ein valider Tr\u00e4ger (Signal) in der Luft ist. F\u00e4llt CS ab, musst du den RMT sofort deaktivieren (`rmt_disable`).\n\n---\n\n### Robuste Implementierung (Code-L\u00f6sung)\n\nHier ist die Best-Practice-Implementierung f\u00fcr den ESP-IDF v5 RMT-Treiber.\n\n#### 1. Initialisierung des RMT\n\n```c\n#include \"driver/rmt_rx.h\"\n#include \"esp_heap_caps.h\"\n\n// Globale Variablen\nrmt_channel_handle_t rx_channel = NULL;\nrmt_symbol_word_t *rmt_rx_buffer = NULL;\nSemaphoreHandle_t rmt_done_sem = NULL;\n\n#define RMT_RX_BUFFER_SIZE 1024\n#define RMT_RESOLUTION_HZ  1000000 // 1 MHz = 1us Aufl\u00f6sung (perfekt f\u00fcr 8us Pulse bei 125kbps)\n\n// Callback, wenn RMT fertig ist (Idle Timeout oder Buffer voll)\nstatic bool IRAM_ATTR rmt_rx_done_callback(rmt_channel_handle_t channel, const rmt_rx_done_event_data_t *edata, void *user_data) {\n    BaseType_t high_task_wakeup = pdFALSE;\n    xSemaphoreGiveFromISR(rmt_done_sem, &high_task_wakeup);\n    return high_task_wakeup == pdTRUE;\n}\n\nvoid radio_rmt_rx_init(void) {\n    rmt_done_sem = xSemaphoreCreateBinary();\n\n    // 1. DMA-f\u00e4higen Speicher allokieren (Zwingend f\u00fcr ESP32-C6 DMA!)\n    rmt_rx_buffer = (rmt_symbol_word_t *)heap_caps_calloc(\n        RMT_RX_BUFFER_SIZE, \n        sizeof(rmt_symbol_word_t), \n        MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT\n    );\n    ESP_ERROR_CHECK(rmt_rx_buffer == NULL ? ESP_ERR_NO_MEM : ESP_OK);\n\n    // 2. RMT Konfiguration\n    rmt_rx_channel_config_t rx_chan_config = {\n        .clk_src = RMT_CLK_SRC_DEFAULT,\n        .resolution_hz = RMT_RESOLUTION_HZ,\n        .mem_block_symbols = 48, // ESP32-C6 hat max 48 per Kanal! (Nicht 64)\n        .gpio_num = PIN_GDO0,\n        .flags.invert_in = false,\n        .flags.with_dma = true\n    };\n    ESP_ERROR_CHECK(rmt_new_rx_channel(&rx_chan_config, &rx_channel));\n\n    // 3. Callback registrieren\n    rmt_rx_event_callbacks_t cbs = {\n        .on_recv_done = rmt_rx_done_callback,\n    };\n    ESP_ERROR_CHECK(rmt_rx_register_event_callbacks(rx_channel, &cbs, NULL));\n    \n    // RMT bleibt initial deaktiviert! Aktivierung erfolgt nur \u00fcber Carrier Sense.\n}\n```\n\n#### 2. Carrier Sense Interrupt Setup (GDO2)\nRichte GDO2 (Carrier Sense) so ein, dass er einen Interrupt ausl\u00f6st, wenn das Signal HIGH wird.\n\n```c\nSemaphoreHandle_t carrier_sense_sem = NULL;\n\nstatic void IRAM_ATTR gdo2_cs_isr_handler(void* arg) {\n    // Wenn GDO2 (CS) auf HIGH geht, wecke die RX-Task\n    BaseType_t high_task_wakeup = pdFALSE;\n    xSemaphoreGiveFromISR(carrier_sense_sem, &high_task_wakeup);\n    portYIELD_FROM_ISR(high_task_wakeup);\n}\n\nvoid init_cs_interrupt(void) {\n    carrier_sense_sem = xSemaphoreCreateBinary();\n    \n    gpio_config_t io_conf = {\n        .intr_type = GPIO_INTR_POSEDGE, // Trigger bei steigender Flanke (Carrier erkannt)\n        .pin_bit_mask = (1ULL << PIN_GDO2),\n        .mode = GPIO_MODE_INPUT,\n        .pull_down_en = 0,\n        .pull_up_en = 0\n    };\n    gpio_config(&io_conf);\n    gpio_install_isr_service(0);\n    gpio_isr_handler_add(PIN_GDO2, gdo2_cs_isr_handler, NULL);\n}\n```\n\n#### 3. Die stabile Empfangs-Schleife (FreeRTOS Task)\n\n```c\nvoid radio_rx_task(void *arg) {\n    while (1) {\n        // 1. Warte bis ein Tr\u00e4gersignal (Carrier Sense) erkannt wird\n        if (xSemaphoreTake(carrier_sense_sem, portMAX_DELAY) == pdTRUE) {\n            \n            // 2. RMT jetzt erst einschalten\n            ESP_ERROR_CHECK(rmt_enable(rx_channel));\n\n            // Bei 125kbps dauert 1 Bit 8us. \n            // Manchester Encode: max. 2 Bits lang gleicher Pegel = 16us.\n            // Timeout-Bedingung: Wenn f\u00fcr 40us keine Flanke mehr kommt, ist das Paket vorbei.\n            rmt_receive_config_t rx_config = {\n                .signal_range_min_ns = 1000,   // Glitch-Filterung: Flanken < 1us ignorieren\n                .signal_range_max_ns = 40000,  // Idle Threshold: 40us Ruhe bedeutet Paketende\n            };\n\n            // 3. Empfang starten\n            ESP_ERROR_CHECK(rmt_receive(rx_channel, rmt_rx_buffer, RMT_RX_BUFFER_SIZE * sizeof(rmt_symbol_word_t), &rx_config));\n\n            // 4. Warte auf Paketende oder Timeout (max 20ms bei 125kbps f\u00fcr ein ERP1 Paket)\n            // Wenn der Carrier Sense ein False-Positive war, l\u00e4uft dieser Timeout ab, \n            // ohne die CPU zu blockieren.\n            if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(20)) == pdTRUE) {\n                // PAKET EMPFANGEN! \n                // Hier Logik f\u00fcr Manchester-Decoding aufrufen\n                process_erp1_packet(rmt_rx_buffer); \n            }\n\n            // 5. RMT sofort wieder ausschalten, um Interrupt-Storm durch Rauschen zu verhindern\n            ESP_ERROR_CHECK(rmt_disable(rx_channel));\n            \n            // Wichtig: RX Puffer/Hardware zur\u00fccksetzen falls n\u00f6tig, macht ESP-IDF idR intern beim disable/enable\n        }\n    }\n}\n```\n\n### Zusammenfassung der Architektur-Gewinne:\n1. **Kein Interrupt-Storm mehr:** Die CPU entspannt sich. Die USB-CDC Verbindung auf dem ESP32-C6 bleibt extrem stabil, da sie nicht mehr durch RMT-Interrupts verhungert (`SW_CPU` Reset ist behoben).\n2. **Sauberer DMA:** Durch `MALLOC_CAP_DMA` l\u00e4uft der Transfer ohne Bus-Fehler am Cache vorbei direkt in den RAM.\n3. **Perfektes Timing:** Mit dem `signal_range_max_ns` von 40\u00b5s (5 Bit-L\u00e4ngen bei 125kbps) erkennt der Hardware-Block exakt das Ende der Manchester-\u00dcbertragung und beendet den DMA-Transfer v\u00f6llig selbstst\u00e4ndig."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "static rmt_channel_handle_t rx_channel = NULL;\nstatic TaskHandle_t rf_task_handle = NULL;\nstatic SemaphoreHandle_t rmt_done_sem = NULL;\nstatic rmt_symbol_word_t *rmt_rx_buffer = NULL;\nstatic SemaphoreHandle_t carrier_sense_sem = NULL;\n\n// ISR / Callbacks\nstatic bool IRAM_ATTR rmt_rx_done_callback(rmt_channel_handle_t channel, const rmt_rx_done_event_data_t *edata, void *user_ctx) {\n    BaseType_t high_task_wakeup = pdFALSE;\n    xSemaphoreGiveFromISR(rmt_done_sem, &high_task_wakeup);\n    return high_task_wakeup == pdTRUE;\n}\n\nstatic void IRAM_ATTR gdo2_cs_isr_handler(void* arg) {\n    BaseType_t high_task_wakeup = pdFALSE;\n    xSemaphoreGiveFromISR(carrier_sense_sem, &high_task_wakeup);\n    if (high_task_wakeup) portYIELD_FROM_ISR();\n}",
+            "path": "src/radio_hal.c",
+            "original_text": "static rmt_channel_handle_t rx_channel = NULL;\nstatic TaskHandle_t rf_task_handle = NULL;\nstatic SemaphoreHandle_t rmt_done_sem = NULL;\nstatic rmt_symbol_word_t rmt_rx_buffer[MAX_RMT_SYMBOLS];\n\n// ISR / Callbacks\nstatic bool IRAM_ATTR rmt_rx_done_callback(rmt_channel_handle_t channel, const rmt_rx_done_event_data_t *edata, void *user_ctx) {\n    BaseType_t high_task_wakeup = pdFALSE;\n    xSemaphoreGiveFromISR(rmt_done_sem, &high_task_wakeup);\n    return high_task_wakeup == pdTRUE;\n}\n\nstatic void IRAM_ATTR gdo2_cs_isr_handler(void* arg) {\n    BaseType_t high_task_wakeup = pdFALSE;\n    gpio_intr_disable(PIN_GDO2);\n    vTaskNotifyGiveFromISR(rf_task_handle, &high_task_wakeup);\n    if (high_task_wakeup) portYIELD_FROM_ISR();\n}"
+          }
+        }
+      }
+    ]
   }
 ]
