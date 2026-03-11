@@ -25,6 +25,8 @@ void usb_rx_task(void *pvParameters) {
 void app_main(void) {
     esp_log_level_set("*", ESP_LOG_NONE);
     
+    enocean_nvs_init();
+
     usb_serial_jtag_driver_config_t usb_config = {
         .tx_buffer_size = 1024,
         .rx_buffer_size = 1024,
