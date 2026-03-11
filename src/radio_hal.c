@@ -182,14 +182,12 @@ static void rf_rx_task_impl(void *pvParameters) {
     };
     while (1) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        esp_err_t err = rmt_receive(rx_channel, rmt_rx_buffer, sizeof(rmt_rx_buffer), &rec_config);
+        esp_err_t err = rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS, &rec_config);
         if (err != ESP_OK) {
-            // If already receiving, stop it
             rmt_disable(rx_channel);
             vTaskDelay(pdMS_TO_TICKS(1));
             rmt_enable(rx_channel);
-            // Try again
-            rmt_receive(rx_channel, rmt_rx_buffer, sizeof(rmt_rx_buffer), &rec_config);
+            rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS, &rec_config);
         }
         
         if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(100)) == pdTRUE) {
