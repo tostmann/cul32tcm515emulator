@@ -27,22 +27,16 @@ typedef struct {
  * 868.3 MHz, 125 kbps, ASK/OOK, Manchester aktiviert 
  */
 static const cc1101_cfg_t erp1_config[] = {
-    {0x00, 0x0E}, // IOCFG2: GDO2 - 0x0E = Carrier Sense
-    {0x02, 0x06}, // IOCFG0: GDO0 - 0x06 = Asserts when sync word has been sent / received
-    {0x03, 0x47}, // FIFOTHR: RX FIFO Threshold
-    {0x04, 0xA5}, // SYNC1: EnOcean Sync Word 0xA5
-    {0x05, 0x5A}, // SYNC0: EnOcean Sync Word 0x5A (Assuming Manchester in HW sees this)
-    {0x06, 0x1F}, // PKTLEN: Max Packet Length
-    {0x07, 0x04}, // PKTCTRL1: Append status
-    {0x08, 0x02}, // PKTCTRL0: Variable packet length mode (uses first byte after sync as length)
+    {0x00, 0x0E}, // IOCFG2: GDO2 - 0x0E = Carrier Sense (CS)
+    {0x02, 0x0D}, // IOCFG0: GDO0 - 0x0D = Serial Data Output (Async)
+    {0x03, 0x47}, // FIFOTHR: 
+    {0x08, 0x32}, // PKTCTRL0: Asynchronous Serial Mode
     {0x0D, 0x21}, // FREQ2: 868.3 MHz
     {0x0E, 0x65}, // FREQ1: 
     {0x0F, 0x6A}, // FREQ0: 
     {0x10, 0xCB}, // MDMCFG4: optimized for 125kbps OOK
     {0x11, 0x83}, // MDMCFG3: 
-    {0x12, 0x3A}, // MDMCFG2: ASK/OOK, Manchester ON, 16/16 Sync
-    {0x13, 0x22}, // MDMCFG1: 
-    {0x14, 0xF8}, // MDMCFG0: 
+    {0x12, 0x30}, // MDMCFG2: ASK/OOK (0x30), Asynchronous Mode, No Sync Word
     {0x17, 0x30}, // MCSM1: IDLE after TX, IDLE after RX
     {0x18, 0x18}, // MCSM0: FS Autocal
     {0x1B, 0x03}, // AGCCTRL2: 
