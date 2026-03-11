@@ -4,37 +4,37 @@
 Entwicklung einer Firmware für den ESP32-C6, die ein EnOcean TCM515 (ESP3-Protokoll) USB-Gateway emuliert. Die Hardware-Basis besteht aus einem ESP32-C6-Modul und einem CC1101 Transceiver für das 868-MHz-Band.
 
 ### Aktueller Stand
-Die Firmware wurde architektonisch gehärtet. Kritische Reboot-Schleifen (`rst:0xc SW_CPU`), verursacht durch Interrupt-Stürme, wurden durch die Implementierung eines **Carrier-Sense-Gating-Mechanismus** behoben. Die SPI-Kommunikation ist nun durch einen Mutex abgesichert. Die grundlegende Stabilität ist wiederhergestellt, jedoch treten unter Last im finalen Differentialtest weiterhin Resets auf.
+**Die Firmware ist stabil.** Die kritischen Reboot-Schleifen (`rst:0xc SW_CPU`), die unter Last im Differentialtest auftraten, wurden **vollständig behoben**. Die Stabilität wurde durch mehrere, tiefgreifende Korrekturen auf Hardware- und Software-Ebene erreicht. Der finale Differentialtest (`diff_test_enocean.py`) wird nun erfolgreich durchlaufen, und der Emulator antwortet korrekt auf ESP3-Befehle vom Host.
 
-### Offene Punkte / Aktuelle Probleme
-*   **Reboot-Schleife unter Last**: Trotz der Stabilisierungsmaßnahmen startet das Gerät während des finalen Differentialtests (`diff_test_enocean.py`) bei der Verarbeitung von Funktelegrammen neu.
-*   **Ursachenforschung**:
-    1.  **USB-Konflikt (Hauptverdacht)**: Es besteht der Verdacht, dass der ESP-IDF Panic-Handler versucht, auf den USB-JTAG-Port zu schreiben, der bereits vom ESP3-Protokoll-Treiber belegt ist.
-    2.  **Speichermanagement**: `malloc` im Protokoll-Parser könnte unter Last zur Heap-Fragmentierung führen.
+### Nächste Schritte
+*   **End-to-End-Validierung**: Testen der Funkkommunikation gegen reale EnOcean-Sensoren und -Aktoren.
+*   **Feinabstimmung**: Ggf. Kalibrierung der RSSI-Werte und des LBT-Schwellwerts für den Praxiseinsatz.
+*   **Code-Refactoring**: Aufräumen des Codes und Hinzufügen von Kommentaren vor dem finalen Release.
 
 ### Architektur-Entscheidungen
 
 1.  **Framework**: ESP-IDF mit PlatformIO für robustes Build-Management und Komponenten-Handling.
 2.  **Kommunikations-Schnittstelle**: Der native USB-JTAG-Controller des ESP32-C6 wird für den ESP3-Datenstrom verwendet. System- und Bootloader-Logs werden via `sdkconfig.defaults` zur Laufzeit vollständig deaktiviert, um einen sauberen Binär-Datenstrom zu gewährleisten.
-3.  **Protokoll-Handling**: Eine dedizierte State-Machine (`esp3_proto.c`) parst den eingehenden ESP3-Stream byte-weise. Dies ist speichereffizient und fehlertolerant.
-4.  **Radio Abstraction**: Eine Hardware Abstraction Layer (`radio_hal.c`) kapselt die gesamte SPI-Kommunikation und Konfiguration des CC1101 sowie die RMT-basierte Empfangslogik.
-5.  **Sendestrategie (Neu implementiert)**:
-    *   **Grund**: Der Hardware-Manchester-Encoder des CC1101 erzeugt Timing-Fehler bei ASK/OOK-Modulation.
-    *   **Modus**: **Software-Manchester-Encoding** mittels einer schnellen Lookup-Table (LUT).
-    *   **CC1101-Konfiguration**: Der CC1101 wird während des Sendens auf eine rohe Chiprate von **250 kbaud** konfiguriert, um die 125-kbps-Manchester-Daten 1:1 zu übertragen. Preamble und Sync-Word werden weiterhin von der Hardware erzeugt und haben durch die höhere Baudrate das korrekte EnOcean-Timing.
-    *   **LBT & Subtelegramme**: bleiben erhalten (RSSI-Prüfung und 3-faches Senden).
+3.  **Protokoll-Handling**:
+    *   Eine dedizierte State-Machine (`esp3_proto.c`) parst den eingehenden ESP3-Stream byte-weise.
+    *   **(Neu)** **Statischer Payload-Puffer**: Die dynamische Speicherallokation (`malloc`) im Parser wurde durch einen **statischen Puffer** ersetzt, um Heap-Fragmentierung unter Last vollständig zu eliminieren.
+4.  **Radio Abstraction**:
+    *   Eine Hardware Abstraction Layer (`radio_hal.c`) kapselt die gesamte SPI-Kommunikation und Konfiguration des CC1101.
+    *   **(Neu)** **Atomare SPI-Transaktionen**: Die Burst-Funktionen (`cc1101_write/read_burst`) wurden korrigiert und verwenden nun **eine einzige, atomare SPI-Transaktion**. Dies behebt Hardware-Fehler, bei denen die CS-Leitung fälschlicherweise zwischen Adress- und Datenphase deaktiviert wurde.
+5.  **Sendestrategie (Final)**:
+    *   **Modus**: **Software-Manchester-Encoding** mittels einer schnellen Lookup-Table (LUT), um Timing-Fehler des CC1101-Hardware-Encoders zu umgehen.
+    *   **CC1101-Konfiguration**: Der CC1101 wird während des Sendens auf eine rohe Chiprate von **250 kbaud** konfiguriert.
 6.  **Empfangsstrategie (Final, gehärtet)**:
-    *   **Architektur**: Ein **Carrier-Sense-Gating-Mechanismus** wurde implementiert, um die CPU vor Interrupt-Stürmen durch OOK-Rauschen zu schützen.
-    *   **CC1101-Modus**: Asynchroner, transparenter serieller Modus. Die Register für Datenrate (`MDMCFG3/4`), Filter und AGC sind auf TI Best-Practices für 125 kbps OOK optimiert.
-    *   **ESP32-Peripherie & Gating-Logik**:
-        *   Der **Carrier Sense (CS) Pin (GDO2)** löst einen GPIO-Interrupt aus und signalisiert den Beginn eines potenziellen Pakets. Der Interrupt wird im ISR sofort deaktiviert, um Flankenstürme zu verhindern.
-        *   Das **RMT-Modul** wird erst **nach** diesem Interrupt aktiviert und lauscht am Datenpin **GDO0**.
-        *   Sobald der Carrier Sense abfällt oder der RMT einen Timeout hat, wird der RMT-Kanal sofort deaktiviert, was Watchdog-Resets verhindert.
-    *   **DMA-Puffer**: Der RMT-Empfangspuffer wurde auf **1024 Symbole** vergrößert und auf DMA-fähigen Speicher (`heap_caps_calloc`) umgestellt, um die hohe Datenrate stabil zu verarbeiten.
+    *   **Architektur**: Ein **Carrier-Sense-Gating-Mechanismus** schützt die CPU vor Interrupt-Stürmen durch OOK-Rauschen.
+    *   **Gating-Logik (Gehärtet)**:
+        *   Der **Carrier Sense (CS) Pin (GDO2)** löst einen GPIO-Interrupt aus.
+        *   Der Interrupt wird **sofort im ISR deaktiviert** (`gpio_intr_disable`), um Flankenstürme zu verhindern, und erst am Ende der Verarbeitungs-Schleife im Task wieder aktiviert.
+        *   Das **RMT-Modul** wird erst **nach** diesem Interrupt für den Empfang aktiviert.
+    *   **DMA-Puffer**: Der RMT-Empfangspuffer wurde auf **1024 Symbole** vergrößert und auf DMA-fähigen Speicher (`heap_caps_calloc`) umgestellt.
     *   **Hardware-Anpassung**: Der RMT-Parameter `mem_block_symbols` wurde auf den korrekten Wert von **48** für den ESP32-C6 korrigiert.
-7.  **Concurrency Management (Neu)**:
-    *   Die gesamte SPI-Kommunikation mit dem CC1101 wird durch einen **Mutex** geschützt. Dies verhindert Race Conditions zwischen dem USB-Task (der Sende-Befehle auslöst) und dem RF-Empfangstask (der den RSSI-Wert liest).
-8.  **Task Management (Neu)**:
+7.  **Concurrency Management (Final)**:
+    *   Die gesamte SPI-Kommunikation mit dem CC1101 wird durch einen **Mutex** geschützt. Dies verhindert Race Conditions zwischen dem USB-Task (Senden) und dem RF-Empfangstask (RSSI lesen, Status abfragen).
+8.  **Task Management (Final)**:
     *   Der Stack des USB-Empfangstasks wurde präventiv auf **8192 Bytes** erhöht, um Stack Overflows bei tiefen Funktionsaufrufen in der Radio-HAL zu vermeiden.
 
 ### Abgeschlossene Aufgaben (Development Log)
@@ -49,12 +49,15 @@ Die Firmware wurde architektonisch gehärtet. Kritische Reboot-Schleifen (`rst:0
 *   **DONE**: Test-Skript in Python zur Validierung der USB-Kommunikation erstellt.
 *   **DONE**: Differentialtest-Skript (`diff_test_enocean.py`) erstellt.
 *   **DONE**: Problem mit störenden System-Logs auf dem USB-Datenstrom identifiziert und durch Anpassung von `sdkconfig.defaults` nachhaltig behoben (inkl. Bootloader-Logs).
-*   **DONE**: Sende-Logik von CC1101-Hardware- auf **Software-Manchester-Encoding** umgestellt, um Timing-Inkompatibilitäten zu beheben.
-*   **DONE**: CC1101-Register für den RX-Pfad (Datenrate, Filter, AGC) auf 125 kbps OOK optimiert.
+*   **DONE**: Sende-Logik von CC1101-Hardware- auf **Software-Manchester-Encoding** umgestellt.
+*   **DONE**: CC1101-Register für den RX-Pfad auf 125 kbps OOK optimiert.
 *   **DONE**: Manchester-Sync-Word-Suche im Decoder korrigiert.
-*   **DONE**: Architektur auf **Carrier-Sense-Gating** umgestellt, um Interrupt-Stürme durch OOK-Rauschen zu unterbinden und Watchdog-Resets zu verhindern.
-*   **DONE**: **Kritischen Reboot-Fehler (`rst:0xc SW_CPU`) im RMT-Empfangstask behoben** durch defensive Fehlerbehandlung und manuelles Zurücksetzen des RMT-Kanals.
-*   **DONE**: RMT-Empfangspuffer auf 1024 Symbole vergrößert und auf **DMA-fähigen Speicher** umgestellt.
+*   **DONE**: RMT-Empfangspuffer auf **DMA-fähigen Speicher** umgestellt.
 *   **DONE**: RMT-Hardware-Parameter (`mem_block_symbols`) an die Spezifikationen des ESP32-C6 (48) angepasst.
 *   **DONE**: SPI-Kommunikation mit einem **Mutex** abgesichert, um Race Conditions zu verhindern.
 *   **DONE**: Stack-Größe des USB-Empfangstasks präventiv auf **8192 Bytes** erhöht.
+*   **DONE**: Carrier-Sense-ISR durch sofortiges Deaktivieren des Interrupts (`gpio_intr_disable`) **gehärtet**, um Interrupt-Stürme zu verhindern.
+*   **DONE**: ESP3-Protokoll-Parser von `malloc` auf einen **statischen Puffer** umgestellt, um Heap-Fragmentierung zu verhindern.
+*   **DONE**: SPI-Burst-Funktionen (`cc1101_write/read_burst`) auf **atomare Transaktionen** korrigiert.
+*   **DONE**: **Kritische Reboot-Schleife (`rst:0xc SW_CPU`) unter Last vollständig behoben.**
+*   **DONE**: `diff_test_enocean.py` erfolgreich durchlaufen; Emulator antwortet korrekt mit `RET_OK`.
