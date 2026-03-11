@@ -27,8 +27,8 @@ void app_main(void) {
     
     // Initialize USB Serial JTAG driver
     usb_serial_jtag_driver_config_t usb_config = {
-        .tx_buffer_size = 256,
-        .rx_buffer_size = 256,
+        .tx_buffer_size = 512,
+        .rx_buffer_size = 512,
     };
     usb_serial_jtag_driver_install(&usb_config);
 
@@ -36,10 +36,10 @@ void app_main(void) {
     esp3_init();
     
     // Initialize Radio HAL (SPI, GPIO, CC1101, RMT RX Task)
-    // radio_hal_init();
+    radio_hal_init();
 
     // Start USB RX Task
-    xTaskCreate(usb_rx_task, "usb_rx", 4096, NULL, 5, NULL);
+    xTaskCreate(usb_rx_task, "usb_rx", 8192, NULL, 5, NULL);
     
     // Main loop does nothing
     while (1) {
