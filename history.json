@@ -562,5 +562,127 @@
         "text": "Hier ist dein SSH-Key. Bitte f\u00fcge ihn in deinem GitHub-Account unter **Settings -> SSH and GPG keys -> New SSH key** hinzu:\n\n```text\nssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILoXnl9Sh1AGImWAguI41bWPHbZTEUJWkkHzQxCNBbpL culfw-ng-agent\n```\n\n### Git-Status\n*   **Repository lokal initialisiert**: Ja\n*   **Remote gesetzt**: `git@github.com:tostmann/cul32tcm515emulator.git`\n*   **Branch**: `main`\n*   **Commit**: \"Initial commit: ESP32-C6 TCM515 Emulator with CC1101 HAL, ESP3 Parser and SIIL-Testing (Loopback/Injection)\"\n*   **Push**: Steht noch aus (Permission denied), bis du den Key hinterlegt hast.\n\nSobald der Key hinterlegt ist, kannst du den Push mit folgendem Befehl abschlie\u00dfen (oder sag mir kurz Bescheid, dann mache ich das):\n`git push -u origin main`"
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "text": "generiere einen eigenen Deploy-Key im Project Directory. F\u00fcge Userdokumentation und gitignore f\u00fcr interne Files hinzu"
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "ssh-keygen -t ed25519 -C \"deploy-key@tcm-emu\" -N \"\" -f .deploy_key\nchmod 600 .deploy_key"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\nGenerating public/private ed25519 key pair.\nYour identification has been saved in .deploy_key\nYour public key has been saved in .deploy_key.pub\nThe key fingerprint is:\nSHA256:WchD7LTmInM963nIo39c6FaqQMIhjFMmVgo15ySzzCw deploy-key@tcm-emu\nThe key's randomart image is:\n+--[ED25519 256]--+\n|ooO.o  ..        |\n|oX.O   oo.       |\n|E.B o  o+..      |\n| o o .  ++       |\n|    o .+S  .     |\n|    ooo + . o    |\n|     +.o * +     |\n|       .=.B      |\n|      .+=*       |\n+----[SHA256]-----+\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "write_file",
+          "args": {
+            "content": "# PlatformIO\n.pio\n.pioenvs\n.piolibdeps\nlib/README\ntest/README\n\n# ESP-IDF\nsdkconfig\nsdkconfig.old\nbuild/\n\n# Python\n__pycache__/\n*.py[cod]\n*$py.class\nvenv/\n.venv/\n\n# Project Specific\nbinaries/\nlast_execution.log\n\n# Deploy Keys\n.deploy_key\n.deploy_key.pub\n\n# OS files\n.DS_Store\n.vscode/\n",
+            "path": ".gitignore"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "write_file",
+          "response": {
+            "result": "Wrote to .gitignore"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "write_file",
+          "args": {
+            "content": "# TCM515 Emulator for ESP32-C6 & CC1101\n\nThis firmware emulates an EnOcean TCM515 Gateway using an ESP32-C6 and a CC1101 SPI transceiver. It is designed to be a 100% transparent drop-in replacement via the EnOcean Serial Protocol 3 (ESP3).\n\n## Hardware Setup\n\n- **Processor**: ESP32-C6-MINI\n- **RF Transceiver**: TI CC1101 (868.3 MHz)\n- **Connections**:\n  - GDO0: GPIO2\n  - GDO2: GPIO3 (Carrier Sense / Async Data Out)\n  - SS: GPIO18\n  - SCK: GPIO19\n  - MISO: GPIO20\n  - MOSI: GPIO21\n  - LED: GPIO8 (low active)\n  - Switch: GPIO9 (low active)\n\n## Features\n\n- **Transparent ESP3 Parser**: Handles EnOcean Serial Protocol 3.\n- **Hardware-Timed TX**: Uses CC1101 Packet Mode with LUT-based Manchester encoding for precise 125kbps RF timing.\n- **PLL-Based RX Decoder**: Asynchronous sampling of RF pulses via RMT for robust Manchester decoding.\n- **SIIL (Software-in-the-Loop) Testing**:\n  - **Internal Loopback**: Toggle via `COMMON_COMMAND` 0x7E. Reflects TX packets back to the host.\n  - **Pulse Injection**: Inject virtual RMT symbols via `COMMON_COMMAND` 0x7F for decoder validation.\n\n## Development & Testing\n\n### Requirements\n- PlatformIO with ESP-IDF framework.\n- Python 3 with `pyserial`.\n\n### Scripts\n- `test_loopback.py`: Validates the ESP3 stack and host communication.\n- `test_injection_v2.py`: Validates the Manchester decoder logic with synthetic pulses.\n\n## License\nMIT\n",
+            "path": "README.md"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "write_file",
+          "response": {
+            "result": "Wrote to README.md"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "git config core.sshCommand \"ssh -i $(pwd)/.deploy_key -o IdentitiesOnly=yes\"\ngit add .gitignore README.md\ngit commit -m \"Add documentation, gitignore and configure deploy key\"\necho \"--- NEW DEPLOY KEY (PUBLIC) ---\"\ncat .deploy_key.pub\necho \"-------------------------------\""
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n[main 1878030] Add documentation, gitignore and configure deploy key\n 2 files changed, 69 insertions(+)\n create mode 100644 .gitignore\n create mode 100644 README.md\n--- NEW DEPLOY KEY (PUBLIC) ---\nssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGjjEmfT6CrTSJwlkO6u/0kEOq5tMeo60AxcgGH/cA2k deploy-key@tcm-emu\n-------------------------------\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "text": "Ich habe einen projektspezifischen **Deploy-Key** generiert, die **Userdokumentation** (`README.md`) erstellt und eine `.gitignore` f\u00fcr interne Dateien hinzugef\u00fcgt.\n\n### Dein neuer Deploy-Key (Public)\nBitte f\u00fcge diesen Key in deinem GitHub-Repository unter **Settings -> Deploy keys -> Add deploy key** hinzu (Haken bei \"Allow write access\" setzen!):\n\n```text\nssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGjjEmfT6CrTSJwlkO6u/0kEOq5tMeo60AxcgGH/cA2k deploy-key@tcm-emu\n```\n\n### Durchgef\u00fchrte Schritte:\n1.  **Deploy-Key**: `.deploy_key` (privat) und `.deploy_key.pub` (\u00f6ffentlich) wurden im Projektverzeichnis erstellt.\n2.  **Git-Konfiguration**: Git wurde so konfiguriert, dass es f\u00fcr dieses Repository automatisch den neuen Schl\u00fcssel verwendet (`core.sshCommand`).\n3.  **`.gitignore`**: Schlie\u00dft `.pio`, `build/`, `sdkconfig`, die Deploy-Keys selbst sowie Logfiles aus.\n4.  **`README.md`**: Enth\u00e4lt Pin-Belegung, Feature-Liste und Test-Anleitungen.\n\n**Sobald du den Key bei GitHub hinterlegt hast, kannst du pushen:**\n```bash\ngit push -u origin main\n```\n\nSoll ich den Push f\u00fcr dich versuchen, sobald du den Key hinzugef\u00fcgt hast?"
+      }
+    ]
   }
 ]

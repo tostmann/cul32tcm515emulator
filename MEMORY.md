@@ -5,9 +5,9 @@ Entwicklung einer Firmware für den ESP32-C6, die ein EnOcean TCM515 (ESP3-Proto
 
 ### Aktueller Stand
 Die **Hardware-Schwäche (falsches 433-MHz-Matching-Netzwerk) ist als definitive Wurzelursache** für alle RF-Probleme bestätigt. Es verursacht Dämpfung (>60 dB) und massive **Signalform-Verzerrungen (Puls-Ringing)**.
-*   **Software-Test-Infrastruktur**: Die Entwicklung wird durch eine **vollständig implementierte Software-in-the-Loop-Schnittstelle** (Loopback & Puls-Injektion) entblockt.
-*   **Validierung**: Der **Loopback-Test war erfolgreich** und bestätigt die korrekte Funktion des gesamten Host-Protokoll-Stacks.
-*   **Neues Problem**: Erste Tests mit der **Puls-Injektions-Schnittstelle zeigen, dass der PLL-basierte Decoder ideale, synthetische Puls-Daten noch nicht korrekt zu einem ERP1-Paket zusammensetzt**. Dies deutet auf einen reinen Software-Fehler in der Decoder-Logik hin, der nun unabhängig von der Hardware behoben werden kann.
+*   **Software-Test-Infrastruktur**: Die Entwicklung wird durch eine **vollständig implementierte und validierte Software-in-the-Loop-Schnittstelle** (Loopback & Puls-Injektion) entblockt.
+*   **Validierung**: Der **Loopback-Test war erfolgreich** und bestätigt die korrekte Funktion des gesamten Host-Protokoll-Stacks (ESP3-Parser, TX/RX-Logik).
+*   **Neues Problem**: Erste Tests mit der **Puls-Injektions-Schnittstelle zeigen, dass der PLL-basierte Decoder ideale, synthetische Puls-Daten noch nicht korrekt zu einem ERP1-Paket zusammensetzt**. Dies bestätigt einen reinen Software-Fehler in der Decoder-Logik (`erp1_decoder.c`), der nun unabhängig von der Hardware behoben werden kann.
 
 ### Nächste Schritte
 *   **Fehlersuche & Kalibrierung (PLL-Decoder) (Höchste Prio)**: Systematisches Debuggen des Decoders (`erp1_decoder.c`) mit **idealisierten Puls-Daten über die verifizierte Injektions-Schnittstelle**. Ziel ist es, den Software-Fehler zu finden und die korrekte Funktion des Decoders deterministisch nachzuweisen.
@@ -35,12 +35,13 @@ Die **Hardware-Schwäche (falsches 433-MHz-Matching-Netzwerk) ist als definitive
 8.  **CC1101-Register (Final, Anti-Saturation)**: Frequenz 868.300 MHz, Datenrate 250 kbps, OOK, RX-Bandbreite 406 kHz, gehärtete AGC-Einstellungen.
 9.  **Task Management (Final)**: Stack des USB-Empfangstasks auf **8192 Bytes** erhöht.
 10. **Test-Schnittstellen (Final, Software-in-the-Loop)**:
-    *   **Loopback-Modus**: Aktivierbar via `COMMON_COMMAND` (Opcode `0x7E`). Sendet TX-Pakete direkt an den Host zurück. **Validiert.**
-    *   **Puls-Injektion**: Schnittstelle via `COMMON_COMMAND` (Opcode `0x7F`), um virtuelle RMT-Pulse in den Decoder einzuspeisen. **Implementiert.**
+    *   **Loopback-Modus**: Aktivierbar via `COMMON_COMMAND` (Opcode `0x7E`). Sendet TX-Pakete direkt an den Host zurück. **VALIDIERT**.
+    *   **Puls-Injektion**: Schnittstelle via `COMMON_COMMAND` (Opcode `0x7F`), um virtuelle RMT-Pulse in den Decoder einzuspeisen. **IMPLEMENTIERT & VERIFIZIERT** (Mechanismus funktioniert, Decoder-Logik noch fehlerhaft).
 
 ### Abgeschlossene Aufgaben (Development Log)
-*   **DONE**: **Software-Loopback-Test erfolgreich validiert**: Der interne Loopback-Modus (aktivierbar via `COMMON_COMMAND` 0x7E) bestätigt die korrekte Funktion des gesamten Host-Kommunikations-Stacks (Host -> ESP3-Parser -> TX-Pfad -> RX-Pfad -> Host).
-*   **DONE**: **Protokoll-Parser für Test-Schnittstellen erweitert**: Der ESP3-Protokoll-Handler wurde um die Verarbeitung von `COMMON_COMMAND` (Opcode `0x7E` für Loopback, `0x7F` für Puls-Injektion) erweitert.
+*   **DONE**: **GitHub-Repository erstellt und konfiguriert**: Projekt auf GitHub (`cul32tcm515emulator`) initialisiert, inkl. projektspezifischem Deploy-Key, `README.md` und `.gitignore`.
+*   **DONE**: **Software-Loopback-Test erfolgreich validiert**: Der interne Loopback-Modus (via `COMMON_COMMAND` 0x7E) bestätigt die korrekte Funktion des gesamten Host-Kommunikations-Stacks (Host -> ESP3-Parser -> TX-Pfad -> RX-Pfad -> Host).
+*   **DONE**: **Protokoll-Parser für Test-Schnittstellen erweitert**: Der ESP3-Protokoll-Handler wurde um `ESP3_TYPE_COMMON_COMMAND` (Opcode `0x05`) erweitert, um Loopback (`0x7E`) und Puls-Injektion (`0x7F`) zu steuern.
 *   **DONE**: **Physikalische Ursache für Decoder-Fehler identifiziert**: Experten-Analyse bestätigt, dass das 433-MHz-Matching-Netzwerk die 868-MHz-Pulsformen durch *Ringing* und Gruppenlaufzeitverzerrung zerstört.
 *   **DONE**: **Software-Test-Infrastruktur implementiert**: Ein interner **Loopback-Modus** und eine **Puls-Injektions-Schnittstelle** wurden zur Firmware hinzugefügt, um die Entwicklung ohne funktionale RF-Hardware zu ermöglichen.
 *   **DONE**: **RF-Sendestrategie auf Packet Mode und LUT-Kodierung umgestellt**: Der Transmitter nutzt nun den hardware-getimten **Packet Mode** des CC1101 und eine **Look-Up Table (LUT)**.

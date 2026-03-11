@@ -1,6 +1,7 @@
-ERROR: Permission to tostmann/cul32tcm515emulator.git denied to deploy key
-fatal: Could not read from remote repository.
-
-Please make sure you have the correct access rights
-and the repository exists.
-PUSH_FAILED_CHECK_KEY
+[main 1878030] Add documentation, gitignore and configure deploy key
+ 2 files changed, 69 insertions(+)
+ create mode 100644 .gitignore
+ create mode 100644 README.md
+--- NEW DEPLOY KEY (PUBLIC) ---
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGjjEmfT6CrTSJwlkO6u/0kEOq5tMeo60AxcgGH/cA2k deploy-key@tcm-emu
+-------------------------------
