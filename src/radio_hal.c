@@ -144,18 +144,16 @@ static void rf_rx_task_impl(void *pvParameters) {
     rmt_receive_config_t cfg = { .signal_range_min_ns = 1000, .signal_range_max_ns = 60000 };
     rmt_enable(rx_channel);
     while (1) {
-        if (xSemaphoreTake(carrier_sense_sem, portMAX_DELAY) == pdTRUE) {
-            if (is_transmitting) { gpio_intr_enable(PIN_GDO2); continue; }
-            memset(rmt_rx_buffer, 0, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t));
-            if (rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t), &cfg) == ESP_OK) {
-                if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(50)) == pdTRUE) {
-                    size_t cnt = 0; while (cnt < MAX_RMT_SYMBOLS && rmt_rx_buffer[cnt].duration0 != 0) cnt++;
-                    if (cnt > 10) rmt_to_manchester_decode(rmt_rx_buffer, cnt);
-                }
+        // Just keep receiving in a loop, Carrier Sense only triggers the decoder start if needed
+        // But RMT can buffer. Let's try continuous receive for a bit.
+        memset(rmt_rx_buffer, 0, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t));
+        if (rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t), &cfg) == ESP_OK) {
+            if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(100)) == pdTRUE) {
+                size_t cnt = 0; while (cnt < MAX_RMT_SYMBOLS && rmt_rx_buffer[cnt].duration0 != 0) cnt++;
+                if (cnt > 5) rmt_to_manchester_decode(rmt_rx_buffer, cnt);
             }
-            int t = 100; while (gpio_get_level(PIN_GDO2) == 1 && t-- > 0) vTaskDelay(1);
-            vTaskDelay(5); xSemaphoreTake(carrier_sense_sem, 0); gpio_intr_enable(PIN_GDO2);
         }
+        vTaskDelay(1);
     }
 }
 
