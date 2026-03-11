@@ -275,30 +275,59 @@ void radio_hal_init(void) {
     cc1101_write_reg(0x08, 0x32); cc1101_strobe(CC1101_SRX);
 }
 
-typedef struct { uint8_t *buf; int pos; } bit_s;
-static void push_c(bit_s *s, uint8_t c, int n) { for (int i = n - 1; i >= 0; i--) { if ((c >> i) & 1) s->buf[s->pos / 8] |= (1 << (7 - (s->pos % 8))); else s->buf[s->pos / 8] &= ~(1 << (7 - (s->pos % 8))); s->pos++; } }
-static void push_m(bit_s *s, int b) { if (b) push_c(s, 0x02, 2); else push_c(s, 0x01, 2); }
+static const uint8_t manchester_lut[16] = {
+    0x55, 0x56, 0x59, 0x5A, 0x65, 0x66, 0x69, 0x6A,
+    0x95, 0x96, 0x99, 0x9A, 0xA5, 0xA6, 0xA9, 0xAA
+};
 
 void radio_transmit(const uint8_t *data, uint8_t len) {
-    if (len > 31) return; 
-    uint8_t chip_buf[128]; memset(chip_buf, 0, 128); bit_s s = { .buf = chip_buf, .pos = 0 };
-    for (int i = 0; i < 4; i++) push_c(&s, 0xAA, 8); // 4 bytes Warmup
-    for (int i = 0; i < 10; i++) push_m(&s, 1); // 10 bits Preamble
-    push_m(&s, 0); // SOF
-    for (int i = 0; i < len; i++) { for (int j = 7; j >= 0; j--) push_m(&s, (data[i] >> j) & 1); }
-    push_c(&s, 0x00, 16); 
-    int byte_len = (s.pos + 7) / 8;
-    if (byte_len > 64) byte_len = 64; // Safety cut-off for FIFO
-    is_transmitting = true; 
-    cc1101_strobe(CC1101_SIDLE);
-    cc1101_write_reg(0x08, 0x00); 
-    cc1101_write_reg(0x06, byte_len); 
-    for(int sub = 0; sub < 3; sub++) {
-        cc1101_strobe(CC1101_SIDLE); cc1101_strobe(CC1101_SFTX); cc1101_write_burst(0x3F, chip_buf, byte_len); cc1101_strobe(CC1101_STX);
-        int t = 50; while((cc1101_read_status(CC1101_MARCSTATE) & 0x1F) != 0x01 && t-- > 0) vTaskDelay(1);
-        if (sub < 2) vTaskDelay(pdMS_TO_TICKS(15 + (esp_random() % 10)));
+    if (!data || len == 0 || len > 24) return;
+
+    uint8_t tx_buf[64];
+    size_t tx_idx = 0;
+
+    // 1. Extra lange Preamble (31 logische 1er) + SOF (1 logische 0)
+    // Das ergibt 8 physikalische Bytes im FIFO bei 250kbps
+    for(int i=0; i<7; i++) tx_buf[tx_idx++] = 0xAA; // Logisch 1111 -> 10101010
+    tx_buf[tx_idx++] = 0xA9; // Logisch 1110 -> 10101001 (SOF am Ende)
+
+    // 2. Payload Manchester-kodieren
+    for (size_t i = 0; i < len; i++) {
+        uint8_t byte = data[i];
+        tx_buf[tx_idx++] = manchester_lut[byte >> 4];
+        tx_buf[tx_idx++] = manchester_lut[byte & 0x0F];
     }
+    tx_buf[tx_idx++] = 0x00; // Post-amble (OOK off)
+
+    is_transmitting = true;
+
+    for (int sub = 0; sub < 3; sub++) {
+        cc1101_strobe(CC1101_SIDLE);
+        cc1101_write_reg(0x02, 0x06); // GDO2: Packet End
+        cc1101_write_reg(0x12, 0x30); // MDMCFG2: OOK, No Sync
+        cc1101_write_reg(0x08, 0x00); // PKTCTRL0: Fixed Length
+        cc1101_write_reg(0x06, tx_idx); // PKTLEN
+
+        cc1101_strobe(CC1101_SFTX);
+        cc1101_write_burst(0x3F, tx_buf, tx_idx);
+        cc1101_strobe(CC1101_STX);
+
+        // Warten bis Senden beendet (GDO2 Pin 3 geht Low)
+        int timeout = 1000;
+        while(gpio_get_level(GPIO_NUM_3) && --timeout > 0) {
+            ets_delay_us(10);
+        }
+
+        if (sub < 2) {
+            vTaskDelay(pdMS_TO_TICKS(20 + (esp_random() % 15)));
+        }
+    }
+
+    // Zurück in den RX-Modus (Async)
     cc1101_strobe(CC1101_SIDLE);
-    cc1101_write_reg(0x08, 0x32); cc1101_strobe(CC1101_SFRX); cc1101_strobe(CC1101_SRX);
+    cc1101_write_reg(0x02, 0x0D); // GDO2: Async Serial Out
+    cc1101_write_reg(0x08, 0x32); // PKTCTRL0: Async + CS Auto-RX
+    cc1101_strobe(CC1101_SRX);
+    
     is_transmitting = false;
 }
