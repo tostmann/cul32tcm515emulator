@@ -1,5 +1,6 @@
 #include "esp3_proto.h"
 #include "radio_hal.h"
+#include "enocean_security.h"
 #include "driver/usb_serial_jtag.h"
 #include <stdlib.h>
 #include <string.h>
