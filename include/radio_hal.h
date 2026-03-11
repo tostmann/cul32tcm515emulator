@@ -7,8 +7,8 @@
 #include "freertos/semphr.h"
 
 // --- PIN DEFINITIONS (ESP32-C6) ---
-#define PIN_GDO0   2
-#define PIN_GDO2   3
+#define PIN_GDO0   2  // Async Data Out -> RMT RX
+#define PIN_GDO2   3  // Carrier Sense -> GPIO Interrupt
 #define PIN_LED    8
 #define PIN_SWITCH 9
 #define PIN_SS     18
@@ -22,6 +22,7 @@ extern "C" {
 
 void radio_hal_init(void);
 void radio_transmit(const uint8_t *data, uint8_t len);
+void radio_rmt_rx_init(void);
 
 // SPI Primitives
 void cc1101_strobe(uint8_t cmd);
