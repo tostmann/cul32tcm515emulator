@@ -3,43 +3,18 @@
 #include "mbedtls/aes.h"
 #include <string.h>
 
-// Hardware-independent MAC verification using mbedtls
-bool enocean_sec_verify_mac(const enocean_sec_device_t *device, 
-                            const uint8_t *payload, size_t payload_len, 
-                            uint32_t received_rlc, 
-                            const uint8_t *received_mac, size_t mac_len) {
-    if (!device || !payload || !received_mac) return false;
-
-    // Prevent Replay Attacks
-    if (received_rlc <= device->rlc) {
-        return false; 
-    }
-
-    uint8_t cmac_input[64];
-    size_t input_len = 0;
-
-    // RLC is Big Endian in CMAC calculation
-    for (int i = device->rlc_size - 1; i >= 0; i--) {
-        cmac_input[input_len++] = (received_rlc >> (i * 8)) & 0xFF;
-    }
-
-    memcpy(&cmac_input[input_len], payload, payload_len);
-    input_len += payload_len;
+bool enocean_sec_verify_mac_raw(const enocean_sec_device_t *device, 
+                               const uint8_t *mac_input, size_t mi_len, 
+                               const uint8_t *received_mac, size_t mac_len) {
+    if (!device || !mac_input || !received_mac) return false;
 
     const mbedtls_cipher_info_t *cipher_info = mbedtls_cipher_info_from_type(MBEDTLS_CIPHER_AES_128_ECB);
     uint8_t mac_output[16] = {0};
 
-    int ret = mbedtls_cipher_cmac(cipher_info, device->key, 128, cmac_input, input_len, mac_output);
-    if (ret != 0) {
-        return false;
-    }
+    int ret = mbedtls_cipher_cmac(cipher_info, device->key, 128, mac_input, mi_len, mac_output);
+    if (ret != 0) return false;
 
-    // Compare truncated MAC
-    if (memcmp(mac_output, received_mac, mac_len) == 0) {
-        return true;
-    }
-
-    return false;
+    return (memcmp(mac_output, received_mac, mac_len) == 0);
 }
 
 // AES-128 CTR Decryption (Variable AES)
