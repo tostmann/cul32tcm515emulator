@@ -101,8 +101,6 @@ void esp3_process_byte(uint8_t byte) {
                 } else {
                     rx_state = STATE_SYNC;
                 }
-                    rx_state = STATE_CRC8D;
-                }
             } else {
                 rx_state = STATE_SYNC;
             }
