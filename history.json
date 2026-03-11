@@ -1663,5 +1663,33 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "static void rmt_to_manchester_decode(const rmt_symbol_word_t *symbols, size_t num_symbols) {\n    static uint8_t half_bits[MAX_RMT_SYMBOLS * 2];\n    int hb_count = 0;\n\n    for (size_t i = 0; i < num_symbols; i++) {\n        int durations[2] = {symbols[i].duration0, symbols[i].duration1};\n        int levels[2]    = {symbols[i].level0, symbols[i].level1};\n        for (int p = 0; p < 2; p++) {\n            int d = durations[p];\n            int l = levels[p];\n            if (d == 0) continue;\n            if (d < 2) continue; // Noise filter at 1MHz\n            \n            int n = (d + 2) / 4; // 4us = 4 ticks at 1MHz\n            if (n > 4) n = 4;\n            for (int k = 0; k < n && hb_count < (MAX_RMT_SYMBOLS * 2); k++) {\n                half_bits[hb_count++] = l;\n            }\n        }\n    }\n    if (hb_count < 32) return;\n\n    uint8_t payload[64];\n    int payload_len = 0;\n    bool synced = false;\n    uint8_t current_byte = 0;\n    int bit_count = 0;\n\n    int sync_idx = -1;\n    uint32_t pattern = 0;\n    for (int i = 0; i < hb_count; i++) {\n        pattern = (pattern << 1) | half_bits[i];\n        if ((pattern & 0xFFFF) == 0xCCF3) { \n            sync_idx = i + 1;\n            synced = true;\n            break;\n        }\n    }\n\n    if (synced && sync_idx != -1) {\n        for (int i = sync_idx; i < hb_count - 1; i += 2) {\n            uint8_t hb1 = half_bits[i];\n            uint8_t hb2 = half_bits[i+1];\n            int decoded_bit = -1;\n            if (hb1 == 1 && hb2 == 0) decoded_bit = 1;\n            else if (hb1 == 0 && hb2 == 1) decoded_bit = 0;\n            else { i--; continue; } \n            \n            current_byte = (current_byte << 1) | decoded_bit;\n            bit_count++;\n            if (bit_count == 8) {\n                if (payload_len < sizeof(payload)) payload[payload_len++] = current_byte;\n                bit_count = 0;\n            }\n        }\n    }\n    if (synced && payload_len > 0) {\n        uint8_t opt_data[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x40, 0x00 };\n        esp3_send_packet(ESP3_TYPE_RADIO_ERP1, payload, payload_len, opt_data, 7);\n    }\n}",
+            "path": "src/radio_hal.c",
+            "original_text": "static void rmt_to_manchester_decode(const rmt_symbol_word_t *symbols, size_t num_symbols) {\n    static uint8_t half_bits[MAX_RMT_SYMBOLS * 2];\n    int hb_count = 0;\n\n    for (size_t i = 0; i < num_symbols; i++) {\n        int durations[2] = {symbols[i].duration0, symbols[i].duration1};\n        int levels[2]    = {symbols[i].level0, symbols[i].level1};\n        for (int p = 0; p < 2; p++) {\n            int d = durations[p];\n            int l = levels[p];\n            if (d == 0) continue;\n            // Filter short glitches (< 2us = 8 ticks)\n            if (d < 8) continue;\n            \n            int n = (d + 8) / 16; // 4us = 16 ticks\n            if (n > 4) n = 4; // Cap\n            for (int k = 0; k < n && hb_count < sizeof(half_bits); k++) {\n                half_bits[hb_count++] = l;\n            }\n        }\n    }\n    if (hb_count < 32) return;\n\n    uint8_t payload[64];\n    int payload_len = 0;\n    bool synced = false;\n    uint8_t current_byte = 0;\n    int bit_count = 0;\n\n    int sync_idx = -1;\n    uint32_t pattern = 0;\n    for (int i = 0; i < hb_count; i++) {\n        pattern = (pattern << 1) | half_bits[i];\n        // Raw EnOcean Sync Byte 0xAD = 1100110011110011 = 0xCCF3 (in half-bits)\n        if ((pattern & 0xFFFF) == 0xCCF3) { \n            sync_idx = i + 1;\n            synced = true;\n            break;\n        }\n    }\n\n    if (synced && sync_idx != -1) {\n        for (int i = sync_idx; i < hb_count - 1; i += 2) {\n            uint8_t hb1 = half_bits[i];\n            uint8_t hb2 = half_bits[i+1];\n            int decoded_bit = -1;\n            // EnOcean Manchester: 1 -> 10, 0 -> 01\n            if (hb1 == 1 && hb2 == 0) decoded_bit = 1;\n            else if (hb1 == 0 && hb2 == 1) decoded_bit = 0;\n            else { i--; continue; } // Try resync\n            \n            current_byte = (current_byte << 1) | decoded_bit;\n            bit_count++;\n            if (bit_count == 8) {\n                if (payload_len < sizeof(payload)) payload[payload_len++] = current_byte;\n                bit_count = 0;\n            }\n        }\n    }\n    if (synced && payload_len > 0) {\n        uint8_t rssi_raw = cc1101_read_status(0x34);\n        int dbm = (rssi_raw >= 128) ? (rssi_raw - 256) / 2 - 74 : rssi_raw / 2 - 74;\n        uint8_t opt_data[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, (uint8_t)(-dbm), 0x00 };\n        esp3_send_packet(ESP3_TYPE_RADIO_ERP1, payload, payload_len, opt_data, 7);\n    }\n}"
+          }
+        }
+      }
+    ]
   }
 ]

@@ -119,12 +119,11 @@ static void rmt_to_manchester_decode(const rmt_symbol_word_t *symbols, size_t nu
             int d = durations[p];
             int l = levels[p];
             if (d == 0) continue;
-            // Filter short glitches (< 2us = 8 ticks)
-            if (d < 8) continue;
+            if (d < 2) continue; // Noise filter at 1MHz
             
-            int n = (d + 8) / 16; // 4us = 16 ticks
-            if (n > 4) n = 4; // Cap
-            for (int k = 0; k < n && hb_count < sizeof(half_bits); k++) {
+            int n = (d + 2) / 4; // 4us = 4 ticks at 1MHz
+            if (n > 4) n = 4;
+            for (int k = 0; k < n && hb_count < (MAX_RMT_SYMBOLS * 2); k++) {
                 half_bits[hb_count++] = l;
             }
         }
@@ -141,7 +140,6 @@ static void rmt_to_manchester_decode(const rmt_symbol_word_t *symbols, size_t nu
     uint32_t pattern = 0;
     for (int i = 0; i < hb_count; i++) {
         pattern = (pattern << 1) | half_bits[i];
-        // Raw EnOcean Sync Byte 0xAD = 1100110011110011 = 0xCCF3 (in half-bits)
         if ((pattern & 0xFFFF) == 0xCCF3) { 
             sync_idx = i + 1;
             synced = true;
@@ -154,10 +152,9 @@ static void rmt_to_manchester_decode(const rmt_symbol_word_t *symbols, size_t nu
             uint8_t hb1 = half_bits[i];
             uint8_t hb2 = half_bits[i+1];
             int decoded_bit = -1;
-            // EnOcean Manchester: 1 -> 10, 0 -> 01
             if (hb1 == 1 && hb2 == 0) decoded_bit = 1;
             else if (hb1 == 0 && hb2 == 1) decoded_bit = 0;
-            else { i--; continue; } // Try resync
+            else { i--; continue; } 
             
             current_byte = (current_byte << 1) | decoded_bit;
             bit_count++;
@@ -168,9 +165,7 @@ static void rmt_to_manchester_decode(const rmt_symbol_word_t *symbols, size_t nu
         }
     }
     if (synced && payload_len > 0) {
-        uint8_t rssi_raw = cc1101_read_status(0x34);
-        int dbm = (rssi_raw >= 128) ? (rssi_raw - 256) / 2 - 74 : rssi_raw / 2 - 74;
-        uint8_t opt_data[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, (uint8_t)(-dbm), 0x00 };
+        uint8_t opt_data[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x40, 0x00 };
         esp3_send_packet(ESP3_TYPE_RADIO_ERP1, payload, payload_len, opt_data, 7);
     }
 }
