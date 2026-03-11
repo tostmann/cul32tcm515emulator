@@ -1682,5 +1682,190 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "$HOME/.platformio/penv/bin/pio run -t upload --upload-port /dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:90:B0-if00"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n\n... [OUTPUT TRUNCATED. Total size: 7381 bytes. Showing last 1500 bytes. Full output saved in 'last_execution.log'. Use 'grep' or 'read_file last_execution.log' to analyze!]\nWrote 3072 bytes (103 compressed) at 0x00008000 in 0.0 seconds (904.1 kbit/s).\nHash of data verified.\nCompressed 172144 bytes to 91686...\n\nWriting at 0x00010000 [\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]   0.0% 0/91686 bytes... \n\nWriting at 0x00019941 [\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  17.9% 16384/91686 bytes... \n\nWriting at 0x00020ec5 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  35.7% 32768/91686 bytes... \n\nWriting at 0x0002795f [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  53.6% 49152/91686 bytes... \n\nWriting at 0x0002e22e [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  71.5% 65536/91686 bytes... \n\nWriting at 0x00035542 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591]  89.3% 81920/91686 bytes... \n\nWriting at 0x0003a070 [\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588] 100.0% 91686/91686 bytes... \nWrote 172144 bytes (91686 compressed) at 0x00010000 in 1.0 seconds (1360.8 kbit/s).\nHash of data verified.\n\nHard resetting via RTS pin...\n========================= [SUCCESS] Took 20.27 seconds =========================\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "python3 diff_test_enocean.py > test_results_28.log 2>&1 & sleep 15; kill $!"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 1\nOutput:\n/bin/sh: 1: kill: No such process\n\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "cat test_results_28.log"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n[TCM515] Listening...\n[EMULATOR] Listening...\n[EMULATOR] Received: 550004003332cc9c000116\n\n--- Test 1: TCM515 Transmits -> Emulator Receives ---\n[HOST -> TCM515] Sending ESP3: 55000b070180a5010203040102030400b901ffffffff00008b\n[TCM515] Received: 55000100026500005500010004770838\n[EMULATOR] Received: 550004003332ca9b000073\n[EMULATOR] Received: 550004003332cc9c000116\n\n--- Test 2: Emulator Transmits -> TCM515 Receives ---\n[HOST -> EMULATOR] Sending ESP3: 55000b070180a5010203040506070800c901ffffffff0000b1\n[EMULATOR] Received: 550004003332c5990001705500010002650000\n[EMULATOR] Received: 550004003332cb9c000174\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "write_file",
+          "args": {
+            "content": "import serial\nimport time\nimport sys\n\nEMU_PORT = \"/dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:90:B0-if00\"\n\ndef crc8_calc(data, crc):\n    for b in data:\n        crc ^= b\n        for _ in range(8):\n            if crc & 0x80:\n                crc = (crc << 1) ^ 0x07\n            else:\n                crc <<= 1\n            crc &= 0xFF\n    return crc\n\ntry:\n    ser = serial.Serial(EMU_PORT, 115200, timeout=0.1)\n    print(\"Monitoring EMU RSSI...\")\n    \n    while True:\n        if ser.in_waiting >= 10:\n            byte = ser.read(1)\n            if byte == b'\\x55':\n                header = ser.read(4)\n                if len(header) < 4: continue\n                crc8h = ser.read(1)\n                data_len = (header[0] << 8) | header[1]\n                opt_len = header[2]\n                pkt_type = header[3]\n                \n                payload = ser.read(data_len + opt_len)\n                crc8d = ser.read(1)\n                \n                if pkt_type == 0x33:\n                    rssi_raw = payload[0]\n                    rssi_dbm = payload[1]\n                    if rssi_dbm > 127: rssi_dbm -= 256\n                    gdo2 = payload[2]\n                    gdo0 = payload[3]\n                    print(f\"RSSI: {rssi_dbm} dBm, GDO2: {gdo2}, GDO0: {gdo0}\")\n                elif pkt_type == 0x07:\n                    print(f\"*** RADIO PACKET RECEIVED: {payload.hex()} ***\")\nexcept KeyboardInterrupt:\n    print(\"Exit\")\nexcept Exception as e:\n    print(f\"Error: {e}\")\n",
+            "path": "monitor_emu.py"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "write_file",
+          "response": {
+            "result": "Wrote to monitor_emu.py"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "python3 monitor_emu.py > monitor.log 2>&1 & sleep 2; \npython3 -c \"import serial; ser=serial.Serial('/dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:77:28-if00', 57600); ser.write(bytes.fromhex('55000b070180a5010203040102030400b901ffffffff00008b'))\";\nsleep 5; kill $!"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "execute_shell",
+          "args": {
+            "command": "cat monitor.log"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "execute_shell",
+          "response": {
+            "result": "Exit: 0\nOutput:\nMonitoring EMU RSSI...\nRSSI: -105 dBm, GDO2: 0, GDO0: 0\nRSSI: -103 dBm, GDO2: 0, GDO0: 0\nRSSI: -104 dBm, GDO2: 0, GDO0: 0\nRSSI: -104 dBm, GDO2: 0, GDO0: 1\nRSSI: -102 dBm, GDO2: 0, GDO0: 0\nRSSI: -104 dBm, GDO2: 0, GDO0: 1\nRSSI: -103 dBm, GDO2: 0, GDO0: 1\nRSSI: -105 dBm, GDO2: 0, GDO0: 1\nRSSI: -103 dBm, GDO2: 0, GDO0: 0\nRSSI: -102 dBm, GDO2: 0, GDO0: 0\nRSSI: -103 dBm, GDO2: 0, GDO0: 0\nRSSI: -103 dBm, GDO2: 0, GDO0: 0\nRSSI: -103 dBm, GDO2: 0, GDO0: 0\nRSSI: -104 dBm, GDO2: 0, GDO0: 1\nRSSI: -103 dBm, GDO2: 0, GDO0: 1\nRSSI: -104 dBm, GDO2: 0, GDO0: 0\nRSSI: -104 dBm, GDO2: 0, GDO0: 0\nRSSI: -104 dBm, GDO2: 0, GDO0: 1\nRSSI: -100 dBm, GDO2: 0, GDO0: 1\nRSSI: -104 dBm, GDO2: 0, GDO0: 0\nRSSI: -103 dBm, GDO2: 0, GDO0: 0\nRSSI: -103 dBm, GDO2: 0, GDO0: 0\nRSSI: -102 dBm, GDO2: 0, GDO0: 0\nRSSI: -102 dBm, GDO2: 0, GDO0: 0\nRSSI: -103 dBm, GDO2: 0, GDO0: 0\nRSSI: -104 dBm, GDO2: 0, GDO0: 0\nRSSI: -85 dBm, GDO2: 1, GDO0: 1\nRSSI: -102 dBm, GDO2: 0, GDO0: 0\nRSSI: -103 dBm, GDO2: 0, GDO0: 1\nRSSI: -103 dBm, GDO2: 0, GDO0: 0\nRSSI: -101 dBm, GDO2: 0, GDO0: 0\nRSSI: -102 dBm, GDO2: 0, GDO0: 0\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "            if (rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS, &cfg) == ESP_OK) {\n                if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(500)) == pdTRUE) {\n                    size_t cnt = 0; while (cnt < MAX_RMT_SYMBOLS && rmt_rx_buffer[cnt].duration0 != 0) cnt++;\n                    uint16_t debug_data[2] = { (uint16_t)cnt, (uint16_t)global_decoder.sync_pulses };\n                    esp3_send_packet(0x34, (uint8_t*)debug_data, 4, NULL, 0);\n                    for (size_t i = 0; i < cnt; i++) {\n                        erp1_decode_pulse(&global_decoder, rmt_rx_buffer[i].level0, rmt_rx_buffer[i].duration0);\n                        if (global_decoder.packet_ready) {\n                            uint8_t opt[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x40, 0x00 };\n                            esp3_send_packet(ESP3_TYPE_RADIO_ERP1, global_decoder.buffer, global_decoder.byte_idx, opt, 7);\n                            erp1_decoder_reset(&global_decoder);\n                        }\n                        if (rmt_rx_buffer[i].duration1 > 0) {\n                            erp1_decode_pulse(&global_decoder, rmt_rx_buffer[i].level1, rmt_rx_buffer[i].duration1);\n                            if (global_decoder.packet_ready) {\n                                uint8_t opt[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x40, 0x00 };\n                                esp3_send_packet(ESP3_TYPE_RADIO_ERP1, global_decoder.buffer, global_decoder.byte_idx, opt, 7);\n                                erp1_decoder_reset(&global_decoder);\n                            }\n                        }\n                    }\n                }\n            }",
+            "path": "src/radio_hal.c",
+            "original_text": "            if (rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS, &cfg) == ESP_OK) {\n                if (xSemaphoreTake(rmt_done_sem, pdMS_TO_TICKS(500)) == pdTRUE) {\n                    size_t cnt = 0; while (cnt < MAX_RMT_SYMBOLS && rmt_rx_buffer[cnt].duration0 != 0) cnt++;\n                    for (size_t i = 0; i < cnt; i++) {\n                        erp1_decode_pulse(&global_decoder, rmt_rx_buffer[i].level0, rmt_rx_buffer[i].duration0);\n                        if (global_decoder.packet_ready) {\n                            uint8_t opt[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x40, 0x00 };\n                            esp3_send_packet(ESP3_TYPE_RADIO_ERP1, global_decoder.buffer, global_decoder.byte_idx, opt, 7);\n                            erp1_decoder_reset(&global_decoder);\n                        }\n                        erp1_decode_pulse(&global_decoder, rmt_rx_buffer[i].level1, rmt_rx_buffer[i].duration1);\n                        if (global_decoder.packet_ready) {\n                            uint8_t opt[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x40, 0x00 };\n                            esp3_send_packet(ESP3_TYPE_RADIO_ERP1, global_decoder.buffer, global_decoder.byte_idx, opt, 7);\n                            erp1_decoder_reset(&global_decoder);\n                        }\n                    }\n                }\n            }"
+          }
+        }
+      }
+    ]
   }
 ]
