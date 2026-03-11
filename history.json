@@ -1654,5 +1654,33 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "void radio_transmit(const uint8_t *data, uint8_t len) {\n    if (len > 31) return; \n    uint8_t chip_buf[128]; memset(chip_buf, 0, 128); bit_s s = { .buf = chip_buf, .pos = 0 };\n    for (int i = 0; i < 4; i++) push_c(&s, 0xAA, 8); // 4 bytes Warmup\n    for (int i = 0; i < 10; i++) push_m(&s, 1); // 10 bits Preamble\n    push_m(&s, 0); // SOF\n    for (int i = 0; i < len; i++) { for (int j = 7; j >= 0; j--) push_m(&s, (data[i] >> j) & 1); }\n    push_c(&s, 0x00, 16); \n    int byte_len = (s.pos + 7) / 8;\n    if (byte_len > 64) byte_len = 64; // Safety cut-off for FIFO",
+            "path": "src/radio_hal.c",
+            "original_text": "void radio_transmit(const uint8_t *data, uint8_t len) {\n    if (len > 31) return; \n    uint8_t chip_buf[128]; memset(chip_buf, 0, 128); bit_s s = { .buf = chip_buf, .pos = 0 };\n    for (int i = 0; i < 10; i++) push_c(&s, 0xAA, 8); \n    for (int i = 0; i < 12; i++) push_m(&s, 1); \n    push_m(&s, 0); \n    for (int i = 0; i < len; i++) { for (int j = 7; j >= 0; j--) push_m(&s, (data[i] >> j) & 1); }\n    push_c(&s, 0x00, 16); \n    int byte_len = (s.pos + 7) / 8;"
+          }
+        }
+      }
+    ]
   }
 ]

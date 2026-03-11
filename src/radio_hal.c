@@ -275,12 +275,13 @@ static void push_m(bit_s *s, int b) { if (b) push_c(s, 0x02, 2); else push_c(s, 
 void radio_transmit(const uint8_t *data, uint8_t len) {
     if (len > 31) return; 
     uint8_t chip_buf[128]; memset(chip_buf, 0, 128); bit_s s = { .buf = chip_buf, .pos = 0 };
-    for (int i = 0; i < 10; i++) push_c(&s, 0xAA, 8); 
-    for (int i = 0; i < 12; i++) push_m(&s, 1); 
-    push_m(&s, 0); 
+    for (int i = 0; i < 4; i++) push_c(&s, 0xAA, 8); // 4 bytes Warmup
+    for (int i = 0; i < 10; i++) push_m(&s, 1); // 10 bits Preamble
+    push_m(&s, 0); // SOF
     for (int i = 0; i < len; i++) { for (int j = 7; j >= 0; j--) push_m(&s, (data[i] >> j) & 1); }
     push_c(&s, 0x00, 16); 
     int byte_len = (s.pos + 7) / 8;
+    if (byte_len > 64) byte_len = 64; // Safety cut-off for FIFO
     is_transmitting = true; 
     cc1101_strobe(CC1101_SIDLE);
     cc1101_write_reg(0x08, 0x00); 
