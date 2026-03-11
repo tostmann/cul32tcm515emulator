@@ -87,6 +87,13 @@ static void handle_complete_telegram(const uint8_t *data, uint16_t length) {
         enocean_sec_device_t dev;
         if (enocean_nvs_get_device(sender_id, &dev) == ESP_OK) {
             uint32_t rlc_rx = (data[2] << 16) | (data[3] << 8) | data[4];
+            
+            // Anti-Replay: RLC must be strictly greater
+            if (rlc_rx <= dev.rlc && dev.rlc != 0) {
+                ESP_LOGW(TAG, "Replay attack detected for %08lX (RX: %lu, stored: %lu)", (unsigned long)sender_id, (unsigned long)rlc_rx, (unsigned long)dev.rlc);
+                return;
+            }
+
             const uint8_t *mac_rx = &data[5];
             uint16_t payload_len = length - 14; 
             
