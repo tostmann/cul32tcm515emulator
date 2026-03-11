@@ -217,33 +217,27 @@ static void push_m(bit_s *s, int b) { if (b) push_c(s, 0x02, 2); else push_c(s, 
 void radio_transmit(const uint8_t *data, uint8_t len) {
     if (len > 31) return; 
     uint8_t chip_buf[128]; memset(chip_buf, 0, 128); bit_s s = { .buf = chip_buf, .pos = 0 };
-    // Warmup 5 bytes 0xAA (raw chips)
-    for (int i = 0; i < 5; i++) push_c(&s, 0xAA, 8);
-    // EnOcean Preamble (8x '1')
-    for (int i = 0; i < 8; i++) push_m(&s, 1); 
-    // SOF ('0')
-    push_m(&s, 0); 
-    // Payload
+    for (int i = 0; i < 10; i++) push_c(&s, 0xAA, 8); // Longer Warmup
+    for (int i = 0; i < 12; i++) push_m(&s, 1); // Standard EnOcean Preamble (12 bits)
+    push_m(&s, 0); // SOF
     for (int i = 0; i < len; i++) { for (int j = 7; j >= 0; j--) push_m(&s, (data[i] >> j) & 1); }
-    
-    // Add 2 bytes of trailing '0' chips to ensure the last bit is fully transmitted
-    push_c(&s, 0x00, 8); push_c(&s, 0x00, 8);
+    push_c(&s, 0x00, 16); 
     
     int byte_len = (s.pos + 7) / 8;
-    is_transmitting = true; gpio_intr_disable(PIN_GDO2);
+    is_transmitting = true; 
+    // gpio_intr_disable(PIN_GDO2);
     cc1101_strobe(CC1101_SIDLE);
-    cc1101_write_reg(0x08, 0x00); // Fixed Packet length
+    cc1101_write_reg(0x08, 0x00); 
     cc1101_write_reg(0x06, byte_len); 
-    
-    for(int i = 0; i < 10; i++) { if (cc1101_read_status(0x34) < 140) break; vTaskDelay(pdMS_TO_TICKS(5)); }
     
     for(int sub = 0; sub < 3; sub++) {
         cc1101_strobe(CC1101_SIDLE); cc1101_strobe(CC1101_SFTX); cc1101_write_burst(0x3F, chip_buf, byte_len); cc1101_strobe(CC1101_STX);
         int t = 50; while((cc1101_read_status(CC1101_MARCSTATE) & 0x1F) != 0x01 && t-- > 0) vTaskDelay(1);
-        if (sub < 2) vTaskDelay(pdMS_TO_TICKS(20));
+        if (sub < 2) vTaskDelay(pdMS_TO_TICKS(15 + (esp_random() % 10)));
     }
     
     cc1101_strobe(CC1101_SIDLE);
     cc1101_write_reg(0x08, 0x32); cc1101_strobe(CC1101_SFRX); cc1101_strobe(CC1101_SRX);
-    gpio_intr_enable(PIN_GDO2); is_transmitting = false;
+    // gpio_intr_enable(PIN_GDO2); 
+    is_transmitting = false;
 }
