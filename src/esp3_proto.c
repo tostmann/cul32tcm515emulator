@@ -104,7 +104,7 @@ void esp3_process_byte(uint8_t byte) {
             }
             break;
         case STATE_DATA:
-            payload_buf[payload_idx++] = byte;
+            payload_static_buf[payload_idx++] = byte;
             if (payload_idx == (current_packet.data_len + current_packet.opt_len)) {
                 rx_state = STATE_CRC8D;
             }
@@ -112,18 +112,16 @@ void esp3_process_byte(uint8_t byte) {
         case STATE_CRC8D:
             {
                 uint16_t total_len = current_packet.data_len + current_packet.opt_len;
-                uint8_t expected_crc = calc_buffer_crc(payload_buf, total_len);
+                uint8_t expected_crc = calc_buffer_crc(payload_static_buf, total_len);
                 if (byte == expected_crc) {
-                    current_packet.data = payload_buf;
-                    current_packet.opt_data = payload_buf + current_packet.data_len;
+                    current_packet.data = payload_static_buf;
+                    current_packet.opt_data = payload_static_buf + current_packet.data_len;
                     if (current_packet.packet_type == ESP3_TYPE_RADIO_ERP1) {
                         radio_transmit(current_packet.data, current_packet.data_len);
                         esp3_send_response(RET_OK);
                     }
                 }
             }
-            if (payload_buf) free(payload_buf);
-            payload_buf = NULL;
             rx_state = STATE_SYNC;
             break;
     }
