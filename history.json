@@ -1354,5 +1354,33 @@
         }
       }
     ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "function_response": {
+          "name": "edit_file",
+          "response": {
+            "result": "Successfully edited file."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "function_call": {
+          "name": "edit_file",
+          "args": {
+            "replacement_text": "    cc1101_strobe(CC1101_SRX);\n    \n    gpio_intr_enable(PIN_GDO2);\n    is_transmitting = false;\n}",
+            "path": "src/radio_hal.c",
+            "original_text": "    cc1101_strobe(CC1101_SRX);\n    \n    gpio_intr_enable(PIN_GDO0);\n    is_transmitting = false;\n}"
+          }
+        }
+      }
+    ]
   }
 ]

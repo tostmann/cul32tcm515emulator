@@ -310,6 +310,6 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
     cc1101_strobe(CC1101_SFRX);
     cc1101_strobe(CC1101_SRX);
     
-    gpio_intr_enable(PIN_GDO0);
+    gpio_intr_enable(PIN_GDO2);
     is_transmitting = false;
 }
