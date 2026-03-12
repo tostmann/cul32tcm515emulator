@@ -6,6 +6,7 @@
 #include "driver/spi_master.h"
 #include "driver/gpio.h"
 #include "driver/rmt_rx.h"
+#include "driver/rmt_tx.h"
 #include "esp_log.h"
 #include "esp_random.h"
 #include "esp_rom_sys.h"
