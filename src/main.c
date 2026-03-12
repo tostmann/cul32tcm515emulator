@@ -8,6 +8,11 @@
 #include "radio_hal.h"
 #include "enocean_nvs.h"
 
+#include <stdio.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "driver/usb_serial_jtag.h"
+#include "esp_log.h"
 #include "TCMSerial.h"
 
 void app_main(void) {
