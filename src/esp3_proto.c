@@ -53,7 +53,6 @@ void esp3_send_packet(uint8_t type, const uint8_t *data, uint16_t data_len, cons
     
     uint8_t crc8d = 0;
     if (data_len > 0 || opt_len > 0) {
-        // Calculate CRC8 over data then opt_data
         if (data_len > 0) {
              for(int i=0; i<data_len; i++) crc8d = crc8_table[crc8d ^ data[i]];
         }
@@ -63,12 +62,12 @@ void esp3_send_packet(uint8_t type, const uint8_t *data, uint16_t data_len, cons
     }
 
     uint8_t sync = ESP3_SYNC_BYTE;
-    usb_serial_jtag_write_bytes(&sync, 1, portMAX_DELAY);
-    usb_serial_jtag_write_bytes(header, 4, portMAX_DELAY);
-    usb_serial_jtag_write_bytes(&crc8h, 1, portMAX_DELAY);
-    if (data_len > 0) usb_serial_jtag_write_bytes(data, data_len, portMAX_DELAY);
-    if (opt_len > 0) usb_serial_jtag_write_bytes(opt, opt_len, portMAX_DELAY);
-    usb_serial_jtag_write_bytes(&crc8d, 1, portMAX_DELAY);
+    TCMSerial_internal_push(&sync, 1);
+    TCMSerial_internal_push(header, 4);
+    TCMSerial_internal_push(&crc8h, 1);
+    if (data_len > 0) TCMSerial_internal_push(data, data_len);
+    if (opt_len > 0) TCMSerial_internal_push(opt, opt_len);
+    TCMSerial_internal_push(&crc8d, 1);
 }
 
 void esp3_send_response(uint8_t ret_code) {
