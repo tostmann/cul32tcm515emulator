@@ -1,9 +1,10 @@
 #include "esp3_proto.h"
 #include "radio_hal.h"
 #include "enocean_security.h"
-#include "driver/usb_serial_jtag.h"
 #include <stdlib.h>
 #include <string.h>
+
+extern void TCMSerial_internal_push(const uint8_t *data, size_t len);
 
 typedef enum {
     STATE_SYNC, STATE_HEADER, STATE_CRC8H, STATE_DATA, STATE_CRC8D
