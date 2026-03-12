@@ -337,25 +337,30 @@ void radio_hal_init(void) {
     gpio_config_t io_led = { .pin_bit_mask = (1ULL << PIN_LED), .mode = GPIO_MODE_OUTPUT };
     gpio_config(&io_led); gpio_set_level(PIN_LED, 1);
     cc1101_strobe(CC1101_SRES); vTaskDelay(10);
-    cc1101_write_reg(0x00, 0x0E); // Carrier Sense
-    cc1101_write_reg(0x02, 0x0D); // Async Serial Out
-    // Correct Freq for 868.302 MHz (26.0 MHz Crystal): 0x21656A
-    cc1101_write_reg(0x0D, 0x21); cc1101_write_reg(0x0E, 0x65); cc1101_write_reg(0x0F, 0x6A); 
-    cc1101_write_reg(0x10, 0x2D); // MDMCFG4: BW ~540kHz, DRATE_E=13 for 250kbps
-    cc1101_write_reg(0x11, 0x3B); // MDMCFG3: DRATE_M=59 for 250kbps (26MHz)
+    // Correct Pin Assignment:
+    cc1101_write_reg(0x00, 0x0D); // IOCFG0: GDO0 = Serial Data Output (Async)
+    cc1101_write_reg(0x02, 0x0E); // IOCFG2: GDO2 = Carrier Sense
+    
+    // Frequency: 868.3 MHz (26MHz XTAL) -> 0x216550
+    cc1101_write_reg(0x0D, 0x21); cc1101_write_reg(0x0E, 0x65); cc1101_write_reg(0x0F, 0x50); 
+
+    cc1101_write_reg(0x10, 0x2D); // MDMCFG4: BW ~540kHz
+    cc1101_write_reg(0x11, 0x3B); // MDMCFG3: 250kbps
     cc1101_write_reg(0x12, 0x30); // MDMCFG2: OOK, No Sync
-    cc1101_write_reg(0x22, 0x11); cc1101_write_reg(0x21, 0xB6); 
-    cc1101_write_reg(0x1B, 0x07); // AGCCTRL2: Max target amplitude (42dB)
+    
+    // PKTCTRL0: Bit 5:4 = 11 (Async serial mode)
+    cc1101_write_reg(0x08, 0x32); 
+
+    cc1101_write_reg(0x1B, 0x07); // AGCCTRL2: Max target amplitude
     cc1101_write_reg(0x1C, 0x00); // AGCCTRL1: Max relative CS sensitivity
-    cc1101_write_reg(0x1D, 0x91); // AGCCTRL0: Freeze on CS, high filter BW
-    cc1101_write_reg(0x18, 0x18); 
-    cc1101_write_reg(0x23, 0x81); cc1101_write_reg(0x24, 0x35); cc1101_write_reg(0x25, 0x09); 
+    cc1101_write_reg(0x1D, 0x92); // AGCCTRL0: Freeze on CS, high filter BW
+    
     static const uint8_t patable_ook[] = {0x00, 0xC0};
     cc1101_write_burst(0x3E, patable_ook, 2);
+
     gpio_install_isr_service(0); radio_rmt_rx_init();
-    // xTaskCreate(radio_diag_task, "diag", 2048, NULL, 1, NULL);
     cc1101_strobe(CC1101_SIDLE);
-    cc1101_write_reg(0x08, 0x32); cc1101_strobe(CC1101_SRX);
+    cc1101_strobe(CC1101_SRX);
 }
 
 static const uint8_t manchester_lut[16] = {
