@@ -1,14 +1,4 @@
 #include <stdio.h>
-#include <string.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "driver/usb_serial_jtag.h"
-#include "esp_log.h"
-#include "esp3_proto.h"
-#include "radio_hal.h"
-#include "enocean_nvs.h"
-
-#include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "driver/usb_serial_jtag.h"
@@ -41,12 +31,13 @@ void app_main(void) {
         if (tcm_avail > 0) {
             if (tcm_avail > sizeof(buf)) tcm_avail = sizeof(buf);
             for (int i = 0; i < tcm_avail; i++) {
-                buf[i] = (uint8_t)TCMSerial_read();
+                int c = TCMSerial_read();
+                if (c != -1) buf[i] = (uint8_t)c;
             }
             usb_serial_jtag_write_bytes(buf, tcm_avail, 0);
         }
 
-        // Slight delay to prevent watchdog issues and excessive CPU usage in the tight loop
+        // Slight delay to prevent watchdog issues and excessive CPU usage
         vTaskDelay(1);
     }
 }
