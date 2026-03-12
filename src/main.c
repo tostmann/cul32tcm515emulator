@@ -8,37 +8,40 @@
 #include "radio_hal.h"
 #include "enocean_nvs.h"
 
-static const char *TAG = "MAIN";
-
-void usb_rx_task(void *pvParameters) {
-    uint8_t rx_buf[128];
-    while (1) {
-        int bytes_read = usb_serial_jtag_read_bytes(rx_buf, sizeof(rx_buf), portMAX_DELAY);
-        if (bytes_read > 0) {
-            for (int i = 0; i < bytes_read; i++) {
-                esp3_process_byte(rx_buf[i]);
-            }
-        }
-    }
-}
+#include "TCMSerial.h"
 
 void app_main(void) {
     esp_log_level_set("*", ESP_LOG_NONE);
-    
-    enocean_nvs_init();
 
+    // Initialize USB CDC (Serial)
     usb_serial_jtag_driver_config_t usb_config = {
-        .tx_buffer_size = 1024,
-        .rx_buffer_size = 1024,
+        .tx_buffer_size = 2048,
+        .rx_buffer_size = 2048,
     };
     usb_serial_jtag_driver_install(&usb_config);
 
-    esp3_init();
-    radio_hal_init();
+    // Initialize TCM Emulator Library
+    TCMSerial_begin(57600);
 
-    xTaskCreate(usb_rx_task, "usb_rx", 4096, NULL, 5, NULL);
-    
+    uint8_t buf[256];
     while (1) {
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        // 1. Read from USB CDC and write to TCMSerial
+        int usb_len = usb_serial_jtag_read_bytes(buf, sizeof(buf), 0);
+        if (usb_len > 0) {
+            TCMSerial_write_buf(buf, usb_len);
+        }
+
+        // 2. Read from TCMSerial and write to USB CDC
+        int tcm_avail = TCMSerial_available();
+        if (tcm_avail > 0) {
+            if (tcm_avail > sizeof(buf)) tcm_avail = sizeof(buf);
+            for (int i = 0; i < tcm_avail; i++) {
+                buf[i] = (uint8_t)TCMSerial_read();
+            }
+            usb_serial_jtag_write_bytes(buf, tcm_avail, 0);
+        }
+
+        // Slight delay to prevent watchdog issues and excessive CPU usage in the tight loop
+        vTaskDelay(1);
     }
 }
