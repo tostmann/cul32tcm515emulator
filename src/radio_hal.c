@@ -53,6 +53,8 @@ typedef struct {
 static erp1_decoder_t global_decoder;
 
 static rmt_channel_handle_t rx_channel = NULL;
+static rmt_channel_handle_t tx_channel = NULL;
+static rmt_encoder_handle_t tx_encoder = NULL;
 static TaskHandle_t rf_task_handle = NULL;
 static SemaphoreHandle_t rmt_done_sem = NULL;
 static rmt_symbol_word_t *rmt_rx_buffer = NULL;
