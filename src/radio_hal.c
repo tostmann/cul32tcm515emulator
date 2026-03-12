@@ -382,10 +382,10 @@ static const uint8_t manchester_lut[16] = {
 bool g_radio_loopback_enabled = false; // Disable for link test
 
 static void push_manchester_bit(rmt_symbol_word_t *buf, size_t *idx, uint8_t bit) {
-    if (bit) { // 1 -> 01 (Low, High)
-        buf[(*idx)++] = (rmt_symbol_word_t){ .duration0 = 32, .level0 = 0, .duration1 = 32, .level1 = 1 };
-    } else {   // 0 -> 10 (High, Low)
+    if (bit) { // 1 -> 10 (High, Low) - Alternative Polarity
         buf[(*idx)++] = (rmt_symbol_word_t){ .duration0 = 32, .level0 = 1, .duration1 = 32, .level1 = 0 };
+    } else {   // 0 -> 01 (Low, High)
+        buf[(*idx)++] = (rmt_symbol_word_t){ .duration0 = 32, .level0 = 0, .duration1 = 32, .level1 = 1 };
     }
 }
 
