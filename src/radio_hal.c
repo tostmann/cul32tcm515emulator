@@ -363,7 +363,7 @@ static const uint8_t manchester_lut[16] = {
     0x95, 0x96, 0x99, 0x9A, 0xA5, 0xA6, 0xA9, 0xAA
 };
 
-bool g_radio_loopback_enabled = true; // Standardmäßig AN zum Testen
+bool g_radio_loopback_enabled = false; // Disable for link test
 
 void radio_transmit(const uint8_t *data, uint8_t len) {
     if (!data || len == 0 || len > 24) return;
@@ -375,7 +375,7 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
 
     uint8_t tx_buf[64];
     size_t tx_idx = 0;
-    for(int i=0; i<7; i++) tx_buf[tx_idx++] = 0xAA;
+    for(int i=0; i<12; i++) tx_buf[tx_idx++] = 0xAA; // Longer preamble
     tx_buf[tx_idx++] = 0xA9;
     for (size_t i = 0; i < len; i++) {
         uint8_t byte = data[i];
