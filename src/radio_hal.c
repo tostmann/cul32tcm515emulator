@@ -351,8 +351,8 @@ void radio_hal_init(void) {
     cc1101_write_reg(0x00, 0x0D); // IOCFG0: GDO0 = Serial Data Output (Async)
     cc1101_write_reg(0x02, 0x0E); // IOCFG2: GDO2 = Carrier Sense
     
-    // Frequency: 868.3 MHz (26MHz XTAL) -> 0x216550
-    cc1101_write_reg(0x0D, 0x21); cc1101_write_reg(0x0E, 0x65); cc1101_write_reg(0x0F, 0x50); 
+    // Frequency: 868.300 MHz (26MHz XTAL) -> 0x216490
+    cc1101_write_reg(0x0D, 0x21); cc1101_write_reg(0x0E, 0x64); cc1101_write_reg(0x0F, 0x90); 
 
     cc1101_write_reg(0x10, 0x2D); // MDMCFG4: BW ~540kHz
     cc1101_write_reg(0x11, 0x3B); // MDMCFG3: 250kbps
