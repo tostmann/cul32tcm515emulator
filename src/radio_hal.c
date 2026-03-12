@@ -306,14 +306,21 @@ static void rf_rx_task_impl(void *pvParameters) {
     }
 }
 
-void radio_rmt_rx_init(void) {
+void radio_rmt_init(void) {
     if (!carrier_sense_sem) carrier_sense_sem = xSemaphoreCreateBinary();
     if (!rmt_done_sem) rmt_done_sem = xSemaphoreCreateBinary();
     if (!rmt_rx_buffer) rmt_rx_buffer = heap_caps_calloc(MAX_RMT_SYMBOLS, sizeof(rmt_symbol_word_t), MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
+    
+    // RX Channel
     rmt_rx_channel_config_t rcfg = { .clk_src = RMT_CLK_SRC_DEFAULT, .resolution_hz = RMT_RESOLUTION_HZ, .mem_block_symbols = 128, .gpio_num = PIN_GDO0, .flags.with_dma = true };
     rmt_new_rx_channel(&rcfg, &rx_channel);
     rmt_rx_event_callbacks_t cbs = { .on_recv_done = rmt_rx_done_callback };
     rmt_rx_register_event_callbacks(rx_channel, &cbs, NULL);
+    
+    // TX Channel (Same GPIO as RX!)
+    rmt_tx_channel_config_t tcfg = { .clk_src = RMT_CLK_SRC_DEFAULT, .resolution_hz = RMT_RESOLUTION_HZ, .mem_block_symbols = 128, .gpio_num = PIN_GDO0, .trans_queue_depth = 4 };
+    rmt_new_tx_channel(&tcfg, &tx_channel);
+
     xTaskCreate(rf_rx_task_impl, "rf_rx", 4096, NULL, 5, &rf_task_handle);
     gpio_config_t io_cs = { .pin_bit_mask = (1ULL << PIN_GDO2), .mode = GPIO_MODE_INPUT, .intr_type = GPIO_INTR_POSEDGE, .pull_down_en = 1 };
     gpio_config(&io_cs); gpio_isr_handler_add(PIN_GDO2, gdo2_cs_isr_handler, NULL);
