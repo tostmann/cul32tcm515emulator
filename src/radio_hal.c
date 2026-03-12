@@ -367,7 +367,7 @@ void radio_hal_init(void) {
     static const uint8_t patable_ook[] = {0x00, 0xC0};
     cc1101_write_burst(0x3E, patable_ook, 2);
 
-    gpio_install_isr_service(0); radio_rmt_rx_init();
+    gpio_install_isr_service(0); radio_rmt_init();
     cc1101_strobe(CC1101_SIDLE);
     cc1101_strobe(CC1101_SRX);
 }
