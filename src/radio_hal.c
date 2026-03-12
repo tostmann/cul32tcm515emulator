@@ -379,44 +379,57 @@ static const uint8_t manchester_lut[16] = {
 
 bool g_radio_loopback_enabled = false; // Disable for link test
 
+static void push_manchester_bit(rmt_symbol_word_t *buf, size_t *idx, uint8_t bit) {
+    if (bit) { // 1 -> 01 (Low, High)
+        buf[(*idx)++] = (rmt_symbol_word_t){ .duration0 = 32, .level0 = 0, .duration1 = 32, .level1 = 1 };
+    } else {   // 0 -> 10 (High, Low)
+        buf[(*idx)++] = (rmt_symbol_word_t){ .duration0 = 32, .level0 = 1, .duration1 = 32, .level1 = 0 };
+    }
+}
+
 void radio_transmit(const uint8_t *data, uint8_t len) {
-    if (!data || len == 0 || len > 24) return;
+    if (!data || len == 0 || len > 32) return;
 
     if (g_radio_loopback_enabled) {
         uint8_t opt[7] = { 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x30, 0x00 }; 
         esp3_send_packet(ESP3_TYPE_RADIO_ERP1, data, len, opt, 7);
     }
 
-    uint8_t tx_buf[64];
-    size_t tx_idx = 0;
-    for(int i=0; i<12; i++) tx_buf[tx_idx++] = 0xAA; // Longer preamble
-    tx_buf[tx_idx++] = 0xA9;
-    for (size_t i = 0; i < len; i++) {
-        uint8_t byte = data[i];
-        tx_buf[tx_idx++] = manchester_lut[byte >> 4];
-        tx_buf[tx_idx++] = manchester_lut[byte & 0x0F];
+    rmt_symbol_word_t *tx_symbols = malloc(1024 * sizeof(rmt_symbol_word_t));
+    if (!tx_symbols) return;
+
+    size_t s_idx = 0;
+    // Preamble: 12 bits of 1
+    for (int i = 0; i < 12; i++) push_manchester_bit(tx_symbols, &s_idx, 1);
+    // Sync bit: 0
+    push_manchester_bit(tx_symbols, &s_idx, 0);
+    // Data bits
+    for (int i = 0; i < len; i++) {
+        for (int b = 7; b >= 0; b--) {
+            push_manchester_bit(tx_symbols, &s_idx, (data[i] >> b) & 1);
+        }
     }
-    tx_buf[tx_idx++] = 0x00;
+    tx_symbols[s_idx++] = (rmt_symbol_word_t){ .duration0 = 100, .level0 = 0, .duration1 = 0, .level1 = 0 };
 
     is_transmitting = true;
+    rmt_disable(rx_channel);
+
     for (int sub = 0; sub < 3; sub++) {
         cc1101_strobe(CC1101_SIDLE);
-        cc1101_write_reg(0x02, 0x06);
-        cc1101_write_reg(0x12, 0x30);
-        cc1101_write_reg(0x08, 0x00);
-        cc1101_write_reg(0x06, tx_idx);
-        cc1101_strobe(CC1101_SFTX);
-        cc1101_write_burst(0x3F, tx_buf, tx_idx);
         cc1101_strobe(CC1101_STX);
-        int timeout = 1000;
-        while(gpio_get_level(GPIO_NUM_3) && --timeout > 0) esp_rom_delay_us(10);
+        esp_rom_delay_us(100); 
+
+        rmt_transmit_config_t tx_cfg = { .loop_count = 0 };
+        rmt_transmit(tx_channel, NULL, tx_symbols, s_idx, &tx_cfg);
+        
         if (sub < 2) vTaskDelay(pdMS_TO_TICKS(20 + (esp_random() % 15)));
     }
+
     cc1101_strobe(CC1101_SIDLE);
-    cc1101_write_reg(0x02, 0x0D);
-    cc1101_write_reg(0x08, 0x32);
     cc1101_strobe(CC1101_SRX);
+    rmt_enable(rx_channel);
     is_transmitting = false;
+    free(tx_symbols);
 }
 
 static inline int hex2int(char c) {
