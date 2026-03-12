@@ -39,6 +39,17 @@ int TCMSerial_read(void) {
     return byte;
 }
 
+size_t TCMSerial_read_buf(uint8_t *buf, size_t size) {
+    xSemaphoreTake(buffer_mutex, portMAX_DELAY);
+    size_t i = 0;
+    while (i < size && rx_head != rx_tail) {
+        buf[i++] = rx_buffer[rx_tail];
+        rx_tail = (rx_tail + 1) % RX_BUFFER_SIZE;
+    }
+    xSemaphoreGive(buffer_mutex);
+    return i;
+}
+
 size_t TCMSerial_write(uint8_t byte) {
     esp3_process_byte(byte);
     return 1;
