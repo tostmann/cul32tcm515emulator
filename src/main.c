@@ -27,14 +27,9 @@ void app_main(void) {
         }
 
         // 2. Read from TCMSerial and write to USB CDC
-        int tcm_avail = TCMSerial_available();
-        if (tcm_avail > 0) {
-            if (tcm_avail > sizeof(buf)) tcm_avail = sizeof(buf);
-            for (int i = 0; i < tcm_avail; i++) {
-                int c = TCMSerial_read();
-                if (c != -1) buf[i] = (uint8_t)c;
-            }
-            usb_serial_jtag_write_bytes(buf, tcm_avail, 0);
+        size_t tcm_len = TCMSerial_read_buf(buf, sizeof(buf));
+        if (tcm_len > 0) {
+            usb_serial_jtag_write_bytes(buf, tcm_len, 0);
         }
 
         // Slight delay to prevent watchdog issues and excessive CPU usage
