@@ -38,7 +38,8 @@ def crc8(data):
             crc &= 0xFF
     return crc
 
-data = bytes.fromhex("A5 00 00 00 08 01 23 45 67 00")
+# Changed ID to FE DC BA 98
+data = bytes.fromhex("A5 00 00 00 08 FE DC BA 98 00")
 opt = bytes.fromhex("03 FF FF FF FF 00 00")
 dlen = len(data)
 oplen = len(opt)
