@@ -25,7 +25,12 @@ extern enocean_stream_t* get_emulator_stream(void);
 extern enocean_stream_t* get_uart_stream(int port, int tx_pin, int rx_pin);
 
 // SWITCH HERE
+#include "driver/gpio.h"
+
+// Set to 1 for Emulator (Target cul32-c6), 0 for Real TCM515 Bridge
+#ifndef USE_EMULATOR
 #define USE_EMULATOR 1
+#endif
 
 void app_main(void) {
     esp_log_level_set("*", ESP_LOG_NONE);
@@ -37,7 +42,28 @@ void app_main(void) {
 #if USE_EMULATOR
     tcm_stream = get_emulator_stream();
 #else
-    // Example for real TCM: UART 1, GPIO 4 TX, GPIO 5 RX
+    // Setup Real TCM515 Hardware Pins
+    // RF_RST = GPIO7
+    // RF_SET = GPIO6
+    gpio_config_t tcm_pins = {
+        .pin_bit_mask = (1ULL << 6) | (1ULL << 7),
+        .mode = GPIO_MODE_OUTPUT,
+        .pull_up_en = 0,
+        .pull_down_en = 0,
+        .intr_type = GPIO_INTR_DISABLE
+    };
+    gpio_config(&tcm_pins);
+    
+    // Set Baudrate 57600 (RF_SET = High)
+    gpio_set_level(6, 1);
+    
+    // Reset pulse for TCM
+    gpio_set_level(7, 0);
+    vTaskDelay(pdMS_TO_TICKS(50));
+    gpio_set_level(7, 1);
+    vTaskDelay(pdMS_TO_TICKS(100)); // wait for TCM to boot
+
+    // Real TCM: UART 1, GPIO 4 TX, GPIO 5 RX
     tcm_stream = get_uart_stream(1, 4, 5);
 #endif
 
