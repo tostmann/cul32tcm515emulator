@@ -342,6 +342,8 @@ void radio_rmt_init(void) {
     // Create copy encoder for TX
     rmt_copy_encoder_config_t copy_encoder_config = {};
     rmt_new_copy_encoder(&copy_encoder_config, &tx_encoder);
+    
+    rmt_enable(tx_channel);
 
     gpio_set_direction(PIN_GDO0, GPIO_MODE_INPUT);
     gpio_set_direction(PIN_GDO0, GPIO_MODE_INPUT);
@@ -461,8 +463,7 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
         esp3_send_packet(ESP3_TYPE_RADIO_ERP1, data, len, opt, 7);
     }
 
-    rmt_symbol_word_t *tx_symbols = malloc(1024 * sizeof(rmt_symbol_word_t));
-    if (!tx_symbols) return;
+    static rmt_symbol_word_t tx_symbols[1024];
 
     size_t s_idx = 0;
     // Preamble: 12 bits of 1
@@ -478,9 +479,11 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
     tx_symbols[s_idx++] = (rmt_symbol_word_t){ .duration0 = 100, .level0 = 0, .duration1 = 0, .level1 = 0 };
 
     is_transmitting = true;
-    rmt_disable(rx_channel);
-
+    
+    // rmt_disable(rx_channel); // CRASHES IF RECEIVE IS PENDING!
+    
     gpio_set_direction(PIN_GDO0, GPIO_MODE_OUTPUT);
+    
     for (int sub = 0; sub < 3; sub++) {
         cc1101_strobe(CC1101_SIDLE);
         cc1101_strobe(CC1101_STX);
@@ -496,9 +499,9 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
     cc1101_strobe(CC1101_SIDLE);
     cc1101_strobe(CC1101_SRX);
     gpio_set_direction(PIN_GDO0, GPIO_MODE_INPUT);
-    rmt_enable(rx_channel);
+    // rmt_enable(rx_channel);
     is_transmitting = false;
-    free(tx_symbols);
+    // no more free!
 }
 
 static inline int hex2int(char c) {
