@@ -384,7 +384,7 @@ void radio_hal_init(void) {
     cc1101_write_reg(0x00, 0x0E); // IOCFG2: GDO2 = Carrier Sense
     
     // Frequency: 868.300 MHz (26MHz XTAL) -> 0x216490
-    cc1101_write_reg(0x0D, 0x21); cc1101_write_reg(0x0E, 0x65); cc1101_write_reg(0x0F, 0x6A); 
+    cc1101_write_reg(0x0D, 0x21); cc1101_write_reg(0x0E, 0x64); cc1101_write_reg(0x0F, 0x90); 
 
     cc1101_write_reg(0x10, 0x2D); // MDMCFG4: BW ~540kHz
     cc1101_write_reg(0x11, 0x3B); // MDMCFG3: 250kbps
@@ -445,10 +445,12 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
     for (int i = 0; i < len; i++) checksum += data[i];
 
     size_t s_idx = 0;
+    // PLL Settling Time (500us LOW)
+    tx_symbols[s_idx++] = (rmt_symbol_word_t){ .duration0 = 4000, .level0 = 0, .duration1 = 4000, .level1 = 0 };
     // Preamble: 16 bits of EnOcean '0' (Low-High)
-    for (int i = 0; i < 16; i++) push_manchester_bit(tx_symbols, &s_idx, 1);
-    // Sync bit: 1 bit of EnOcean '0' (Low-High)
-    push_manchester_bit(tx_symbols, &s_idx, 0);
+    for (int i = 0; i < 4; i++) push_manchester_bit(tx_symbols, &s_idx, 0);
+    // Sync bit: 1 bit of EnOcean '1' (Low-High)
+    push_manchester_bit(tx_symbols, &s_idx, 1);
     
     // Data bits
     for (int i = 0; i < len; i++) {
@@ -467,13 +469,12 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
     is_transmitting = true;
     cc1101_write_reg(0x02, 0x2E); // GDO0 to High-Z (Input for TX)
     
-    gpio_set_direction(PIN_GDO0, GPIO_MODE_OUTPUT);
+    // gpio_set_direction(PIN_GDO0, GPIO_MODE_OUTPUT);
     
     for (int sub = 0; sub < 3; sub++) {
         cc1101_strobe(CC1101_SIDLE);
-        gpio_set_level(PIN_GDO0, 0); // Force idle low
-        cc1101_strobe(CC1101_STX);
-        esp_rom_delay_us(250); 
+        // gpio_set_level(PIN_GDO0, 0); // Force idle low
+        cc1101_strobe(CC1101_STX); 
 
         rmt_transmit_config_t tx_cfg = { .loop_count = 0 };
         rmt_transmit(tx_channel, tx_encoder, tx_symbols, s_idx * sizeof(rmt_symbol_word_t), &tx_cfg);
