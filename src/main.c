@@ -74,13 +74,17 @@ void app_main(void) {
         int usb_len = usb_serial_jtag_read_bytes(buf, sizeof(buf), 0);
         if (usb_len > 0) {
             STREAM_WRITE_BUF(tcm_stream, buf, usb_len);
+        } else {
+            vTaskDelay(pdMS_TO_TICKS(1)); // Wait
         }
 
         size_t tcm_len = STREAM_READ_BUF(tcm_stream, buf, sizeof(buf));
         if (tcm_len > 0) {
             usb_serial_jtag_write_bytes(buf, tcm_len, 0);
+            usb_serial_jtag_write_bytes(NULL, 0, 0); // Flush or trigger push
+            vTaskDelay(pdMS_TO_TICKS(1));
         }
 
-        vTaskDelay(1);
+        vTaskDelay(pdMS_TO_TICKS(1));
     }
 }

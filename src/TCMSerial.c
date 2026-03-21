@@ -83,10 +83,10 @@ void TCMSerial_internal_push(const uint8_t *data, size_t len) {
     xSemaphoreTake(buffer_mutex, portMAX_DELAY);
     for (size_t i = 0; i < len; i++) {
         size_t next = (rx_head + 1) % RX_BUFFER_SIZE;
-        if (next != rx_tail) {
-            rx_buffer[rx_head] = data[i];
-            rx_head = next;
-        }
+        // Ignore overflow for testing, overwrite!
+        rx_buffer[rx_head] = data[i];
+        rx_head = next;
+        if (rx_head == rx_tail) rx_tail = (rx_tail + 1) % RX_BUFFER_SIZE; // Advance tail to drop oldest
     }
     xSemaphoreGive(buffer_mutex);
 }
