@@ -445,10 +445,10 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
     for (int i = 0; i < len; i++) checksum += data[i];
 
     size_t s_idx = 0;
-    // Preamble: 16 bits of EnOcean '1' (High-Low)
-    for (int i = 0; i < 16; i++) push_manchester_bit(tx_symbols, &s_idx, 1);
-    // Sync bit: 1 bit of EnOcean '0' (Low-High)
-    push_manchester_bit(tx_symbols, &s_idx, 0);
+    // Preamble: 16 bits of EnOcean '0' (Low-High)
+    for (int i = 0; i < 16; i++) push_manchester_bit(tx_symbols, &s_idx, 0);
+    // Sync bit: 1 bit of EnOcean '1' (High-Low)
+    push_manchester_bit(tx_symbols, &s_idx, 1);
     
     // Data bits
     for (int i = 0; i < len; i++) {

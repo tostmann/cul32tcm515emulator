@@ -1,10 +1,10 @@
 {
-  "total_cost": 4.31202485,
-  "total_tokens": 10145497,
+  "total_cost": 4.42427145,
+  "total_tokens": 10286356,
   "daily_costs": {
     "2026-03-21": {
-      "cost": 4.31202485,
-      "tokens": 10145497
+      "cost": 4.42427145,
+      "tokens": 10286356
     }
   }
 }
