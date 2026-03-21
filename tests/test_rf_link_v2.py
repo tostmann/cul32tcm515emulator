@@ -77,6 +77,16 @@ def read_packets(ser, name):
                     print(f"[{name}] RET: {d.hex()}")
                 elif pt == 4:
                     print(f"[{name}] EVENT: {d.hex()}")
+                elif pt == 0x70:
+                    print(f"[{name}] SPI VERIFY: PARTNUM={d[0]:02X}, VERSION={d[1]:02X}")
+                elif pt == 0x71:
+                    print(f"[{name}] GDO0 HW0 -> {d[0]}")
+                elif pt == 0x72:
+                    print(f"[{name}] GDO0 HW1 -> {d[0]}")
+                elif pt == 0x73:
+                    print(f"[{name}] GDO2 HW0 -> {d[0]}")
+                elif pt == 0x74:
+                    print(f"[{name}] GDO2 HW1 -> {d[0]}")
                 elif pt == 0x33:
                     print(f"[{name}] DIAG 0x33: {d.hex()}")
                 else:
