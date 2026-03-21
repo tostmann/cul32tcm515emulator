@@ -33,7 +33,7 @@ extern enocean_stream_t* get_uart_stream(int port, int tx_pin, int rx_pin);
 #endif
 
 void app_main(void) {
-    esp_log_level_set("*", ESP_LOG_NONE);
+    esp_log_level_set("*", ESP_LOG_INFO);
     usb_serial_jtag_driver_config_t usb_config = { .tx_buffer_size = 2048, .rx_buffer_size = 2048 };
     usb_serial_jtag_driver_install(&usb_config);
 
