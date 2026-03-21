@@ -331,7 +331,7 @@ void radio_rmt_init(void) {
     
     // RX Channel
     rmt_rx_channel_config_t rcfg = { .clk_src = RMT_CLK_SRC_DEFAULT, .resolution_hz = RMT_RESOLUTION_HZ, .mem_block_symbols = 128, .gpio_num = PIN_GDO0, .flags.with_dma = true };
-    rmt_new_rx_channel(&rcfg, &rx_channel);
+    //rmt_new_rx_channel(&rcfg, &rx_channel);
     rmt_rx_event_callbacks_t cbs = { .on_recv_done = rmt_rx_done_callback };
     rmt_rx_register_event_callbacks(rx_channel, &cbs, NULL);
     
@@ -345,8 +345,8 @@ void radio_rmt_init(void) {
     
     rmt_enable(tx_channel);
 
-    gpio_set_direction(PIN_GDO0, GPIO_MODE_INPUT);
-    gpio_set_direction(PIN_GDO0, GPIO_MODE_INPUT);
+    //gpio_set_direction(PIN_GDO0, GPIO_MODE_INPUT);
+    //gpio_set_direction(PIN_GDO0, GPIO_MODE_INPUT);
 
     xTaskCreate(rf_rx_task_impl, "rf_rx", 4096, NULL, 5, &rf_task_handle);
     gpio_config_t io_cs = { .pin_bit_mask = (1ULL << PIN_GDO2), .mode = GPIO_MODE_INPUT, .intr_type = GPIO_INTR_POSEDGE, .pull_down_en = 1 };
@@ -384,7 +384,7 @@ void radio_hal_init(void) {
     cc1101_write_reg(0x02, 0x0E); // IOCFG2: GDO2 = Carrier Sense
     
     // Frequency: 868.300 MHz (26MHz XTAL) -> 0x216490
-    cc1101_write_reg(0x0D, 0x21); cc1101_write_reg(0x0E, 0x64); cc1101_write_reg(0x0F, 0x90); 
+    cc1101_write_reg(0x0D, 0x21); cc1101_write_reg(0x0E, 0x65); cc1101_write_reg(0x0F, 0x6A); 
 
     cc1101_write_reg(0x10, 0x2D); // MDMCFG4: BW ~540kHz
     cc1101_write_reg(0x11, 0x3B); // MDMCFG3: 250kbps
@@ -407,7 +407,7 @@ void radio_hal_init(void) {
     cc1101_write_reg(0x25, 0x00); // FSCAL1: recommended
     cc1101_write_reg(0x26, 0x1F); // FSCAL0: recommended
     
-    static const uint8_t patable_ook[] = {0x00, 0x50};
+    static const uint8_t patable_ook[] = {0x00, 0xC0};
     cc1101_write_burst(0x3E, patable_ook, 2);
 
     gpio_install_isr_service(0); radio_rmt_init();
@@ -424,10 +424,10 @@ static const uint8_t manchester_lut[16] = {
 bool g_radio_loopback_enabled = false; // Disable for link test
 
 static void push_manchester_bit(rmt_symbol_word_t *buf, size_t *idx, uint8_t bit) {
-    if (bit) { // 1 -> 10 (High, Low) - Alternative Polarity
-        buf[(*idx)++] = (rmt_symbol_word_t){ .duration0 = 32, .level0 = 1, .duration1 = 32, .level1 = 0 };
-    } else {   // 0 -> 01 (Low, High)
+    if (bit) { // 1 -> 01 (Low, High)
         buf[(*idx)++] = (rmt_symbol_word_t){ .duration0 = 32, .level0 = 0, .duration1 = 32, .level1 = 1 };
+    } else {   // 0 -> 10 (High, Low)
+        buf[(*idx)++] = (rmt_symbol_word_t){ .duration0 = 32, .level0 = 1, .duration1 = 32, .level1 = 0 };
     }
 }
 
@@ -446,7 +446,7 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
 
     size_t s_idx = 0;
     // Preamble: 16 bits of EnOcean '0' (Low-High)
-    for (int i = 0; i < 16; i++) push_manchester_bit(tx_symbols, &s_idx, 0);
+    for (int i = 0; i < 4; i++) push_manchester_bit(tx_symbols, &s_idx, 0);
     // Sync bit: 1 bit of EnOcean '1' (High-Low)
     push_manchester_bit(tx_symbols, &s_idx, 1);
     
@@ -466,7 +466,7 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
 
     is_transmitting = true;
     
-    gpio_set_direction(PIN_GDO0, GPIO_MODE_OUTPUT);
+    //gpio_set_direction(PIN_GDO0, GPIO_MODE_OUTPUT);
     
     for (int sub = 0; sub < 3; sub++) {
         cc1101_strobe(CC1101_SIDLE);
@@ -482,7 +482,7 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
     
     cc1101_strobe(CC1101_SIDLE);
     cc1101_strobe(CC1101_SRX);
-    gpio_set_direction(PIN_GDO0, GPIO_MODE_INPUT);
+    //gpio_set_direction(PIN_GDO0, GPIO_MODE_INPUT);
     is_transmitting = false;
 }
 
