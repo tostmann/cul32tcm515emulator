@@ -34,9 +34,9 @@ if (len > 0) {
 - **MCU**: ESP32-C6-MINI
 - **Transceiver**: CC1101
 - **Pins**:
-  - GDO0: GPIO2 (RMT Data)
-  - GDO2: GPIO3 (Carrier Sense)
-  - SPI: SS=18, SCK=19, MISO=20, MOSI=21
+  - GDO0: GPIO1 (RMT Data)
+  - GDO2: GPIO2 (Carrier Sense)
+  - SPI: SS=23, SCK=18, MISO=17, MOSI=16
 
 ## Build & Test
 ```bash
