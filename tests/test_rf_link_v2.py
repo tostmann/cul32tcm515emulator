@@ -78,7 +78,7 @@ def read_packets(ser, name):
                 elif pt == 4:
                     print(f"[{name}] EVENT: {d.hex()}")
                 elif pt == 0x33:
-                    pass # Silently drop diagnostic
+                    print(f"[{name}] DIAG 0x33: {d.hex()}")
                 else:
                     print(f"[{name}] TYPE {pt}: Data={d.hex()} Opt={o.hex()}")
                 idx += consumed

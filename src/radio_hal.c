@@ -300,7 +300,8 @@ static void rf_rx_task_impl(void *pvParameters) {
     rmt_enable(rx_channel);
     erp1_decoder_reset(&global_decoder);
     while (1) {
-        if (xSemaphoreTake(carrier_sense_sem, portMAX_DELAY) == pdTRUE) {
+        if (xSemaphoreTake(carrier_sense_sem, pdMS_TO_TICKS(1000)) == pdTRUE) {
+
             if (is_transmitting) { continue; }
             memset(rmt_rx_buffer, 0, MAX_RMT_SYMBOLS * sizeof(rmt_symbol_word_t));
             if (rmt_receive(rx_channel, rmt_rx_buffer, MAX_RMT_SYMBOLS, &cfg) == ESP_OK) {
@@ -317,7 +318,7 @@ static void rf_rx_task_impl(void *pvParameters) {
                     erp1_decode_pulse(&global_decoder, 0, 0, true); 
                 }
             }
-            xSemaphoreTake(carrier_sense_sem, 0); 
+            xSemaphoreTake(carrier_sense_sem, 0);
         }
     }
 }
@@ -336,6 +337,7 @@ void radio_rmt_init(void) {
     // TX Channel (Same GPIO as RX!)
     rmt_tx_channel_config_t tcfg = { .clk_src = RMT_CLK_SRC_DEFAULT, .resolution_hz = RMT_RESOLUTION_HZ, .mem_block_symbols = 128, .gpio_num = PIN_GDO0, .trans_queue_depth = 4 };
     rmt_new_tx_channel(&tcfg, &tx_channel);
+    gpio_set_direction(PIN_GDO0, GPIO_MODE_INPUT);
     gpio_set_direction(PIN_GDO0, GPIO_MODE_INPUT);
 
     xTaskCreate(rf_rx_task_impl, "rf_rx", 4096, NULL, 5, &rf_task_handle);
@@ -377,8 +379,8 @@ void radio_hal_init(void) {
     // PKTCTRL0: Bit 5:4 = 11 (Async serial mode)
     cc1101_write_reg(0x08, 0x32); 
 
-    cc1101_write_reg(0x1B, 0x07); // AGCCTRL2: Max target amplitude
-    cc1101_write_reg(0x1C, 0x00); // AGCCTRL1: Max relative CS sensitivity
+    cc1101_write_reg(0x1B, 0x03); // AGCCTRL2
+    cc1101_write_reg(0x1C, 0x30); // AGCCTRL1: +14dB relative CS threshold
     cc1101_write_reg(0x1D, 0x92); // AGCCTRL0: Freeze on CS, high filter BW
     
     // Fix missing OOK PA power index configuration and autocalibration
