@@ -429,7 +429,7 @@ void radio_hal_init(void) {
     cc1101_write_reg(0x25, 0x00); // FSCAL1: recommended
     cc1101_write_reg(0x26, 0x1F); // FSCAL0: recommended
     
-    static const uint8_t patable_ook[] = {0x00, 0xC0};
+    static const uint8_t patable_ook[] = {0x00, 0x50};
     cc1101_write_burst(0x3E, patable_ook, 2);
 
     gpio_install_isr_service(0); radio_rmt_init();
@@ -480,22 +480,22 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
     is_transmitting = true;
     rmt_disable(rx_channel);
 
+    gpio_set_direction(PIN_GDO0, GPIO_MODE_OUTPUT);
     for (int sub = 0; sub < 3; sub++) {
         cc1101_strobe(CC1101_SIDLE);
         cc1101_strobe(CC1101_STX);
         esp_rom_delay_us(100); 
 
         rmt_transmit_config_t tx_cfg = { .loop_count = 0 };
-        gpio_set_direction(PIN_GDO0, GPIO_MODE_OUTPUT);
         rmt_transmit(tx_channel, tx_encoder, tx_symbols, s_idx * sizeof(rmt_symbol_word_t), &tx_cfg);
         rmt_tx_wait_all_done(tx_channel, portMAX_DELAY);
-        gpio_set_direction(PIN_GDO0, GPIO_MODE_INPUT);
         
         if (sub < 2) vTaskDelay(pdMS_TO_TICKS(20 + (esp_random() % 15)));
     }
 
     cc1101_strobe(CC1101_SIDLE);
     cc1101_strobe(CC1101_SRX);
+    gpio_set_direction(PIN_GDO0, GPIO_MODE_INPUT);
     rmt_enable(rx_channel);
     is_transmitting = false;
     free(tx_symbols);
