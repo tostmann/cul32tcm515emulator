@@ -7,14 +7,14 @@
 #include "freertos/semphr.h"
 
 // --- PIN DEFINITIONS (ESP32-C6) ---
-#define PIN_GDO0   2  // Async Data Out -> RMT RX
-#define PIN_GDO2   3  // Carrier Sense -> GPIO Interrupt
+#define PIN_GDO0   1  // Async Data Out -> RMT RX
+#define PIN_GDO2   2  // Carrier Sense -> GPIO Interrupt
 #define PIN_LED    8
 #define PIN_SWITCH 9
-#define PIN_SS     18
-#define PIN_SCK    19
-#define PIN_MISO   20
-#define PIN_MOSI   21
+#define PIN_SS     23
+#define PIN_SCK    18
+#define PIN_MISO   17
+#define PIN_MOSI   16
 
 #ifdef __cplusplus
 extern "C" {
