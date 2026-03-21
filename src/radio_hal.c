@@ -47,7 +47,7 @@ volatile bool is_transmitting = false;
 #define ERP1_PULSE_SHORT_MAX  47    // ~5.8 µs
 #define ERP1_PULSE_LONG_MIN   48    // ~6.0 µs
 #define ERP1_PULSE_LONG_MAX   95    // ~11.8 µs
-#define ERP1_MIN_PREAMBLE     6     
+#define ERP1_MIN_PREAMBLE     3     
 #define ERP1_MAX_PAYLOAD      64    
 #define ERP1_MIN_LENGTH       7     
 #define NOISE_RESET           200
@@ -441,22 +441,30 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
 
     static rmt_symbol_word_t tx_symbols[1024];
 
+    uint8_t checksum = 0;
+    for (int i = 0; i < len; i++) checksum += data[i];
+
     size_t s_idx = 0;
-    // Preamble: 12 bits of 1
-    for (int i = 0; i < 12; i++) push_manchester_bit(tx_symbols, &s_idx, 1);
-    // Sync bit: 0
+    // Preamble: 16 bits of EnOcean '1' (High-Low)
+    for (int i = 0; i < 16; i++) push_manchester_bit(tx_symbols, &s_idx, 1);
+    // Sync bit: 1 bit of EnOcean '0' (Low-High)
     push_manchester_bit(tx_symbols, &s_idx, 0);
+    
     // Data bits
     for (int i = 0; i < len; i++) {
         for (int b = 7; b >= 0; b--) {
             push_manchester_bit(tx_symbols, &s_idx, (data[i] >> b) & 1);
         }
     }
-    tx_symbols[s_idx++] = (rmt_symbol_word_t){ .duration0 = 100, .level0 = 0, .duration1 = 0, .level1 = 0 };
+    // Checksum
+    for (int b = 7; b >= 0; b--) {
+        push_manchester_bit(tx_symbols, &s_idx, (checksum >> b) & 1);
+    }
+    
+    // Explicit End of Frame (idle low)
+    tx_symbols[s_idx++] = (rmt_symbol_word_t){ .duration0 = 100, .level0 = 0, .duration1 = 100, .level1 = 0 };
 
     is_transmitting = true;
-    
-    // rmt_disable(rx_channel); // CRASHES IF RECEIVE IS PENDING!
     
     gpio_set_direction(PIN_GDO0, GPIO_MODE_OUTPUT);
     
@@ -471,13 +479,11 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
         
         if (sub < 2) vTaskDelay(pdMS_TO_TICKS(20 + (esp_random() % 15)));
     }
-
+    
     cc1101_strobe(CC1101_SIDLE);
     cc1101_strobe(CC1101_SRX);
     gpio_set_direction(PIN_GDO0, GPIO_MODE_INPUT);
-    // rmt_enable(rx_channel);
     is_transmitting = false;
-    // no more free!
 }
 
 static inline int hex2int(char c) {
