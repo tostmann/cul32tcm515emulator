@@ -22,6 +22,7 @@
 #include "driver/gpio.h"
 #include "driver/rmt_rx.h"
 #include "driver/rmt_tx.h"
+#include "driver/rmt_encoder.h"
 #include "esp_log.h"
 #include "esp_random.h"
 #include "esp_rom_sys.h"
@@ -337,6 +338,11 @@ void radio_rmt_init(void) {
     // TX Channel (Same GPIO as RX!)
     rmt_tx_channel_config_t tcfg = { .clk_src = RMT_CLK_SRC_DEFAULT, .resolution_hz = RMT_RESOLUTION_HZ, .mem_block_symbols = 128, .gpio_num = PIN_GDO0, .trans_queue_depth = 4 };
     rmt_new_tx_channel(&tcfg, &tx_channel);
+
+    // Create copy encoder for TX
+    rmt_copy_encoder_config_t copy_encoder_config = {};
+    rmt_new_copy_encoder(&copy_encoder_config, &tx_encoder);
+
     gpio_set_direction(PIN_GDO0, GPIO_MODE_INPUT);
     gpio_set_direction(PIN_GDO0, GPIO_MODE_INPUT);
 
@@ -481,7 +487,7 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
 
         rmt_transmit_config_t tx_cfg = { .loop_count = 0 };
         gpio_set_direction(PIN_GDO0, GPIO_MODE_OUTPUT);
-        rmt_transmit(tx_channel, NULL, tx_symbols, s_idx, &tx_cfg);
+        rmt_transmit(tx_channel, tx_encoder, tx_symbols, s_idx * sizeof(rmt_symbol_word_t), &tx_cfg);
         rmt_tx_wait_all_done(tx_channel, portMAX_DELAY);
         gpio_set_direction(PIN_GDO0, GPIO_MODE_INPUT);
         
