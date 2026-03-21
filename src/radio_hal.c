@@ -386,8 +386,8 @@ void radio_hal_init(void) {
     // Frequency: 868.300 MHz (26MHz XTAL) -> 0x216490
     cc1101_write_reg(0x0D, 0x21); cc1101_write_reg(0x0E, 0x64); cc1101_write_reg(0x0F, 0x90); 
 
-    cc1101_write_reg(0x10, 0x2D); // MDMCFG4: BW ~540kHz
-    cc1101_write_reg(0x11, 0x3B); // MDMCFG3: 250kbps
+    cc1101_write_reg(0x10, 0x2D); // MDMCFG4: ~250kbps
+    cc1101_write_reg(0x11, 0x3B); // MDMCFG3: ~250kbps
     cc1101_write_reg(0x12, 0x30); // MDMCFG2: OOK, No Sync
     
     // PKTCTRL0: Bit 5:4 = 11 (Async serial mode)
@@ -402,10 +402,14 @@ void radio_hal_init(void) {
     cc1101_write_reg(0x18, 0x18); // MCSM0: Autocalibrate from IDLE to RX/TX
     cc1101_write_reg(0x19, 0x16); // FOCCFG: No freq offset comp for OOK
     cc1101_write_reg(0x20, 0xFB); // WORCTRL: recommended
-    cc1101_write_reg(0x23, 0xE9); // FSCAL3: recommended
-    cc1101_write_reg(0x24, 0x2A); // FSCAL2: recommended
-    cc1101_write_reg(0x25, 0x00); // FSCAL1: recommended
-    cc1101_write_reg(0x26, 0x1F); // FSCAL0: recommended
+        cc1101_write_reg(0x2C, 0x81); // TEST2
+    cc1101_write_reg(0x2D, 0x35); // TEST1
+    cc1101_write_reg(0x2E, 0x09); // TEST0
+    cc1101_write_reg(0x23, 0xEA); // FSCAL3
+    cc1101_write_reg(0x24, 0x2A); // FSCAL2
+    cc1101_write_reg(0x25, 0x00); // FSCAL1
+    cc1101_write_reg(0x26, 0x1F); // FSCAL0
+
     
     static const uint8_t patable_ook[] = {0x00, 0xC0};
     cc1101_write_burst(0x3E, patable_ook, 2);
@@ -446,7 +450,7 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
 
     size_t s_idx = 0;
     // PLL Settling Time (500us LOW)
-    tx_symbols[s_idx++] = (rmt_symbol_word_t){ .duration0 = 4000, .level0 = 0, .duration1 = 4000, .level1 = 0 };
+    tx_symbols[s_idx++] = (rmt_symbol_word_t){ .duration0 = 9600, .level0 = 0, .duration1 = 9600, .level1 = 0 };
     // Preamble: 16 bits of EnOcean '0' (Low-High)
     for (int i = 0; i < 4; i++) push_manchester_bit(tx_symbols, &s_idx, 0);
     // Sync bit: 1 bit of EnOcean '1' (Low-High)
@@ -464,7 +468,7 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
     }
     
     // Explicit End of Frame (idle low)
-    tx_symbols[s_idx++] = (rmt_symbol_word_t){ .duration0 = 400, .level0 = 0, .duration1 = 400, .level1 = 0 };
+    tx_symbols[s_idx++] = (rmt_symbol_word_t){ .duration0 = 4000, .level0 = 0, .duration1 = 4000, .level1 = 0 };
 
     is_transmitting = true;
     cc1101_write_reg(0x02, 0x2E); // GDO0 to High-Z (Input for TX)
@@ -473,12 +477,14 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
     
     for (int sub = 0; sub < 3; sub++) {
         cc1101_strobe(CC1101_SIDLE);
-        // gpio_set_level(PIN_GDO0, 0); // Force idle low
+        esp_rom_delay_us(100);
         cc1101_strobe(CC1101_STX); 
 
         rmt_transmit_config_t tx_cfg = { .loop_count = 0 };
         rmt_transmit(tx_channel, tx_encoder, tx_symbols, s_idx * sizeof(rmt_symbol_word_t), &tx_cfg);
         rmt_tx_wait_all_done(tx_channel, portMAX_DELAY);
+        
+        cc1101_strobe(CC1101_SIDLE); // KILL TX CARRIER IMMEDIATELY
         
         if (sub < 2) vTaskDelay(pdMS_TO_TICKS(20 + (esp_random() % 15)));
     }
