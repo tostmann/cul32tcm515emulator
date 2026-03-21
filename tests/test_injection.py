@@ -71,7 +71,7 @@ for b in data_bytes:
 # End of packet
 pulses += p(0, 30) # 30us silence
 
-EMU_ID = "/dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:90:B0-if00"
+EMU_ID = "/dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_98:A3:16:8E:9E:5C-if00"
 
 try:
     with serial.Serial(EMU_ID, 57600, timeout=2) as ser:

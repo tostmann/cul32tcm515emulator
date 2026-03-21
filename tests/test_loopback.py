@@ -35,7 +35,7 @@ def build_esp3_packet(packet_type, data, opt_data=b''):
     crc8d = calc_crc8(payload)
     return b'\x55' + header + bytes([crc8h]) + payload + bytes([crc8d])
 
-EMU_ID = "/dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:90:B0-if00"
+EMU_ID = "/dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_98:A3:16:8E:9E:5C-if00"
 
 try:
     with serial.Serial(EMU_ID, 57600, timeout=2) as ser:

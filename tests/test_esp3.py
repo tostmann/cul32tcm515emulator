@@ -35,7 +35,7 @@ def send_esp3(ser, packet_type, data, opt_data=[]):
     ser.write(bytearray(packet))
     print(f"Sent: {bytearray(packet).hex()}")
 
-port = "/dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_58:E6:C5:E6:90:B0-if00"
+port = "/dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_98:A3:16:8E:9E:5C-if00"
 ser = serial.Serial(port, 115200, timeout=1)
 
 # Send ERP1 packet (Type 1)
