@@ -336,6 +336,7 @@ void radio_rmt_init(void) {
     // TX Channel (Same GPIO as RX!)
     rmt_tx_channel_config_t tcfg = { .clk_src = RMT_CLK_SRC_DEFAULT, .resolution_hz = RMT_RESOLUTION_HZ, .mem_block_symbols = 128, .gpio_num = PIN_GDO0, .trans_queue_depth = 4 };
     rmt_new_tx_channel(&tcfg, &tx_channel);
+    gpio_set_direction(PIN_GDO0, GPIO_MODE_INPUT);
 
     xTaskCreate(rf_rx_task_impl, "rf_rx", 4096, NULL, 5, &rf_task_handle);
     gpio_config_t io_cs = { .pin_bit_mask = (1ULL << PIN_GDO2), .mode = GPIO_MODE_INPUT, .intr_type = GPIO_INTR_POSEDGE, .pull_down_en = 1 };
@@ -351,7 +352,7 @@ static void radio_diag_task(void *pv) {
         uint8_t gdo2 = gpio_get_level(PIN_GDO2);
         uint8_t gdo0 = gpio_get_level(PIN_GDO0);
         uint8_t data[4] = { (uint8_t)rssi_raw, (uint8_t)rssi_dbm, gdo2, gdo0 };
-        esp3_send_packet(0x33, data, 4, NULL, 0);
+        //esp3_send_packet(0x33, data, 4, NULL, 0);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
@@ -437,7 +438,10 @@ void radio_transmit(const uint8_t *data, uint8_t len) {
         esp_rom_delay_us(100); 
 
         rmt_transmit_config_t tx_cfg = { .loop_count = 0 };
+        gpio_set_direction(PIN_GDO0, GPIO_MODE_OUTPUT);
         rmt_transmit(tx_channel, NULL, tx_symbols, s_idx, &tx_cfg);
+        rmt_tx_wait_all_done(tx_channel, portMAX_DELAY);
+        gpio_set_direction(PIN_GDO0, GPIO_MODE_INPUT);
         
         if (sub < 2) vTaskDelay(pdMS_TO_TICKS(20 + (esp_random() % 15)));
     }
